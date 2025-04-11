@@ -54,7 +54,7 @@ const PlayerControls = () => {
           </div>
         ) : (
           // Horizontal scroll for normal mode
-          <ScrollArea orientation="horizontal" className="w-full">
+          <ScrollArea className="w-full">
             <div className="flex space-x-4 px-4 pb-2 min-w-max">
               {sounds.map(sound => (
                 <div key={sound.id} className="flex flex-col items-center">
