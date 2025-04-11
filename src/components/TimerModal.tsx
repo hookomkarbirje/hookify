@@ -4,6 +4,7 @@ import { usePlayer } from "@/context/PlayerContext";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
+import { Timer, Minus, Plus } from "lucide-react";
 import { 
   Dialog,
   DialogContent,
@@ -12,134 +13,156 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TimerModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const presetMinutes = [15, 30, 45, 60, 90];
+const presetMinutes = [15, 30, 45, 60];
 
 const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
   const { state, setTimer } = usePlayer();
-  const [selectedMinutes, setSelectedMinutes] = useState(15);
-  const [customMinutes, setCustomMinutes] = useState("");
-  const [isCustomTime, setIsCustomTime] = useState(false);
+  const [selectedMinutes, setSelectedMinutes] = useState(25);
+  const [shortBreakMinutes, setShortBreakMinutes] = useState(5);
+  const [rounds, setRounds] = useState(1);
+  const [task, setTask] = useState("");
+  const isMobile = useIsMobile();
   
   const handleSetTimer = () => {
-    let minutesToSet = selectedMinutes;
-    
-    if (isCustomTime && customMinutes) {
-      const parsedMinutes = parseInt(customMinutes);
-      if (!isNaN(parsedMinutes) && parsedMinutes > 0) {
-        minutesToSet = parsedMinutes;
-      }
-    }
-    
-    setTimer(minutesToSet * 60); // Convert to seconds
+    // For now, we'll just use the focus time
+    setTimer(selectedMinutes * 60); // Convert to seconds
     onClose();
   };
   
-  const formatTime = (minutes: number) => {
-    if (minutes < 60) return `${minutes}m`;
-    const hrs = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
+  const formatTimeDisplay = (minutes: number) => {
+    return `${minutes < 10 ? '0' : ''}${minutes}:00`;
   };
 
-  const handleCustomTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value === "" || /^\d+$/.test(value)) {
-      setCustomMinutes(value);
-      setIsCustomTime(true);
-    }
+  const incrementRounds = () => {
+    setRounds(prev => Math.min(prev + 1, 10));
   };
 
-  const selectPreset = (minutes: number) => {
-    setSelectedMinutes(minutes);
-    setIsCustomTime(false);
+  const decrementRounds = () => {
+    setRounds(prev => Math.max(prev - 1, 1));
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="bg-player-dark border-white/10 text-white max-w-sm">
-        <DialogHeader>
-          <DialogTitle className="text-white text-xl">Shut-Off Timer</DialogTitle>
-          <DialogDescription className="text-white/70">
-            Set the timer for the player to stop playing in:
-          </DialogDescription>
+      <DialogContent className="bg-black border-white/10 text-white max-w-sm sm:max-w-md">
+        <DialogHeader className="text-center">
+          <div className="flex justify-center mb-2">
+            <div className="bg-white/10 rounded-full p-3">
+              <Timer className="h-6 w-6 text-white" />
+            </div>
+          </div>
+          <DialogTitle className="text-white text-2xl font-light">Focus Timer</DialogTitle>
         </DialogHeader>
 
-        <div className="py-6">
-          <div className="text-center text-5xl font-light mb-6">
-            {isCustomTime && customMinutes ? `${customMinutes}m` : formatTime(selectedMinutes)}
+        <div className="py-4">
+          {/* Task input */}
+          <Input
+            type="text"
+            placeholder="What's getting done?"
+            value={task}
+            onChange={(e) => setTask(e.target.value)}
+            className="bg-white/5 border-white/10 text-white mb-6 p-4 h-12 rounded-lg"
+          />
+          
+          {/* Timer settings */}
+          <div className="bg-white/5 rounded-lg p-4 mb-6">
+            <div className="flex justify-between items-center">
+              <div className="text-center">
+                <div className="text-4xl font-light">{selectedMinutes}</div>
+                <div className="text-white/60 text-xs">Focus</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-light">{shortBreakMinutes}</div>
+                <div className="text-white/60 text-xs">Short Break</div>
+              </div>
+              <div className="text-white/60">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+            </div>
           </div>
           
-          {!isCustomTime && (
-            <Slider
-              value={[selectedMinutes]}
-              min={1}
-              max={120}
-              step={1}
-              onValueChange={(value) => setSelectedMinutes(value[0])}
-              className="my-6"
-            />
-          )}
-          
-          <div className="flex justify-between gap-2 mt-6">
-            {presetMinutes.map((minutes) => (
-              <Button
-                key={minutes}
-                variant="outline"
-                onClick={() => selectPreset(minutes)}
-                className={`flex-1 ${
-                  !isCustomTime && selectedMinutes === minutes 
-                    ? "bg-white/10 text-white" 
-                    : "bg-player-medium text-white/70"
-                }`}
-              >
-                {formatTime(minutes)}
-              </Button>
-            ))}
+          {/* Settings section */}
+          <div className="bg-white/5 rounded-lg p-4 mb-4">
+            <h3 className="text-white text-lg font-medium mb-4">Settings</h3>
+            <p className="text-white/70 text-sm mb-6">Adjust Focus Timer Intervals:</p>
+            
+            {/* Focus time slider */}
+            <div className="mb-6">
+              <div className="flex justify-between mb-2">
+                <label className="text-white/80">Focus Time</label>
+                <div className="text-white">{formatTimeDisplay(selectedMinutes)}</div>
+              </div>
+              <Slider
+                value={[selectedMinutes]}
+                min={5}
+                max={60}
+                step={5}
+                onValueChange={(value) => setSelectedMinutes(value[0])}
+                className="my-2"
+              />
+            </div>
+            
+            {/* Short break slider */}
+            <div className="mb-2">
+              <div className="flex justify-between mb-2">
+                <label className="text-white/80">Short break</label>
+                <div className="text-white">{formatTimeDisplay(shortBreakMinutes)}</div>
+              </div>
+              <Slider
+                value={[shortBreakMinutes]}
+                min={1}
+                max={15}
+                step={1}
+                onValueChange={(value) => setShortBreakMinutes(value[0])}
+                className="my-2"
+              />
+            </div>
           </div>
           
-          {/* Custom time input */}
-          <div className="mt-4 flex items-center">
-            <Button
-              variant="outline"
-              onClick={() => setIsCustomTime(true)}
-              className={`mr-2 ${
-                isCustomTime 
-                  ? "bg-white/10 text-white" 
-                  : "bg-player-medium text-white/70"
-              }`}
+          {/* Rounds adjuster */}
+          <div className="flex justify-between items-center mb-2">
+            <button 
+              onClick={decrementRounds}
+              className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center"
             >
-              Custom
-            </Button>
-            <Input
-              type="text"
-              placeholder="Minutes"
-              value={customMinutes}
-              onChange={handleCustomTimeChange}
-              className="bg-player-medium border-white/10 text-white"
-              disabled={!isCustomTime}
-            />
+              <Minus size={20} className="text-white" />
+            </button>
+            <div className="text-center">
+              <div className="text-white">Rounds: {rounds}</div>
+              <div className="text-white/60 text-xs mt-1">
+                {rounds} × Focus Time + {rounds} × Short Break
+              </div>
+            </div>
+            <button 
+              onClick={incrementRounds}
+              className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center"
+            >
+              <Plus size={20} className="text-white" />
+            </button>
           </div>
         </div>
 
-        <DialogFooter className="flex flex-col gap-2 sm:flex-col">
-          <Button 
-            onClick={handleSetTimer}
-            className="w-full bg-white text-black hover:bg-white/90"
-          >
-            Start
-          </Button>
+        <DialogFooter className="flex flex-col gap-2 sm:flex-row">
           <Button 
             variant="outline" 
             onClick={onClose}
-            className="w-full bg-transparent border-white/10 text-white/70 hover:text-white"
+            className="w-full sm:w-1/2 bg-transparent border-white/10 text-white hover:bg-white/10"
           >
-            Cancel
+            Done
+          </Button>
+          <Button 
+            onClick={handleSetTimer}
+            className="w-full sm:w-1/2 bg-white text-black hover:bg-white/90"
+          >
+            Start
           </Button>
         </DialogFooter>
       </DialogContent>

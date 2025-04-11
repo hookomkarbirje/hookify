@@ -3,7 +3,7 @@ import { useState } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { 
   Play, Pause, Timer, Image, Eye, EyeOff, 
-  RefreshCcw, ChevronDown, Layers
+  RefreshCcw, ChevronDown, Layers, X
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { sounds } from "@/data/soundData";
@@ -13,7 +13,8 @@ import BackgroundGallery from "./BackgroundGallery";
 import ExploreModal from "./ExploreModal";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import SoundMixTile from "./SoundMixTile";
+import MixModeDrawer from "./MixModeDrawer";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const PlayerControls = () => {
   const { state, togglePlayPause, toggleHideInterface, resetTimer, toggleMixMode, setVolume } = usePlayer();
@@ -21,6 +22,7 @@ const PlayerControls = () => {
   const [isBackgroundGalleryOpen, setIsBackgroundGalleryOpen] = useState(false);
   const [isExploreModalOpen, setIsExploreModalOpen] = useState(false);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const isMobile = useIsMobile();
   
   // Only show these elements when interface is not hidden
   if (state.isHidden) {
@@ -41,19 +43,9 @@ const PlayerControls = () => {
   
   return (
     <>
-      {/* Sound Category Grid/Scroll */}
-      <div className="fixed bottom-28 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-4xl">
-        {state.isMixMode ? (
-          // Grid layout for mix mode with volume sliders
-          <div className="bg-player-dark/90 backdrop-blur-md rounded-lg p-4 border border-white/10">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 justify-center mx-auto max-w-3xl pb-2">
-              {sounds.map(sound => (
-                <SoundMixTile key={sound.id} sound={sound} />
-              ))}
-            </div>
-          </div>
-        ) : (
-          // Horizontal scroll for normal mode
+      {/* Sound Category Grid/Scroll (only when mix mode is not active) */}
+      {!state.isMixMode && (
+        <div className="fixed bottom-28 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-4xl">
           <ScrollArea className="w-full">
             <div className="flex space-x-4 px-4 pb-2 min-w-max">
               {sounds.map(sound => (
@@ -64,14 +56,17 @@ const PlayerControls = () => {
               ))}
             </div>
           </ScrollArea>
-        )}
-      </div>
+        </div>
+      )}
+      
+      {/* Mix Mode Drawer */}
+      <MixModeDrawer />
       
       {/* Main Controls */}
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-4">
         {/* Volume Slider */}
         {showVolumeSlider && (
-          <div className="w-64 bg-player-medium/90 backdrop-blur-sm rounded-full px-4 py-2 mb-2">
+          <div className={`${isMobile ? 'w-48' : 'w-64'} bg-player-medium/90 backdrop-blur-sm rounded-full px-4 py-2 mb-2`}>
             <Slider
               value={[state.volume]}
               min={0}
@@ -86,7 +81,7 @@ const PlayerControls = () => {
         {/* Primary Controls */}
         <div className="flex gap-4 items-center">
           {/* Left Controls */}
-          <div className="flex gap-2">
+          <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'}`}>
             {/* Timer Button */}
             <button
               onClick={() => setIsTimerModalOpen(true)}
@@ -139,7 +134,7 @@ const PlayerControls = () => {
           </button>
           
           {/* Right Controls */}
-          <div className="flex gap-2">
+          <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'}`}>
             {/* Hide Interface Button */}
             <button
               onClick={toggleHideInterface}
@@ -176,13 +171,15 @@ const PlayerControls = () => {
           </div>
         </div>
         
-        {/* Explore Button */}
-        <button
-          onClick={() => setIsExploreModalOpen(true)}
-          className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors"
-        >
-          Explore <ChevronDown className="w-4 h-4" />
-        </button>
+        {/* Explore Button (hide on smaller screens) */}
+        {!isMobile && (
+          <button
+            onClick={() => setIsExploreModalOpen(true)}
+            className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors"
+          >
+            Explore <ChevronDown className="w-4 h-4" />
+          </button>
+        )}
       </div>
       
       {/* Modals */}
