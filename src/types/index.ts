@@ -8,7 +8,7 @@ export interface Sound {
   isActive?: boolean;
 }
 
-export type SoundCategory = 'Focus' | 'Relax' | 'Sleep' | 'Nature';
+export type SoundCategory = 'Focus' | 'Relax' | 'Sleep' | 'Nature' | 'Urban' | 'Transport' | 'Things' | 'Rain';
 
 export interface BackgroundImage {
   id: string;

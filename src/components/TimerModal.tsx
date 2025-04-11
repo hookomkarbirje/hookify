@@ -3,6 +3,7 @@ import { useState } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 import { 
   Dialog,
   DialogContent,
@@ -22,9 +23,20 @@ const presetMinutes = [15, 30, 45, 60, 90];
 const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
   const { state, setTimer } = usePlayer();
   const [selectedMinutes, setSelectedMinutes] = useState(15);
+  const [customMinutes, setCustomMinutes] = useState("");
+  const [isCustomTime, setIsCustomTime] = useState(false);
   
   const handleSetTimer = () => {
-    setTimer(selectedMinutes * 60); // Convert to seconds
+    let minutesToSet = selectedMinutes;
+    
+    if (isCustomTime && customMinutes) {
+      const parsedMinutes = parseInt(customMinutes);
+      if (!isNaN(parsedMinutes) && parsedMinutes > 0) {
+        minutesToSet = parsedMinutes;
+      }
+    }
+    
+    setTimer(minutesToSet * 60); // Convert to seconds
     onClose();
   };
   
@@ -33,6 +45,19 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
     const hrs = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
+  };
+
+  const handleCustomTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === "" || /^\d+$/.test(value)) {
+      setCustomMinutes(value);
+      setIsCustomTime(true);
+    }
+  };
+
+  const selectPreset = (minutes: number) => {
+    setSelectedMinutes(minutes);
+    setIsCustomTime(false);
   };
 
   return (
@@ -47,26 +72,28 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
 
         <div className="py-6">
           <div className="text-center text-5xl font-light mb-6">
-            {formatTime(selectedMinutes)}
+            {isCustomTime && customMinutes ? `${customMinutes}m` : formatTime(selectedMinutes)}
           </div>
           
-          <Slider
-            value={[selectedMinutes]}
-            min={1}
-            max={120}
-            step={1}
-            onValueChange={(value) => setSelectedMinutes(value[0])}
-            className="my-6"
-          />
+          {!isCustomTime && (
+            <Slider
+              value={[selectedMinutes]}
+              min={1}
+              max={120}
+              step={1}
+              onValueChange={(value) => setSelectedMinutes(value[0])}
+              className="my-6"
+            />
+          )}
           
           <div className="flex justify-between gap-2 mt-6">
             {presetMinutes.map((minutes) => (
               <Button
                 key={minutes}
                 variant="outline"
-                onClick={() => setSelectedMinutes(minutes)}
+                onClick={() => selectPreset(minutes)}
                 className={`flex-1 ${
-                  selectedMinutes === minutes 
+                  !isCustomTime && selectedMinutes === minutes 
                     ? "bg-white/10 text-white" 
                     : "bg-player-medium text-white/70"
                 }`}
@@ -74,6 +101,29 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
                 {formatTime(minutes)}
               </Button>
             ))}
+          </div>
+          
+          {/* Custom time input */}
+          <div className="mt-4 flex items-center">
+            <Button
+              variant="outline"
+              onClick={() => setIsCustomTime(true)}
+              className={`mr-2 ${
+                isCustomTime 
+                  ? "bg-white/10 text-white" 
+                  : "bg-player-medium text-white/70"
+              }`}
+            >
+              Custom
+            </Button>
+            <Input
+              type="text"
+              placeholder="Minutes"
+              value={customMinutes}
+              onChange={handleCustomTimeChange}
+              className="bg-player-medium border-white/10 text-white"
+              disabled={!isCustomTime}
+            />
           </div>
         </div>
 
