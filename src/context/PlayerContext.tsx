@@ -10,7 +10,7 @@ interface PlayerContextType {
   togglePlayPause: () => void;
   toggleHideInterface: () => void;
   setBackground: (background: BackgroundImage) => void;
-  setTimer: (duration: number) => void;
+  setTimer: (duration: number, task?: string) => void;
   cancelTimer: () => void;
   resetTimer: () => void;
   setVolume: (volume: number) => void;
@@ -28,6 +28,7 @@ const initialState: PlayerState = {
     isActive: false,
     duration: 0,
     remaining: 0,
+    task: "",
   },
   currentBackground: backgroundImages[0],
   volume: 0.8,
@@ -40,11 +41,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [audioElements, setAudioElements] = useState<Map<string, HTMLAudioElement>>(new Map());
   const [timerInterval, setTimerInterval] = useState<number | null>(null);
 
-  // Initialize audio elements for all sounds
   useEffect(() => {
     const elementsMap = new Map<string, HTMLAudioElement>();
     
-    // Create audio elements for all sounds
     sounds.forEach(sound => {
       const audioElement = new Audio(sound.audio);
       audioElement.loop = true;
@@ -55,7 +54,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setAudioElements(elementsMap);
 
     return () => {
-      // Cleanup audio elements
       elementsMap.forEach(audio => {
         audio.pause();
         audio.src = '';
@@ -63,7 +61,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Manage timer countdown
   useEffect(() => {
     if (state.timer.isActive && state.timer.remaining > 0) {
       const interval = window.setInterval(() => {
@@ -80,7 +77,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       
       return () => clearInterval(interval);
     } else if (state.timer.isActive && state.timer.remaining === 0) {
-      // Timer completed
       pauseSound();
       setState(prevState => ({
         ...prevState,
@@ -99,17 +95,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     };
   }, [state.timer.isActive, state.timer.remaining]);
 
-  // Play a sound
   const playSound = (sound: Sound) => {
     const audioElement = audioElements.get(sound.id);
     if (!audioElement) return;
     
     if (state.isMixMode) {
-      // In mix mode, add to active sounds if not already active
       const isAlreadyActive = state.activeSounds.some(s => s.id === sound.id);
       
       if (isAlreadyActive) {
-        // Remove from active sounds
         audioElement.pause();
         setState(prevState => ({
           ...prevState,
@@ -117,7 +110,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         }));
         toast(`Removed: ${sound.name}`);
       } else {
-        // Add to active sounds
         const soundWithVolume = { ...sound, volume: state.volume };
         audioElement.volume = state.volume;
         audioElement.play().catch(error => {
@@ -133,11 +125,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         toast.success(`Added: ${sound.name}`);
       }
     } else {
-      // In regular mode, replace current sound
-      // Pause all currently playing sounds
       audioElements.forEach(audio => audio.pause());
       
-      // Play selected sound
       audioElement.volume = state.volume;
       audioElement.play().catch(error => {
         console.error('Error playing audio:', error);
@@ -154,9 +143,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Pause sound
   const pauseSound = () => {
-    // Pause all playing sounds
     audioElements.forEach(audio => audio.pause());
     
     setState(prevState => ({
@@ -165,12 +152,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  // Toggle play/pause
   const togglePlayPause = () => {
     if (state.isPlaying) {
       pauseSound();
     } else {
-      // Resume playing all active sounds
       if (state.activeSounds.length > 0) {
         state.activeSounds.forEach(sound => {
           const audio = audioElements.get(sound.id);
@@ -185,17 +170,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           isPlaying: true,
         }));
       } else if (sounds.length > 0) {
-        // If no active sounds, play the first available sound
         playSound(sounds[0]);
       }
     }
   };
 
-  // Toggle mix mode
   const toggleMixMode = () => {
     setState(prevState => {
-      // When switching to mix mode, keep current sound as active
-      // When switching from mix mode to single mode, keep only the first active sound
       const newActiveSounds = prevState.isMixMode 
         ? prevState.activeSounds.length > 0 ? [prevState.activeSounds[0]] : []
         : prevState.currentSound ? [{ ...prevState.currentSound, volume: prevState.volume }] : [];
@@ -211,15 +192,12 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     toast(`${state.isMixMode ? 'Single' : 'Mix'} mode activated`);
   };
 
-  // Update individual sound volume
   const updateSoundVolume = (soundId: string, volume: number) => {
-    // Update audio element volume
     const audio = audioElements.get(soundId);
     if (audio) {
       audio.volume = volume;
     }
     
-    // Update state
     setState(prevState => ({
       ...prevState,
       activeSounds: prevState.activeSounds.map(sound => 
@@ -228,9 +206,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  // Set volume (master)
   const setVolume = (volume: number) => {
-    // Update all audio elements if not in mix mode
     if (!state.isMixMode) {
       audioElements.forEach(audio => {
         audio.volume = volume;
@@ -243,7 +219,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  // Toggle hide interface
   const toggleHideInterface = () => {
     setState(prevState => ({
       ...prevState,
@@ -251,7 +226,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  // Set background
   const setBackground = (background: BackgroundImage) => {
     setState(prevState => ({
       ...prevState,
@@ -260,8 +234,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     toast(`Background changed to ${background.name}`);
   };
 
-  // Set timer
-  const setTimer = (duration: number) => {
+  const setTimer = (duration: number, task?: string) => {
     if (timerInterval) {
       clearInterval(timerInterval);
       setTimerInterval(null);
@@ -270,16 +243,17 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setState(prevState => ({
       ...prevState,
       timer: {
+        ...prevState.timer,
         isActive: true,
         duration,
         remaining: duration,
-      },
+        task: task || "",
+      }
     }));
     
     toast(`Timer set for ${Math.floor(duration / 60)} minutes`);
   };
 
-  // Cancel timer
   const cancelTimer = () => {
     if (timerInterval) {
       clearInterval(timerInterval);
@@ -298,7 +272,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     toast('Timer canceled');
   };
 
-  // Reset timer
   const resetTimer = () => {
     if (state.timer.duration > 0) {
       setState(prevState => ({

@@ -32,11 +32,8 @@ const TimerDisplay = () => {
       <h2 className="text-white text-2xl font-light mb-1">
         {currentSound?.name || "Ambient Sound"}
       </h2>
-      <p className="text-white/70 text-sm mb-6">
-        Shutting off in {formatTime(timer.remaining)}
-      </p>
       
-      {/* Timer Circle */}
+      {/* Timer digits */}
       <div className="relative w-[280px] h-[280px] flex items-center justify-center">
         {/* Background circle */}
         <svg className="absolute inset-0 transform -rotate-90" width="280" height="280">
@@ -81,27 +78,32 @@ const TimerDisplay = () => {
         <div className="text-white text-6xl font-light z-10">
           {formatTime(timer.remaining)}
         </div>
-        
-        {/* Timer controls (when not hidden) */}
-        {!state.isHidden && (
-          <div className="absolute bottom-[-60px] flex gap-4">
-            <button
-              onClick={resetTimer}
-              className="bg-black/40 backdrop-blur-md w-12 h-12 rounded-full flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors"
-              title="Reset timer"
-            >
-              <RefreshCcw className="w-5 h-5 text-white" />
-            </button>
-            <button
-              onClick={cancelTimer}
-              className="bg-black/40 backdrop-blur-md w-12 h-12 rounded-full flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors"
-              title="Cancel timer"
-            >
-              <XCircle className="w-5 h-5 text-white" />
-            </button>
-          </div>
-        )}
       </div>
+
+      {/* Display task name instead of "Shutting off" text */}
+      <p className="text-white/70 text-sm mt-4">
+        {timer.task || "Focus Session"}
+      </p>
+      
+      {/* Timer controls (when not hidden) */}
+      {!state.isHidden && (
+        <div className="absolute bottom-[-60px] flex gap-4">
+          <button
+            onClick={resetTimer}
+            className="bg-black/40 backdrop-blur-md w-12 h-12 rounded-full flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors"
+            title="Reset timer"
+          >
+            <RefreshCcw className="w-5 h-5 text-white" />
+          </button>
+          <button
+            onClick={cancelTimer}
+            className="bg-black/40 backdrop-blur-md w-12 h-12 rounded-full flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors"
+            title="Cancel timer"
+          >
+            <XCircle className="w-5 h-5 text-white" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

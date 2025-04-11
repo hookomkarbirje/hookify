@@ -31,8 +31,8 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
   const isMobile = useIsMobile();
   
   const handleSetTimer = () => {
-    // For now, we'll just use the focus time
-    setTimer(selectedMinutes * 60); // Convert to seconds
+    // Pass both duration and task to setTimer
+    setTimer(selectedMinutes * 60, task); // Convert to seconds and pass task
     onClose();
   };
   
