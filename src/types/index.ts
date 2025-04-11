@@ -6,6 +6,7 @@ export interface Sound {
   icon: string;
   audio: string;
   isActive?: boolean;
+  volume?: number; // Individual sound volume
 }
 
 export type SoundCategory = 'Focus' | 'Relax' | 'Sleep' | 'Nature' | 'Urban' | 'Transport' | 'Things' | 'Rain';
@@ -27,7 +28,9 @@ export interface PlayerState {
   isPlaying: boolean;
   isHidden: boolean;
   currentSound: Sound | null;
+  activeSounds: Sound[]; // Multiple active sounds
+  isMixMode: boolean; // Toggle for mix mode
   timer: TimerConfig;
   currentBackground: BackgroundImage;
-  volume: number;
+  volume: number; // Master volume
 }

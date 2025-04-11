@@ -3,20 +3,23 @@ import { useState } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { 
   Play, Pause, Timer, Image, Eye, EyeOff, 
-  RefreshCcw, ChevronDown
+  RefreshCcw, ChevronDown, Layers
 } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 import { sounds } from "@/data/soundData";
 import SoundIcon from "./SoundIcon";
 import TimerModal from "./TimerModal";
 import BackgroundGallery from "./BackgroundGallery";
 import ExploreModal from "./ExploreModal";
+import MixPanel from "./MixPanel";
 import { cn } from "@/lib/utils";
 
 const PlayerControls = () => {
-  const { state, togglePlayPause, toggleHideInterface, resetTimer } = usePlayer();
+  const { state, togglePlayPause, toggleHideInterface, resetTimer, toggleMixMode, setVolume } = usePlayer();
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
   const [isBackgroundGalleryOpen, setIsBackgroundGalleryOpen] = useState(false);
   const [isExploreModalOpen, setIsExploreModalOpen] = useState(false);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   
   // Only show these elements when interface is not hidden
   if (state.isHidden) {
@@ -46,8 +49,25 @@ const PlayerControls = () => {
         </div>
       </div>
       
+      {/* Mix Panel for volume controls */}
+      <MixPanel />
+      
       {/* Main Controls */}
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-4">
+        {/* Volume Slider */}
+        {showVolumeSlider && (
+          <div className="w-64 bg-player-medium/90 backdrop-blur-sm rounded-full px-4 py-2 mb-2">
+            <Slider
+              value={[state.volume]}
+              min={0}
+              max={1}
+              step={0.01}
+              className="w-full"
+              onValueChange={(values) => setVolume(values[0])}
+            />
+          </div>
+        )}
+        
         {/* Primary Controls */}
         <div className="flex gap-4 items-center">
           {/* Left Controls */}
@@ -71,6 +91,18 @@ const PlayerControls = () => {
                 <RefreshCcw className="w-5 h-5" />
               </button>
             )}
+            
+            {/* Mix Mode Toggle */}
+            <button
+              onClick={toggleMixMode}
+              className={cn(
+                "control-button",
+                state.isMixMode && "bg-white/20 text-white"
+              )}
+              title={state.isMixMode ? "Switch to single sound mode" : "Switch to mix mode"}
+            >
+              <Layers className="w-5 h-5" />
+            </button>
           </div>
           
           {/* Play/Pause Button */}
@@ -109,6 +141,22 @@ const PlayerControls = () => {
               title="Background gallery"
             >
               <Image className="w-5 h-5" />
+            </button>
+            
+            {/* Volume Button */}
+            <button
+              onClick={() => setShowVolumeSlider(!showVolumeSlider)}
+              className={cn(
+                "control-button",
+                showVolumeSlider && "bg-white/20 text-white"
+              )}
+              title="Volume control"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              </svg>
             </button>
           </div>
         </div>

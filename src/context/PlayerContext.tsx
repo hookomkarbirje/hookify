@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { PlayerState, Sound, BackgroundImage, TimerConfig } from '@/types';
 import { sounds, backgroundImages } from '@/data/soundData';
@@ -15,12 +14,16 @@ interface PlayerContextType {
   cancelTimer: () => void;
   resetTimer: () => void;
   setVolume: (volume: number) => void;
+  toggleMixMode: () => void;
+  updateSoundVolume: (soundId: string, volume: number) => void;
 }
 
 const initialState: PlayerState = {
   isPlaying: false,
   isHidden: false,
   currentSound: null,
+  activeSounds: [],
+  isMixMode: false,
   timer: {
     isActive: false,
     duration: 0,
@@ -34,19 +37,29 @@ const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<PlayerState>(initialState);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const [audioElements, setAudioElements] = useState<Map<string, HTMLAudioElement>>(new Map());
   const [timerInterval, setTimerInterval] = useState<number | null>(null);
 
-  // Initialize audio element
+  // Initialize audio elements for all sounds
   useEffect(() => {
-    const audioElement = new Audio();
-    audioElement.loop = true;
-    audioElement.volume = initialState.volume;
-    setAudio(audioElement);
+    const elementsMap = new Map<string, HTMLAudioElement>();
+    
+    // Create audio elements for all sounds
+    sounds.forEach(sound => {
+      const audioElement = new Audio(sound.audio);
+      audioElement.loop = true;
+      audioElement.volume = initialState.volume;
+      elementsMap.set(sound.id, audioElement);
+    });
+    
+    setAudioElements(elementsMap);
 
     return () => {
-      audioElement.pause();
-      audioElement.src = '';
+      // Cleanup audio elements
+      elementsMap.forEach(audio => {
+        audio.pause();
+        audio.src = '';
+      });
     };
   }, []);
 
@@ -88,28 +101,63 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   // Play a sound
   const playSound = (sound: Sound) => {
-    if (!audio) return;
+    const audioElement = audioElements.get(sound.id);
+    if (!audioElement) return;
     
-    audio.src = sound.audio;
-    audio.play().catch(error => {
-      console.error('Error playing audio:', error);
-      toast.error('Failed to play audio');
-    });
-    
-    setState(prevState => ({
-      ...prevState,
-      isPlaying: true,
-      currentSound: sound,
-    }));
-
-    toast.success(`Now playing: ${sound.name}`);
+    if (state.isMixMode) {
+      // In mix mode, add to active sounds if not already active
+      const isAlreadyActive = state.activeSounds.some(s => s.id === sound.id);
+      
+      if (isAlreadyActive) {
+        // Remove from active sounds
+        audioElement.pause();
+        setState(prevState => ({
+          ...prevState,
+          activeSounds: prevState.activeSounds.filter(s => s.id !== sound.id),
+        }));
+        toast(`Removed: ${sound.name}`);
+      } else {
+        // Add to active sounds
+        const soundWithVolume = { ...sound, volume: state.volume };
+        audioElement.volume = state.volume;
+        audioElement.play().catch(error => {
+          console.error('Error playing audio:', error);
+          toast.error('Failed to play audio');
+        });
+        
+        setState(prevState => ({
+          ...prevState,
+          isPlaying: true,
+          activeSounds: [...prevState.activeSounds, soundWithVolume],
+        }));
+        toast.success(`Added: ${sound.name}`);
+      }
+    } else {
+      // In regular mode, replace current sound
+      // Pause all currently playing sounds
+      audioElements.forEach(audio => audio.pause());
+      
+      // Play selected sound
+      audioElement.volume = state.volume;
+      audioElement.play().catch(error => {
+        console.error('Error playing audio:', error);
+        toast.error('Failed to play audio');
+      });
+      
+      setState(prevState => ({
+        ...prevState,
+        isPlaying: true,
+        currentSound: sound,
+        activeSounds: [{ ...sound, volume: state.volume }],
+      }));
+      toast.success(`Now playing: ${sound.name}`);
+    }
   };
 
   // Pause sound
   const pauseSound = () => {
-    if (!audio) return;
-    
-    audio.pause();
+    // Pause all playing sounds
+    audioElements.forEach(audio => audio.pause());
     
     setState(prevState => ({
       ...prevState,
@@ -121,11 +169,78 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const togglePlayPause = () => {
     if (state.isPlaying) {
       pauseSound();
-    } else if (state.currentSound) {
-      playSound(state.currentSound);
-    } else if (sounds.length > 0) {
-      playSound(sounds[0]);
+    } else {
+      // Resume playing all active sounds
+      if (state.activeSounds.length > 0) {
+        state.activeSounds.forEach(sound => {
+          const audio = audioElements.get(sound.id);
+          if (audio) {
+            audio.volume = sound.volume || state.volume;
+            audio.play().catch(console.error);
+          }
+        });
+        
+        setState(prevState => ({
+          ...prevState,
+          isPlaying: true,
+        }));
+      } else if (sounds.length > 0) {
+        // If no active sounds, play the first available sound
+        playSound(sounds[0]);
+      }
     }
+  };
+
+  // Toggle mix mode
+  const toggleMixMode = () => {
+    setState(prevState => {
+      // When switching to mix mode, keep current sound as active
+      // When switching from mix mode to single mode, keep only the first active sound
+      const newActiveSounds = prevState.isMixMode 
+        ? prevState.activeSounds.length > 0 ? [prevState.activeSounds[0]] : []
+        : prevState.currentSound ? [{ ...prevState.currentSound, volume: prevState.volume }] : [];
+      
+      return {
+        ...prevState,
+        isMixMode: !prevState.isMixMode,
+        activeSounds: newActiveSounds,
+        currentSound: !prevState.isMixMode ? null : (newActiveSounds.length > 0 ? newActiveSounds[0] : null),
+      };
+    });
+    
+    toast(`${state.isMixMode ? 'Single' : 'Mix'} mode activated`);
+  };
+
+  // Update individual sound volume
+  const updateSoundVolume = (soundId: string, volume: number) => {
+    // Update audio element volume
+    const audio = audioElements.get(soundId);
+    if (audio) {
+      audio.volume = volume;
+    }
+    
+    // Update state
+    setState(prevState => ({
+      ...prevState,
+      activeSounds: prevState.activeSounds.map(sound => 
+        sound.id === soundId ? { ...sound, volume } : sound
+      ),
+    }));
+  };
+
+  // Set volume (master)
+  const setVolume = (volume: number) => {
+    // Update all audio elements if not in mix mode
+    if (!state.isMixMode) {
+      audioElements.forEach(audio => {
+        audio.volume = volume;
+      });
+    }
+    
+    setState(prevState => ({
+      ...prevState,
+      volume,
+    }));
   };
 
   // Toggle hide interface
@@ -199,18 +314,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Set volume
-  const setVolume = (volume: number) => {
-    if (!audio) return;
-    
-    audio.volume = volume;
-    
-    setState(prevState => ({
-      ...prevState,
-      volume,
-    }));
-  };
-
   return (
     <PlayerContext.Provider
       value={{
@@ -224,6 +327,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         cancelTimer,
         resetTimer,
         setVolume,
+        toggleMixMode,
+        updateSoundVolume,
       }}
     >
       {children}
