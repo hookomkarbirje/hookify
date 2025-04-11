@@ -2,6 +2,7 @@
 import { usePlayer } from "@/context/PlayerContext";
 import PlayerControls from "./PlayerControls";
 import TimerDisplay from "./TimerDisplay";
+import { Icon } from "./Icon";
 
 const Player = () => {
   const { state } = usePlayer();
@@ -30,14 +31,20 @@ const Player = () => {
         <div className="absolute top-12 left-0 w-full text-center z-10">
           {state.isMixMode ? (
             <>
-              <h1 className="text-white text-3xl font-light">Mix Mode</h1>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <Icon name="Layers" size={20} className="text-white/70" />
+                <h1 className="text-white text-3xl font-light">Mix Mode</h1>
+              </div>
               <p className="text-white/70 mt-1">
                 {state.activeSounds.length} sound{state.activeSounds.length !== 1 ? 's' : ''} playing
               </p>
             </>
           ) : currentSound ? (
             <>
-              <h1 className="text-white text-3xl font-light">{currentSound.category}</h1>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <Icon name={currentSound.icon} size={20} className="text-white/70" />
+                <h1 className="text-white text-3xl font-light">{currentSound.category}</h1>
+              </div>
               <p className="text-white/70 mt-1">{currentSound.name}</p>
             </>
           ) : (

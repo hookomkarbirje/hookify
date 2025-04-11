@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Play, Pause } from "lucide-react";
-import SoundIcon from "./SoundIcon";
+import { Icon } from "@/components/Icon";
 
 interface ExploreModalProps {
   isOpen: boolean;
@@ -52,7 +52,9 @@ const ExploreModal = ({ isOpen, onClose }: ExploreModalProps) => {
                     className="flex items-center justify-between p-2 rounded-md hover:bg-player-medium/50"
                   >
                     <div className="flex items-center gap-3">
-                      <SoundIcon sound={sound} size="sm" />
+                      <div className="w-8 h-8 rounded-full bg-player-medium flex items-center justify-center">
+                        <Icon name={sound.icon} size={16} />
+                      </div>
                       <span className="text-white">{sound.name}</span>
                     </div>
                     

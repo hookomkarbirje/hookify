@@ -2,6 +2,7 @@
 import { Toaster } from "sonner";
 import { PlayerProvider } from "@/context/PlayerContext";
 import Player from "@/components/Player";
+import MixPanel from "@/components/MixPanel";
 
 const Index = () => {
   return (

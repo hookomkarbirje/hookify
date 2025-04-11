@@ -13,6 +13,7 @@ import BackgroundGallery from "./BackgroundGallery";
 import ExploreModal from "./ExploreModal";
 import MixPanel from "./MixPanel";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const PlayerControls = () => {
   const { state, togglePlayPause, toggleHideInterface, resetTimer, toggleMixMode, setVolume } = usePlayer();
@@ -40,13 +41,31 @@ const PlayerControls = () => {
   
   return (
     <>
-      {/* Sound Category Grid */}
-      <div className="fixed bottom-28 left-1/2 transform -translate-x-1/2 z-10">
-        <div className="flex flex-wrap justify-center gap-3 max-w-3xl">
-          {sounds.map(sound => (
-            <SoundIcon key={sound.id} sound={sound} />
-          ))}
-        </div>
+      {/* Sound Category Grid/Scroll */}
+      <div className="fixed bottom-28 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-4xl">
+        {state.isMixMode ? (
+          // Grid layout for mix mode
+          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 p-4 justify-center mx-auto max-w-3xl">
+            {sounds.map(sound => (
+              <div key={sound.id} className="flex flex-col items-center">
+                <SoundIcon sound={sound} />
+                <span className="text-white/70 text-xs mt-1 truncate w-14 text-center">{sound.name}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          // Horizontal scroll for normal mode
+          <ScrollArea orientation="horizontal" className="w-full">
+            <div className="flex space-x-4 px-4 pb-2 min-w-max">
+              {sounds.map(sound => (
+                <div key={sound.id} className="flex flex-col items-center">
+                  <SoundIcon sound={sound} />
+                  <span className="text-white/70 text-xs mt-1 truncate w-14 text-center">{sound.name}</span>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        )}
       </div>
       
       {/* Mix Panel for volume controls */}
