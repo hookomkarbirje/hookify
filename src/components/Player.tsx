@@ -30,7 +30,7 @@ const Player = () => {
 
       {/* Mode Selector and Sound Title */}
       {!isHidden && (
-        <div className="absolute top-3 left-0 w-full text-center z-10">
+        <div className="absolute top-12 left-0 w-full text-center z-10">
           {/* Mode Switcher Tabs */}
           <div className="flex justify-center gap-3 mb-4">
             <button 

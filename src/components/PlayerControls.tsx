@@ -32,13 +32,12 @@ const PlayerControls = () => {
   useEffect(() => {
     if (state.isMixMode) {
       setIsMixDrawerOpen(true);
-      setShowMixPanel(true);
     }
   }, [state.isMixMode]);
 
   // Only show these elements when interface is not hidden
   if (state.isHidden) {
-    return <div className="fixed bottom-2 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-4">
+    return <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-4">
         <div className="flex gap-3">
           <button onClick={toggleHideInterface} className="control-button w-12 h-12" title="Show interface">
             <Eye className="w-6 h-6" />
@@ -69,7 +68,7 @@ const PlayerControls = () => {
       />
       
       {/* Main Controls */}
-      <div className="fixed bottom-2 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-4">
+      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-4">
         {/* Volume Slider */}
         {showVolumeSlider && <div className={`${isMobile ? 'w-48' : 'w-64'} bg-player-medium/90 backdrop-blur-sm rounded-full px-4 py-2 mb-2`}>
             <Slider value={[state.volume]} min={0} max={1} step={0.01} className="w-full" onValueChange={values => setVolume(values[0])} />
@@ -83,11 +82,6 @@ const PlayerControls = () => {
             <button onClick={() => setIsTimerModalOpen(true)} className="control-button" title="Set timer">
               <Timer className="w-5 h-5" />
             </button>
-            
-            {/* Background Gallery Button - Moved to first position */}
-            <button onClick={() => setIsBackgroundGalleryOpen(true)} className="control-button" title="Background gallery">
-              <Image className="w-5 h-5" />
-            </button>
           </div>
           
           {/* Play/Pause Button (centered) */}
@@ -95,9 +89,14 @@ const PlayerControls = () => {
             {state.isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
           </button>
           
-          {/* Right Controls */}
+          {/* Right Controls - Swapped positions of Hide and Background buttons */}
           <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'} ml-4`}>
-            {/* Hide Interface Button */}
+            {/* Background Gallery Button */}
+            <button onClick={() => setIsBackgroundGalleryOpen(true)} className="control-button" title="Background gallery">
+              <Image className="w-5 h-5" />
+            </button>
+            
+            {/* Hide Interface Button - Moved to 3rd position */}
             <button onClick={toggleHideInterface} className="control-button" title="Hide interface">
               <EyeOff className="w-5 h-5" />
             </button>
