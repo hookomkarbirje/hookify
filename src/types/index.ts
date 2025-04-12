@@ -22,6 +22,7 @@ export interface TimerConfig {
   isActive: boolean;
   duration: number; // in seconds
   remaining: number; // in seconds
+  task?: string; // Added task property for storing what's getting done
 }
 
 export interface PlayerState {
