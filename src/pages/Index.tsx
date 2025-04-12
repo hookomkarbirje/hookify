@@ -14,7 +14,8 @@ const Index = () => {
             background: 'rgba(0,0,0,0.8)',
             color: '#fff',
             border: '1px solid rgba(255,255,255,0.1)'
-          }
+          },
+          duration: 2000  // Reduce duration for less intrusive notifications
         }}
       />
       <Player />

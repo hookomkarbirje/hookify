@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { usePlayer } from "@/context/PlayerContext";
-import { Play, Pause, Timer, Image, Eye, EyeOff, RefreshCcw, ChevronUp, Layers } from "lucide-react";
+import { Play, Pause, Timer, Image, Eye, EyeOff, ChevronUp, Layers } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { sounds } from "@/data/soundData";
 import SoundIcon from "./SoundIcon";
@@ -18,7 +18,6 @@ const PlayerControls = () => {
     state,
     togglePlayPause,
     toggleHideInterface,
-    resetTimer,
     setVolume
   } = usePlayer();
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
@@ -39,8 +38,8 @@ const PlayerControls = () => {
   }
   return <>
       {/* Sound Category Grid/Scroll (only when mix mode is not active) */}
-      {!state.isMixMode && <div className="fixed bottom-28 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-4xl">
-          <ScrollArea className="w-full">
+      {!state.isMixMode && <div className="fixed bottom-36 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-4xl">
+          <ScrollArea className="w-full" orientation="horizontal">
             <div className="flex space-x-4 px-4 pb-2 min-w-max py-[5px]">
               {sounds.map(sound => <div key={sound.id} className="flex flex-col items-center">
                   <SoundIcon sound={sound} />
@@ -61,18 +60,13 @@ const PlayerControls = () => {
           </div>}
         
         {/* Primary Controls */}
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
           {/* Left Controls */}
           <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'} mr-4`}>
             {/* Timer Button */}
             <button onClick={() => setIsTimerModalOpen(true)} className="control-button" title="Set timer">
               <Timer className="w-5 h-5" />
             </button>
-            
-            {/* Reset Button (only when timer is active) */}
-            {state.timer.isActive && <button onClick={resetTimer} className="control-button" title="Reset timer">
-                <RefreshCcw className="w-5 h-5" />
-              </button>}
           </div>
           
           {/* Play/Pause Button (centered) */}
@@ -106,7 +100,18 @@ const PlayerControls = () => {
         {/* Action Buttons */}
         {state.isMixMode ? (
           <button 
-            onClick={() => setIsExploreDrawerOpen(true)} 
+            onClick={() => {
+              const mixModeDrawer = document.querySelector('.MixModeDrawer');
+              if (mixModeDrawer) {
+                // If drawer is already in DOM, toggle it
+                const isOpen = !mixModeDrawer.classList.contains('bottom-[-100vh]');
+                if (isOpen) {
+                  mixModeDrawer.classList.replace('bottom-0', 'bottom-[-100vh]');
+                } else {
+                  mixModeDrawer.classList.replace('bottom-[-100vh]', 'bottom-0');
+                }
+              }
+            }}
             className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors"
           >
             <Layers className="w-4 h-4" /> Mix Sounds

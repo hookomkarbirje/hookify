@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
@@ -5,6 +6,7 @@ import SoundMixTile from "./SoundMixTile";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { sounds } from "@/data/soundData";
 import { useIsMobile } from "@/hooks/use-mobile";
+
 const MixModeDrawer = () => {
   const {
     state,
@@ -35,14 +37,9 @@ const MixModeDrawer = () => {
   if (!state.isMixMode || !isVisible) {
     return null;
   }
-  const handleClose = () => {
-    setIsOpen(false);
-    // Delay hiding to allow for animation
-    setTimeout(() => {
-      setIsVisible(false);
-    }, 300);
-  };
-  return <div className={`fixed inset-x-0 z-10 transition-all duration-300 ease-in-out ${isOpen ? "bottom-0" : "bottom-[-100vh]"}`}>
+  
+  return (
+    <div className={`fixed inset-x-0 z-10 transition-all duration-300 ease-in-out ${isOpen ? "bottom-0" : "bottom-[-100vh]"}`}>
       {/* Handle to open/close the drawer */}
       <div className="flex justify-center">
         
@@ -50,12 +47,12 @@ const MixModeDrawer = () => {
       
       {/* Drawer Content */}
       <div className="bg-player-dark/90 backdrop-blur-md rounded-t-lg border border-white/10 h-[100vh] max-h-[90vh] mx-auto" style={{
-      maxWidth: "800px"
+      maxWidth: "600px"
     }}>
         <div className="flex justify-between items-center mb-4 px-4 pt-4">
           <h3 className="text-white font-medium text-lg">Sound Mix</h3>
           <div className="flex gap-2">
-            <button onClick={handleClose} className="p-2 rounded-full hover:bg-white/10" aria-label="Close mix mode panel">
+            <button onClick={() => setIsOpen(false)} className="p-2 rounded-full hover:bg-white/10" aria-label="Close mix mode panel">
               <X className="h-5 w-5 text-white/70" />
             </button>
           </div>
@@ -67,6 +64,8 @@ const MixModeDrawer = () => {
           </div>
         </ScrollArea>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default MixModeDrawer;

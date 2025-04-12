@@ -49,9 +49,10 @@ const ExploreDrawer = ({ isOpen, onClose }: ExploreDrawerProps) => {
     >
       <div 
         className={cn(
-          "absolute inset-x-0 bottom-0 bg-player-dark rounded-t-xl transition-transform duration-500 ease-out transform max-h-[90vh] overflow-hidden",
+          "absolute inset-x-0 bottom-0 bg-player-dark rounded-t-xl transition-transform duration-500 ease-out transform max-h-[90vh] overflow-hidden mx-auto",
           isOpen ? "translate-y-0" : "translate-y-full"
         )}
+        style={{ maxWidth: "600px" }}
       >
         {/* Close button */}
         <div className="sticky top-0 flex justify-between items-center p-4 border-b border-white/10 bg-player-dark z-10">
@@ -68,7 +69,7 @@ const ExploreDrawer = ({ isOpen, onClose }: ExploreDrawerProps) => {
           <div className="p-5">
             {/* Scenarios section */}
             <div className="mb-8">
-              <h3 className="text-xl text-white mb-4">Scenarios</h3>
+              <h3 className="text-xl text-white mb-4 text-left">Scenarios</h3>
               <div className="flex flex-wrap gap-2">
                 {scenarios.map((scenario) => (
                   <button
@@ -84,7 +85,7 @@ const ExploreDrawer = ({ isOpen, onClose }: ExploreDrawerProps) => {
             {/* Sound Categories */}
             {soundCategories.map((category) => (
               <div key={category} className="mb-8">
-                <h3 className="text-xl text-white mb-4">{category}</h3>
+                <h3 className="text-xl text-white mb-4 text-left">{category}</h3>
                 
                 {/* Sound items */}
                 <div className="space-y-2">
