@@ -23,6 +23,7 @@ const PlayerControls = () => {
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
   const [isBackgroundGalleryOpen, setIsBackgroundGalleryOpen] = useState(false);
   const [isExploreDrawerOpen, setIsExploreDrawerOpen] = useState(false);
+  const [isMixDrawerOpen, setIsMixDrawerOpen] = useState(false);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const isMobile = useIsMobile();
 
@@ -50,7 +51,7 @@ const PlayerControls = () => {
         </div>}
       
       {/* Mix Mode Drawer */}
-      <MixModeDrawer />
+      <MixModeDrawer isOpen={isMixDrawerOpen} onOpenChange={setIsMixDrawerOpen} />
       
       {/* Main Controls */}
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-4">
@@ -100,18 +101,7 @@ const PlayerControls = () => {
         {/* Action Buttons */}
         {state.isMixMode ? (
           <button 
-            onClick={() => {
-              const mixModeDrawer = document.querySelector('.MixModeDrawer');
-              if (mixModeDrawer) {
-                // If drawer is already in DOM, toggle it
-                const isOpen = !mixModeDrawer.classList.contains('bottom-[-100vh]');
-                if (isOpen) {
-                  mixModeDrawer.classList.replace('bottom-0', 'bottom-[-100vh]');
-                } else {
-                  mixModeDrawer.classList.replace('bottom-[-100vh]', 'bottom-0');
-                }
-              }
-            }}
+            onClick={() => setIsMixDrawerOpen(true)}
             className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors"
           >
             <Layers className="w-4 h-4" /> Mix Sounds
