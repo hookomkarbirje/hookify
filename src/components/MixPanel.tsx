@@ -3,7 +3,6 @@ import React from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Slider } from "@/components/ui/slider";
 import { Sound } from "@/types";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Icon } from "@/components/Icon";
 
 const MixPanel = () => {
@@ -17,7 +16,7 @@ const MixPanel = () => {
   }
 
   return (
-    <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 w-full max-w-md px-4">
+    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-full max-w-md px-4">
       <div className="bg-black/60 backdrop-blur-md border border-white/10 rounded-lg p-4">
         <h3 className="text-white text-center mb-4">Sound Mix</h3>
         

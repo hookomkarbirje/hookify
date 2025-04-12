@@ -18,6 +18,15 @@ const Index = () => {
         }}
       />
       <Player />
+
+      <style jsx global>{`
+        .bottom-8 {
+          bottom: 0.5rem;
+        }
+        .top-12 {
+          top: 3rem;
+        }
+      `}</style>
     </PlayerProvider>
   );
 };
