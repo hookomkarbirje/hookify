@@ -1,5 +1,5 @@
 
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import { PlayerProvider } from "@/context/PlayerContext";
 import Player from "@/components/Player";
 

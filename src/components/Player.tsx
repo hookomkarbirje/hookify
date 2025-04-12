@@ -3,9 +3,11 @@ import { usePlayer } from "@/context/PlayerContext";
 import PlayerControls from "./PlayerControls";
 import TimerDisplay from "./TimerDisplay";
 import { Icon } from "./Icon";
+import { Layers, PlayCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const Player = () => {
-  const { state } = usePlayer();
+  const { state, toggleMixMode } = usePlayer();
   const { currentSound, currentBackground, isHidden } = state;
 
   return (
@@ -26,29 +28,53 @@ const Player = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60 z-0" />
       </div>
 
-      {/* Sound Title */}
+      {/* Mode Selector and Sound Title */}
       {!isHidden && (
         <div className="absolute top-12 left-0 w-full text-center z-10">
+          {/* Mode Switcher Tabs */}
+          <div className="flex justify-center gap-3 mb-4">
+            <button 
+              onClick={() => !state.isMixMode && state.isMixMode}
+              className={cn(
+                "flex items-center gap-2 px-5 py-2 rounded-full transition-colors",
+                !state.isMixMode 
+                  ? "bg-white/20 text-white" 
+                  : "bg-transparent text-white/50 hover:text-white/70"
+              )}
+            >
+              <PlayCircle size={18} />
+              <span>Play</span>
+            </button>
+
+            <button 
+              onClick={() => state.isMixMode ? null : toggleMixMode()}
+              className={cn(
+                "flex items-center gap-2 px-5 py-2 rounded-full transition-colors",
+                state.isMixMode 
+                  ? "bg-white/20 text-white" 
+                  : "bg-transparent text-white/50 hover:text-white/70"
+              )}
+            >
+              <Layers size={18} />
+              <span>Mix</span>
+            </button>
+          </div>
+
+          {/* Sound Information Display */}
           {state.isMixMode ? (
-            <>
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <Icon name="Layers" size={20} className="text-white/70" />
-                <h1 className="text-white text-3xl font-light">Mix Mode</h1>
-              </div>
-              <p className="text-white/70 mt-1">
-                {state.activeSounds.length} sound{state.activeSounds.length !== 1 ? 's' : ''} playing
-              </p>
-            </>
+            <p className="text-white/70 mt-1">
+              {state.activeSounds.length} sound{state.activeSounds.length !== 1 ? 's' : ''} playing
+            </p>
           ) : currentSound ? (
             <>
               <div className="flex items-center justify-center gap-2 mb-1">
                 <Icon name={currentSound.icon} size={20} className="text-white/70" />
-                <h1 className="text-white text-3xl font-light">{currentSound.category}</h1>
+                <span className="text-white text-lg font-light">{currentSound.name}</span>
               </div>
-              <p className="text-white/70 mt-1">{currentSound.name}</p>
+              <p className="text-white/70 mt-1">{currentSound.category}</p>
             </>
           ) : (
-            <h1 className="text-white text-3xl font-light">Select a sound</h1>
+            <p className="text-white/70">Select a sound to begin</p>
           )}
         </div>
       )}

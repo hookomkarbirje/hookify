@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { sounds, soundCategories } from "@/data/soundData";
 import { Play, X, ArrowRight, ChevronDown } from "lucide-react";
@@ -35,7 +35,8 @@ const ExploreDrawer = ({ isOpen, onClose }: ExploreDrawerProps) => {
   const { state, playSound } = usePlayer();
   const [activeCategory, setActiveCategory] = useState<string>(soundCategories[0]);
   
-  if (!isOpen) return null;
+  // Don't render if in mix mode or if drawer is not open
+  if (!isOpen || state.isMixMode) return null;
 
   const filteredSounds = sounds.filter(sound => sound.category === activeCategory);
   

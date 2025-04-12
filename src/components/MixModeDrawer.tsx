@@ -10,23 +10,37 @@ import { useIsMobile } from "@/hooks/use-mobile";
 const MixModeDrawer = () => {
   const { state, toggleMixMode } = usePlayer();
   const [isOpen, setIsOpen] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const isMobile = useIsMobile();
   
   // Auto-open when mix mode is toggled on
   useEffect(() => {
     if (state.isMixMode) {
-      setIsOpen(true);
       setIsVisible(true);
+      // Auto open when entering mix mode
+      setIsOpen(true);
+    } else {
+      // Close and hide when leaving mix mode
+      setIsOpen(false);
+      // Delay hiding to allow for animation
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+      }, 300);
+      return () => clearTimeout(timer);
     }
   }, [state.isMixMode]);
   
+  // If not in mix mode or not visible, don't render
   if (!state.isMixMode || !isVisible) {
     return null;
   }
   
   const handleClose = () => {
-    setIsVisible(false);
+    setIsOpen(false);
+    // Delay hiding to allow for animation
+    setTimeout(() => {
+      setIsVisible(false);
+    }, 300);
   };
   
   return (
