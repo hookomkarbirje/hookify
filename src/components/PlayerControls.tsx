@@ -1,16 +1,18 @@
+
 import { useState } from "react";
 import { usePlayer } from "@/context/PlayerContext";
-import { Play, Pause, Timer, Image, Eye, EyeOff, RefreshCcw, ChevronDown, Layers, X } from "lucide-react";
+import { Play, Pause, Timer, Image, Eye, EyeOff, RefreshCcw, ChevronUp, Layers, X } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { sounds } from "@/data/soundData";
 import SoundIcon from "./SoundIcon";
 import TimerModal from "./TimerModal";
 import BackgroundGallery from "./BackgroundGallery";
-import ExploreModal from "./ExploreModal";
+import ExploreDrawer from "./ExploreDrawer";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MixModeDrawer from "./MixModeDrawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+
 const PlayerControls = () => {
   const {
     state,
@@ -22,7 +24,7 @@ const PlayerControls = () => {
   } = usePlayer();
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
   const [isBackgroundGalleryOpen, setIsBackgroundGalleryOpen] = useState(false);
-  const [isExploreModalOpen, setIsExploreModalOpen] = useState(false);
+  const [isExploreDrawerOpen, setIsExploreDrawerOpen] = useState(false);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const isMobile = useIsMobile();
 
@@ -107,16 +109,20 @@ const PlayerControls = () => {
           </div>
         </div>
         
-        {/* Explore Button (hide on smaller screens) */}
-        {!isMobile && <button onClick={() => setIsExploreModalOpen(true)} className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors">
-            Explore <ChevronDown className="w-4 h-4" />
-          </button>}
+        {/* Explore Button */}
+        <button 
+          onClick={() => setIsExploreDrawerOpen(true)} 
+          className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors"
+        >
+          Explore <ChevronUp className="w-4 h-4" />
+        </button>
       </div>
       
       {/* Modals */}
       <TimerModal isOpen={isTimerModalOpen} onClose={() => setIsTimerModalOpen(false)} />
       <BackgroundGallery isOpen={isBackgroundGalleryOpen} onClose={() => setIsBackgroundGalleryOpen(false)} />
-      <ExploreModal isOpen={isExploreModalOpen} onClose={() => setIsExploreModalOpen(false)} />
+      <ExploreDrawer isOpen={isExploreDrawerOpen} onClose={() => setIsExploreDrawerOpen(false)} />
     </>;
 };
+
 export default PlayerControls;
