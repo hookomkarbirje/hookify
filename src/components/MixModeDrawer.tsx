@@ -15,23 +15,20 @@ interface MixModeDrawerProps {
 const MixModeDrawer = ({ isOpen, onOpenChange }: MixModeDrawerProps) => {
   const {
     state,
-    toggleMixMode
+    toggleMixMode,
+    showMixPanel,
+    setShowMixPanel
   } = usePlayer();
   const [isVisible, setIsVisible] = useState(false);
   const isMobile = useIsMobile();
 
-  // Handle visibility
+  // Sync local state with context
   useEffect(() => {
-    if (state.isMixMode) {
-      setIsVisible(true);
-    } else {
-      // Delay hiding to allow for animation
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-      }, 300);
-      return () => clearTimeout(timer);
+    setIsVisible(state.isMixMode);
+    if (showMixPanel && state.isMixMode) {
+      onOpenChange(true);
     }
-  }, [state.isMixMode]);
+  }, [state.isMixMode, showMixPanel]);
 
   // If not in mix mode or not visible, don't render
   if (!state.isMixMode || !isVisible) {
@@ -47,7 +44,14 @@ const MixModeDrawer = ({ isOpen, onOpenChange }: MixModeDrawerProps) => {
         <div className="flex justify-between items-center mb-4 px-4 pt-4">
           <h3 className="text-white font-medium text-lg">Sound Mix</h3>
           <div className="flex gap-2">
-            <button onClick={() => onOpenChange(false)} className="p-2 rounded-full hover:bg-white/10" aria-label="Close mix mode panel">
+            <button 
+              onClick={() => {
+                onOpenChange(false);
+                setShowMixPanel(false);
+              }} 
+              className="p-2 rounded-full hover:bg-white/10" 
+              aria-label="Close mix mode panel"
+            >
               <X className="h-5 w-5 text-white/70" />
             </button>
           </div>

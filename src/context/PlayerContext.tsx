@@ -16,6 +16,8 @@ interface PlayerContextType {
   setVolume: (volume: number) => void;
   toggleMixMode: () => void;
   updateSoundVolume: (soundId: string, volume: number) => void;
+  showMixPanel: boolean;
+  setShowMixPanel: (show: boolean) => void;
 }
 
 const initialState: PlayerState = {
@@ -40,6 +42,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<PlayerState>(initialState);
   const [audioElements, setAudioElements] = useState<Map<string, HTMLAudioElement>>(new Map());
   const [timerInterval, setTimerInterval] = useState<number | null>(null);
+  const [showMixPanel, setShowMixPanel] = useState(false);
 
   useEffect(() => {
     const elementsMap = new Map<string, HTMLAudioElement>();
@@ -189,6 +192,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       };
     });
     
+    // Automatically show mix panel when switching to mix mode
+    if (!state.isMixMode) {
+      setShowMixPanel(true);
+    } else {
+      setShowMixPanel(false);
+    }
+    
     toast(`${state.isMixMode ? 'Single' : 'Mix'} mode activated`);
   };
 
@@ -302,6 +312,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         setVolume,
         toggleMixMode,
         updateSoundVolume,
+        showMixPanel,
+        setShowMixPanel,
       }}
     >
       {children}

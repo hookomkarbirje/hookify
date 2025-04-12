@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Play, Pause, Timer, Image, Eye, EyeOff, ChevronUp, Layers } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
@@ -18,7 +18,8 @@ const PlayerControls = () => {
     state,
     togglePlayPause,
     toggleHideInterface,
-    setVolume
+    setVolume,
+    setShowMixPanel
   } = usePlayer();
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
   const [isBackgroundGalleryOpen, setIsBackgroundGalleryOpen] = useState(false);
@@ -26,6 +27,13 @@ const PlayerControls = () => {
   const [isMixDrawerOpen, setIsMixDrawerOpen] = useState(false);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const isMobile = useIsMobile();
+  
+  // Sync mix drawer state with context
+  useEffect(() => {
+    if (state.isMixMode) {
+      setIsMixDrawerOpen(true);
+    }
+  }, [state.isMixMode]);
 
   // Only show these elements when interface is not hidden
   if (state.isHidden) {
@@ -51,7 +59,13 @@ const PlayerControls = () => {
         </div>}
       
       {/* Mix Mode Drawer */}
-      <MixModeDrawer isOpen={isMixDrawerOpen} onOpenChange={setIsMixDrawerOpen} />
+      <MixModeDrawer 
+        isOpen={isMixDrawerOpen} 
+        onOpenChange={(open) => {
+          setIsMixDrawerOpen(open);
+          setShowMixPanel(open);
+        }} 
+      />
       
       {/* Main Controls */}
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-4">
@@ -75,16 +89,16 @@ const PlayerControls = () => {
             {state.isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
           </button>
           
-          {/* Right Controls */}
+          {/* Right Controls - Swapped positions of Hide and Background buttons */}
           <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'} ml-4`}>
-            {/* Hide Interface Button */}
-            <button onClick={toggleHideInterface} className="control-button" title="Hide interface">
-              <EyeOff className="w-5 h-5" />
-            </button>
-            
             {/* Background Gallery Button */}
             <button onClick={() => setIsBackgroundGalleryOpen(true)} className="control-button" title="Background gallery">
               <Image className="w-5 h-5" />
+            </button>
+            
+            {/* Hide Interface Button - Moved to 3rd position */}
+            <button onClick={toggleHideInterface} className="control-button" title="Hide interface">
+              <EyeOff className="w-5 h-5" />
             </button>
             
             {/* Volume Button */}
@@ -101,7 +115,10 @@ const PlayerControls = () => {
         {/* Action Buttons */}
         {state.isMixMode ? (
           <button 
-            onClick={() => setIsMixDrawerOpen(true)}
+            onClick={() => {
+              setIsMixDrawerOpen(true);
+              setShowMixPanel(true);
+            }}
             className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors"
           >
             <Layers className="w-4 h-4" /> Mix Sounds
