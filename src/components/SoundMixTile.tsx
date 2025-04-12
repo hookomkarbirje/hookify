@@ -49,7 +49,7 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
         {sound.name}
       </div>
       
-      <div className={`w-full px-2 ${isMobile ? "py-2" : ""}`}>
+      <div className={`w-full px-4 ${isMobile ? "py-4" : "py-1"}`}>
         <Slider
           value={[isActive ? getActiveSoundVolume() : state.volume]}
           min={0}
