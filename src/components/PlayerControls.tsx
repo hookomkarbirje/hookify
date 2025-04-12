@@ -61,9 +61,9 @@ const PlayerControls = () => {
           </div>}
         
         {/* Primary Controls */}
-        <div className="flex gap-4 items-center">
+        <div className="flex items-center">
           {/* Left Controls */}
-          <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'}`}>
+          <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'} mr-4`}>
             {/* Timer Button */}
             <button onClick={() => setIsTimerModalOpen(true)} className="control-button" title="Set timer">
               <Timer className="w-5 h-5" />
@@ -75,13 +75,13 @@ const PlayerControls = () => {
               </button>}
           </div>
           
-          {/* Play/Pause Button */}
-          <button onClick={togglePlayPause} className={cn("w-14 h-14 rounded-full flex items-center justify-center", state.isPlaying ? "bg-white text-black hover:bg-white/90" : "bg-player-medium text-white hover:bg-player-light border border-white/10")} title={state.isPlaying ? "Pause" : "Play"}>
-            {state.isPlaying ? <Pause className="w-7 h-7" /> : <Play className="w-7 h-7" />}
+          {/* Play/Pause Button (centered) */}
+          <button onClick={togglePlayPause} className={cn("w-16 h-16 rounded-full flex items-center justify-center", state.isPlaying ? "bg-white text-black hover:bg-white/90" : "bg-player-medium text-white hover:bg-player-light border border-white/10")} title={state.isPlaying ? "Pause" : "Play"}>
+            {state.isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
           </button>
           
           {/* Right Controls */}
-          <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'}`}>
+          <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'} ml-4`}>
             {/* Hide Interface Button */}
             <button onClick={toggleHideInterface} className="control-button" title="Hide interface">
               <EyeOff className="w-5 h-5" />
@@ -114,7 +114,6 @@ const PlayerControls = () => {
         ) : (
           <button 
             onClick={() => setIsExploreDrawerOpen(true)}
-
             className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors"
           >
             Explore <ChevronUp className="w-4 h-4" />

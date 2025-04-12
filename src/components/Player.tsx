@@ -34,7 +34,7 @@ const Player = () => {
           {/* Mode Switcher Tabs */}
           <div className="flex justify-center gap-3 mb-4">
             <button 
-              onClick={() => !state.isMixMode && state.isMixMode}
+              onClick={() => state.isMixMode && toggleMixMode()}
               className={cn(
                 "flex items-center gap-2 px-5 py-2 rounded-full transition-colors",
                 !state.isMixMode 
@@ -47,7 +47,7 @@ const Player = () => {
             </button>
 
             <button 
-              onClick={() => state.isMixMode ? null : toggleMixMode()}
+              onClick={() => !state.isMixMode && toggleMixMode()}
               className={cn(
                 "flex items-center gap-2 px-5 py-2 rounded-full transition-colors",
                 state.isMixMode 

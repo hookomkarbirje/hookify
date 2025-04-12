@@ -2,6 +2,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { PlayerProvider } from "@/context/PlayerContext";
 import Player from "@/components/Player";
+import MixPanel from "@/components/MixPanel";
 
 const Index = () => {
   return (
@@ -17,6 +18,7 @@ const Index = () => {
         }}
       />
       <Player />
+      <MixPanel />
     </PlayerProvider>
   );
 };

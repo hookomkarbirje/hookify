@@ -28,11 +28,15 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
   const [shortBreakMinutes, setShortBreakMinutes] = useState(5);
   const [rounds, setRounds] = useState(1);
   const [task, setTask] = useState("");
+  const [customFocusMinutes, setCustomFocusMinutes] = useState<string>("");
+  const [customBreakMinutes, setCustomBreakMinutes] = useState<string>("");
   const isMobile = useIsMobile();
   
   const handleSetTimer = () => {
+    // Use custom values if provided, otherwise use slider values
+    const focusMinutes = customFocusMinutes ? parseInt(customFocusMinutes) : selectedMinutes;
     // Pass both duration and task to setTimer
-    setTimer(selectedMinutes * 60, task); // Convert to seconds and pass task
+    setTimer(focusMinutes * 60, task); // Convert to seconds and pass task
     onClose();
   };
   
@@ -46,6 +50,26 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
 
   const decrementRounds = () => {
     setRounds(prev => Math.max(prev - 1, 1));
+  };
+  
+  const handleCustomFocusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === "" || (/^\d+$/.test(value) && parseInt(value) <= 120)) {
+      setCustomFocusMinutes(value);
+      if (value !== "") {
+        setSelectedMinutes(parseInt(value));
+      }
+    }
+  };
+  
+  const handleCustomBreakChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === "" || (/^\d+$/.test(value) && parseInt(value) <= 30)) {
+      setCustomBreakMinutes(value);
+      if (value !== "") {
+        setShortBreakMinutes(parseInt(value));
+      }
+    }
   };
 
   return (
@@ -94,34 +118,58 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
             <h3 className="text-white text-lg font-medium mb-4">Settings</h3>
             <p className="text-white/70 text-sm mb-6">Adjust Focus Timer Intervals:</p>
             
-            {/* Focus time slider */}
+            {/* Focus time slider and custom input */}
             <div className="mb-6">
               <div className="flex justify-between mb-2">
                 <label className="text-white/80">Focus Time</label>
-                <div className="text-white">{formatTimeDisplay(selectedMinutes)}</div>
+                <div className="text-white flex items-center gap-2">
+                  <span>{formatTimeDisplay(selectedMinutes)}</span>
+                  <Input
+                    type="text"
+                    value={customFocusMinutes}
+                    onChange={handleCustomFocusChange}
+                    placeholder="Custom"
+                    className="w-16 h-7 bg-white/10 border-white/10 text-white text-xs"
+                  />
+                </div>
               </div>
               <Slider
                 value={[selectedMinutes]}
                 min={5}
                 max={60}
                 step={5}
-                onValueChange={(value) => setSelectedMinutes(value[0])}
+                onValueChange={(value) => {
+                  setSelectedMinutes(value[0]);
+                  setCustomFocusMinutes("");
+                }}
                 className="my-2"
               />
             </div>
             
-            {/* Short break slider */}
+            {/* Short break slider and custom input */}
             <div className="mb-2">
               <div className="flex justify-between mb-2">
                 <label className="text-white/80">Short break</label>
-                <div className="text-white">{formatTimeDisplay(shortBreakMinutes)}</div>
+                <div className="text-white flex items-center gap-2">
+                  <span>{formatTimeDisplay(shortBreakMinutes)}</span>
+                  <Input
+                    type="text"
+                    value={customBreakMinutes}
+                    onChange={handleCustomBreakChange}
+                    placeholder="Custom"
+                    className="w-16 h-7 bg-white/10 border-white/10 text-white text-xs"
+                  />
+                </div>
               </div>
               <Slider
                 value={[shortBreakMinutes]}
                 min={1}
                 max={15}
                 step={1}
-                onValueChange={(value) => setShortBreakMinutes(value[0])}
+                onValueChange={(value) => {
+                  setShortBreakMinutes(value[0]);
+                  setCustomBreakMinutes("");
+                }}
                 className="my-2"
               />
             </div>

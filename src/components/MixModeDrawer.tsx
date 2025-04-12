@@ -65,8 +65,8 @@ const MixModeDrawer = () => {
       </div>
       
       {/* Drawer Content */}
-      <div className="bg-player-dark/90 backdrop-blur-md rounded-t-lg px-4 py-4 border border-white/10 h-[100vh] max-h-[90vh]">
-        <div className="flex justify-between items-center mb-4">
+      <div className="bg-player-dark/90 backdrop-blur-md rounded-t-lg border border-white/10 h-[100vh] max-h-[90vh] mx-auto" style={{ maxWidth: "800px" }}>
+        <div className="flex justify-between items-center mb-4 px-4 pt-4">
           <h3 className="text-white font-medium text-lg">Sound Mix</h3>
           <div className="flex gap-2">
             <button
@@ -82,7 +82,7 @@ const MixModeDrawer = () => {
         <ScrollArea className="h-[calc(90vh-80px)]">
           <div className={`grid grid-cols-2 ${
             isMobile ? "" : "sm:grid-cols-3 md:grid-cols-4"
-          } gap-6 justify-center mx-auto max-w-3xl pb-4`}>
+          } gap-6 justify-center mx-auto max-w-3xl pb-4 px-4`}>
             {sounds.map(sound => (
               <SoundMixTile key={sound.id} sound={sound} />
             ))}
