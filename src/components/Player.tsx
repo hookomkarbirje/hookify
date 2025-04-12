@@ -30,51 +30,51 @@ const Player = () => {
 
       {/* Mode Selector and Sound Title */}
       {!isHidden && (
-        <div className="absolute top-12 left-0 w-full text-center z-10">
+        <div className="absolute top-3 left-0 w-full text-center z-10">
           {/* Mode Switcher Tabs */}
-          <div className="flex justify-center gap-3 mb-4">
+          <div className="flex justify-center gap-2 mb-3">
             <button 
               onClick={() => state.isMixMode && toggleMixMode()}
               className={cn(
-                "flex items-center gap-2 px-5 py-2 rounded-full transition-colors",
+                "flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-colors",
                 !state.isMixMode 
                   ? "bg-white/20 text-white" 
                   : "bg-transparent text-white/50 hover:text-white/70"
               )}
             >
-              <PlayCircle size={18} />
+              <PlayCircle size={14} />
               <span>Play</span>
             </button>
 
             <button 
               onClick={() => !state.isMixMode && toggleMixMode()}
               className={cn(
-                "flex items-center gap-2 px-5 py-2 rounded-full transition-colors",
+                "flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-colors",
                 state.isMixMode 
                   ? "bg-white/20 text-white" 
                   : "bg-transparent text-white/50 hover:text-white/70"
               )}
             >
-              <Layers size={18} />
+              <Layers size={14} />
               <span>Mix</span>
             </button>
           </div>
 
           {/* Sound Information Display */}
           {state.isMixMode ? (
-            <p className="text-white/70 mt-1">
+            <p className="text-white/70 text-sm mt-1">
               {state.activeSounds.length} sound{state.activeSounds.length !== 1 ? 's' : ''} playing
             </p>
           ) : currentSound ? (
             <>
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <Icon name={currentSound.icon} size={20} className="text-white/70" />
-                <span className="text-white text-lg font-light">{currentSound.name}</span>
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <Icon name={currentSound.icon} size={16} className="text-white/70" />
+                <span className="text-white text-base font-light">{currentSound.name}</span>
               </div>
-              <p className="text-white/70 mt-1">{currentSound.category}</p>
+              <p className="text-white/70 text-xs mt-1">{currentSound.category}</p>
             </>
           ) : (
-            <p className="text-white/70">Select a sound to begin</p>
+            <p className="text-white/70 text-sm">Select a sound to begin</p>
           )}
         </div>
       )}

@@ -4,6 +4,7 @@ import { usePlayer } from "@/context/PlayerContext";
 import { Icon } from "./Icon";
 import { Slider } from "@/components/ui/slider";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useState } from "react";
 
 interface SoundMixTileProps {
   sound: Sound;
@@ -13,6 +14,7 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
   const { state, playSound, updateSoundVolume } = usePlayer();
   const isMobile = useIsMobile();
   const isActive = state.activeSounds.some(s => s.id === sound.id) && state.isPlaying;
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   
   const getActiveSoundVolume = (): number => {
     const activeSound = state.activeSounds.find(s => s.id === sound.id);
@@ -21,6 +23,9 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
 
   const handleClick = () => {
     playSound(sound);
+    if (isActive) {
+      setShowVolumeSlider(true);
+    }
   };
 
   const handleVolumeChange = (values: number[]) => {
@@ -49,18 +54,19 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
         {sound.name}
       </div>
       
-      <div className={`w-full px-4 ${isMobile ? "py-5" : "py-1"}`}>
-        <Slider
-          value={[isActive ? getActiveSoundVolume() : state.volume]}
-          min={0}
-          max={1}
-          step={0.01}
-          className={`w-full ${!isActive && "opacity-50"}`}
-          onValueChange={handleVolumeChange}
-          disabled={!isActive}
-          aria-label={`Volume for ${sound.name}`}
-        />
-      </div>
+      {isActive && (showVolumeSlider || isActive) && (
+        <div className={`w-full px-4 ${isMobile ? "py-5" : "py-1"}`}>
+          <Slider
+            value={[getActiveSoundVolume()]}
+            min={0}
+            max={1}
+            step={0.01}
+            className="w-full"
+            onValueChange={handleVolumeChange}
+            aria-label={`Volume for ${sound.name}`}
+          />
+        </div>
+      )}
     </div>
   );
 };
