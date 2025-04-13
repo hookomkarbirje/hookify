@@ -34,8 +34,14 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
   const handleSetTimer = () => {
     // Use custom values if provided, otherwise use slider values
     const focusMinutes = customFocusMinutes ? parseInt(customFocusMinutes) : selectedMinutes;
-    // Pass both duration and task to setTimer
-    setTimer(focusMinutes * 60, task); // Convert to seconds and pass task
+    const breakMinutes = customBreakMinutes ? parseInt(customBreakMinutes) : shortBreakMinutes;
+    
+    // Pass both duration, break duration and task to setTimer
+    setTimer(
+      focusMinutes * 60, // Convert focus time to seconds
+      task,
+      breakMinutes * 60  // Convert break time to seconds
+    );
     onClose();
   };
   

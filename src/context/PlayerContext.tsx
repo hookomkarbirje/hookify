@@ -10,9 +10,10 @@ interface PlayerContextType {
   togglePlayPause: () => void;
   toggleHideInterface: () => void;
   setBackground: (background: BackgroundImage) => void;
-  setTimer: (duration: number, task?: string) => void;
+  setTimer: (duration: number, task?: string, breakDuration?: number) => void;
   cancelTimer: () => void;
-  resetTimer: () => void;
+  resetTimer: (mode?: 'focus' | 'break') => void;
+  pauseResumeTimer: () => void;
   setVolume: (volume: number) => void;
   toggleMixMode: () => void;
   updateSoundVolume: (soundId: string, volume: number) => void;
@@ -30,6 +31,9 @@ const initialState: PlayerState = {
     isActive: false,
     duration: 0,
     remaining: 0,
+    breakDuration: 0,
+    mode: 'focus',
+    isPaused: false,
     task: "",
   },
   currentBackground: backgroundImages[0],
@@ -65,7 +69,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (state.timer.isActive && state.timer.remaining > 0) {
+    if (state.timer.isActive && state.timer.remaining > 0 && !state.timer.isPaused) {
       const interval = window.setInterval(() => {
         setState(prevState => ({
           ...prevState,
@@ -80,23 +84,41 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       
       return () => clearInterval(interval);
     } else if (state.timer.isActive && state.timer.remaining === 0) {
-      pauseSound();
-      setState(prevState => ({
-        ...prevState,
-        timer: {
-          ...prevState.timer,
-          isActive: false,
-        }
-      }));
-      toast('Timer completed', {
-        description: 'Your ambient sound session has ended',
-      });
+      // Timer completed, switch mode or end
+      if (state.timer.mode === 'focus' && state.timer.breakDuration > 0) {
+        // Switch to break mode
+        setState(prevState => ({
+          ...prevState,
+          timer: {
+            ...prevState.timer,
+            mode: 'break',
+            remaining: prevState.timer.breakDuration,
+            duration: prevState.timer.breakDuration,
+          }
+        }));
+        toast('Focus time completed', {
+          description: 'Taking a break now',
+        });
+      } else {
+        // End timer
+        pauseSound();
+        setState(prevState => ({
+          ...prevState,
+          timer: {
+            ...prevState.timer,
+            isActive: false,
+          }
+        }));
+        toast('Timer completed', {
+          description: 'Your ambient sound session has ended',
+        });
+      }
     }
     
     return () => {
       if (timerInterval) clearInterval(timerInterval);
     };
-  }, [state.timer.isActive, state.timer.remaining]);
+  }, [state.timer.isActive, state.timer.remaining, state.timer.isPaused, state.timer.mode]);
 
   const playSound = (sound: Sound) => {
     const audioElement = audioElements.get(sound.id);
@@ -255,7 +277,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     toast(`Background changed to ${background.name}`);
   };
 
-  const setTimer = (duration: number, task?: string) => {
+  const setTimer = (duration: number, task?: string, breakDuration: number = 0) => {
     if (timerInterval) {
       clearInterval(timerInterval);
       setTimerInterval(null);
@@ -268,6 +290,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         isActive: true,
         duration,
         remaining: duration,
+        breakDuration,
+        mode: 'focus',
+        isPaused: false,
         task: task || "",
       }
     }));
@@ -287,25 +312,63 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         isActive: false,
         duration: 0,
         remaining: 0,
+        breakDuration: 0,
+        mode: 'focus',
+        isPaused: false,
       },
     }));
     
     toast('Timer canceled');
   };
 
-  const resetTimer = () => {
-    if (state.timer.duration > 0) {
+  const resetTimer = (mode?: 'focus' | 'break') => {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      setTimerInterval(null);
+    }
+
+    if (mode) {
       setState(prevState => ({
         ...prevState,
         timer: {
           ...prevState.timer,
-          isActive: true,
+          mode,
+          remaining: mode === 'focus' ? prevState.timer.duration : prevState.timer.breakDuration,
+          isPaused: false,
+        },
+      }));
+      
+      toast(`Switched to ${mode} timer`);
+    } else if (state.timer.duration > 0) {
+      setState(prevState => ({
+        ...prevState,
+        timer: {
+          ...prevState.timer,
           remaining: prevState.timer.duration,
+          mode: 'focus',
+          isPaused: false,
         },
       }));
       
       toast('Timer reset');
     }
+  };
+  
+  const pauseResumeTimer = () => {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      setTimerInterval(null);
+    }
+    
+    setState(prevState => ({
+      ...prevState,
+      timer: {
+        ...prevState.timer,
+        isPaused: !prevState.timer.isPaused,
+      },
+    }));
+    
+    toast(state.timer.isPaused ? 'Timer resumed' : 'Timer paused');
   };
 
   return (
@@ -320,6 +383,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         setTimer,
         cancelTimer,
         resetTimer,
+        pauseResumeTimer,
         setVolume,
         toggleMixMode,
         updateSoundVolume,

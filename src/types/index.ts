@@ -20,9 +20,12 @@ export interface BackgroundImage {
 
 export interface TimerConfig {
   isActive: boolean;
-  duration: number; // in seconds
+  duration: number; // in seconds (focus time)
   remaining: number; // in seconds
-  task?: string; // Added task property for storing what's getting done
+  breakDuration?: number; // in seconds (break time)
+  mode?: 'focus' | 'break'; // Current mode
+  isPaused?: boolean; // Timer paused state
+  task?: string; // What's getting done
 }
 
 export interface PlayerState {

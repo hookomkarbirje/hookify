@@ -5,10 +5,9 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const TimerDisplay = () => {
-  const { state, resetTimer, cancelTimer } = usePlayer();
+  const { state, resetTimer, cancelTimer, pauseResumeTimer } = usePlayer();
   const { timer } = state;
   const [displayTime, setDisplayTime] = useState('');
-  const [timerMode, setTimerMode] = useState<'focus' | 'break'>('focus');
   const [progress, setProgress] = useState(0);
   
   useEffect(() => {
@@ -18,8 +17,8 @@ const TimerDisplay = () => {
       const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       setDisplayTime(formattedTime);
       
-      // Calculate progress percentage (from 0 to 360 for the circle)
-      const progressPercent = (timer.remaining / timer.duration) * 360;
+      // Calculate progress percentage for the arc (0 to 100)
+      const progressPercent = 100 - ((timer.remaining / timer.duration) * 100);
       setProgress(progressPercent);
     } else {
       setDisplayTime('00:00');
@@ -32,41 +31,53 @@ const TimerDisplay = () => {
     return null;
   }
   
-  const startAngle = -90; // Start from top (12 o'clock position)
-  const strokeDashoffset = 0;
+  // Arc parameters for a one-third circle starting from left to right
+  const startAngle = 150; // Start from left side
+  const endAngle = 30; // End at right side
   const radius = 140;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDasharray = `${circumference}`;
-  const progressOffset = ((360 - progress) / 360) * circumference;
+  const centerX = 150;
+  const centerY = 150;
+  
+  // Calculate the point coordinates for the arc
+  const startRadians = (startAngle * Math.PI) / 180;
+  const endRadians = (endAngle * Math.PI) / 180;
+  
+  // Calculate the sweep flag (0 for minor arc, 1 for major arc)
+  const sweepFlag = 1;
+  
+  // Calculate start and end points
+  const startX = centerX + radius * Math.cos(startRadians);
+  const startY = centerY + radius * Math.sin(startRadians);
+  const endX = centerX + radius * Math.cos(endRadians);
+  const endY = centerY + radius * Math.sin(endRadians);
+  
+  // Calculate the current progress point along the arc
+  const progressAngle = startAngle - ((startAngle - endAngle) * progress) / 100;
+  const progressRadians = (progressAngle * Math.PI) / 180;
+  const progressX = centerX + radius * Math.cos(progressRadians);
+  const progressY = centerY + radius * Math.sin(progressRadians);
   
   return (
     <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
       <div className="relative flex flex-col items-center justify-center pointer-events-auto">
         {/* Timer Circle */}
         <div className="relative w-80 h-80">
-          <svg viewBox="0 0 300 300" className="w-full h-full transform -rotate-90">
-            {/* Background circle (gray) */}
-            <circle 
-              cx="150" 
-              cy="150" 
-              r={radius} 
+          <svg viewBox="0 0 300 300" className="w-full h-full">
+            {/* Background arc (gray) */}
+            <path 
+              d={`M ${startX} ${startY} A ${radius} ${radius} 0 ${sweepFlag} 0 ${endX} ${endY}`}
               fill="none" 
               stroke="#444444" 
-              strokeWidth="10"
-              strokeDasharray={strokeDasharray}
-              strokeDashoffset={strokeDashoffset}
+              strokeWidth="10" 
+              strokeLinecap="round"
             />
             
-            {/* Progress circle (white) */}
-            <circle 
-              cx="150" 
-              cy="150" 
-              r={radius} 
+            {/* Progress arc (white) */}
+            <path 
+              d={`M ${startX} ${startY} A ${radius} ${radius} 0 ${progress > 50 ? sweepFlag : 0} 0 ${progressX} ${progressY}`}
               fill="none" 
               stroke="white" 
               strokeWidth="10" 
-              strokeDasharray={strokeDasharray}
-              strokeDashoffset={progressOffset}
               strokeLinecap="round"
               className="transition-all duration-1000 ease-linear"
             />
@@ -77,19 +88,19 @@ const TimerDisplay = () => {
             {/* Timer mode tabs */}
             <div className="flex gap-4 mb-4">
               <button 
-                onClick={() => setTimerMode('focus')} 
+                onClick={() => timer.mode === 'break' && resetTimer('focus')}
                 className={cn(
                   "text-sm uppercase tracking-wider font-medium",
-                  timerMode === 'focus' ? "text-white" : "text-gray-400"
+                  timer.mode === 'focus' ? "text-white" : "text-gray-400"
                 )}
               >
                 Focus
               </button>
               <button 
-                onClick={() => setTimerMode('break')} 
+                onClick={() => timer.mode === 'focus' && resetTimer('break')}
                 className={cn(
                   "text-sm uppercase tracking-wider font-medium",
-                  timerMode === 'break' ? "text-white" : "text-gray-400"
+                  timer.mode === 'break' ? "text-white" : "text-gray-400"
                 )}
               >
                 Break
@@ -108,12 +119,12 @@ const TimerDisplay = () => {
               </div>
             )}
 
-            {/* Start/Pause button */}
+            {/* Pause/Resume button */}
             <button
-              onClick={timer.remaining === timer.duration ? resetTimer : cancelTimer}
+              onClick={pauseResumeTimer}
               className="mt-8 bg-white/10 hover:bg-white/20 text-white uppercase tracking-wider text-sm font-medium py-2 px-8 rounded-sm transition-colors"
             >
-              {timer.remaining === timer.duration ? "START" : "PAUSE"}
+              {timer.isPaused ? "RESUME" : "PAUSE"}
             </button>
           </div>
         </div>
