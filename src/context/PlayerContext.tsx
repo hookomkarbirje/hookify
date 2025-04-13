@@ -130,19 +130,31 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     } else {
       audioElements.forEach(audio => audio.pause());
       
-      audioElement.volume = state.volume;
-      audioElement.play().catch(error => {
-        console.error('Error playing audio:', error);
-        toast.error('Failed to play audio');
-      });
+      const isCurrentlyPlaying = state.isPlaying && state.currentSound?.id === sound.id;
       
-      setState(prevState => ({
-        ...prevState,
-        isPlaying: true,
-        currentSound: sound,
-        activeSounds: [{ ...sound, volume: state.volume }],
-      }));
-      toast.success(`Now playing: ${sound.name}`);
+      if (isCurrentlyPlaying) {
+        setState(prevState => ({
+          ...prevState,
+          isPlaying: false,
+          currentSound: null,
+          activeSounds: [],
+        }));
+        toast(`Stopped: ${sound.name}`);
+      } else {
+        audioElement.volume = state.volume;
+        audioElement.play().catch(error => {
+          console.error('Error playing audio:', error);
+          toast.error('Failed to play audio');
+        });
+        
+        setState(prevState => ({
+          ...prevState,
+          isPlaying: true,
+          currentSound: sound,
+          activeSounds: [{ ...sound, volume: state.volume }],
+        }));
+        toast.success(`Now playing: ${sound.name}`);
+      }
     }
   };
 
@@ -192,7 +204,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       };
     });
     
-    // Automatically show mix panel when switching to mix mode
     if (!state.isMixMode) {
       setShowMixPanel(true);
     } else {
