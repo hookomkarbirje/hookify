@@ -2,12 +2,15 @@
 import { useEffect, useState } from 'react';
 import { usePlayer } from '@/context/PlayerContext';
 import { cn } from '@/lib/utils';
+import { Progress } from '@/components/ui/progress';
+import { CircleDot } from 'lucide-react';
 
 const TimerDisplay = () => {
   const { state, resetTimer, cancelTimer, pauseResumeTimer } = usePlayer();
   const { timer } = state;
   const [displayTime, setDisplayTime] = useState('');
   const [progress, setProgress] = useState(0);
+  const [completedRounds, setCompletedRounds] = useState(0);
   
   useEffect(() => {
     if (timer.remaining > 0) {
@@ -30,10 +33,13 @@ const TimerDisplay = () => {
     return null;
   }
 
+  // For demonstration, assuming 4 total rounds
+  const totalRounds = 4;
+
   return (
     <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
       <div className="relative flex flex-col items-center justify-center pointer-events-auto max-w-md w-full px-6">
-        {/* Timer mode tabs */}
+        {/* Timer mode tabs - FOCUS/BREAK switcher */}
         <div className="flex gap-10 mb-4">
           <button 
             onClick={() => timer.mode === 'break' && resetTimer('focus')}
@@ -60,6 +66,19 @@ const TimerDisplay = () => {
           {displayTime}
         </div>
         
+        {/* Round indicators as dots */}
+        <div className="flex space-x-2 mb-4">
+          {Array.from({ length: totalRounds }).map((_, index) => (
+            <div 
+              key={index}
+              className={cn(
+                "w-2 h-2 rounded-full", 
+                index < completedRounds ? "bg-white" : "bg-white/30"
+              )}
+            />
+          ))}
+        </div>
+        
         {/* Task display - What's getting done */}
         {timer.task && (
           <div className="text-white/80 text-lg mb-4">
@@ -67,11 +86,11 @@ const TimerDisplay = () => {
           </div>
         )}
         
-        {/* Progress bar */}
-        <div className="w-full bg-white/10 h-1 mb-8 rounded-full overflow-hidden">
-          <div 
-            className="bg-white h-full transition-all duration-1000 ease-linear rounded-full"
-            style={{ width: `${progress}%` }}
+        {/* Horizontal progress line */}
+        <div className="w-3/4 mb-6">
+          <Progress 
+            value={progress} 
+            className="h-1 bg-white/10" 
           />
         </div>
 
