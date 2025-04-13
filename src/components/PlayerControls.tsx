@@ -78,14 +78,14 @@ const PlayerControls = () => {
         <div className="flex items-center justify-center">
           {/* Left Controls */}
           <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'} mr-4`}>
-            {/* Timer Button */}
-            <button onClick={() => setIsTimerModalOpen(true)} className="control-button" title="Set timer">
-              <Timer className="w-5 h-5" />
-            </button>
-            
             {/* Background Gallery Button - Swapped with Play/Pause */}
             <button onClick={() => setIsBackgroundGalleryOpen(true)} className="control-button" title="Background gallery">
               <Image className="w-5 h-5" />
+            </button>
+            
+            {/* Timer Button */}
+            <button onClick={() => setIsTimerModalOpen(true)} className="control-button" title="Set timer">
+              <Timer className="w-5 h-5" />
             </button>
           </div>
           

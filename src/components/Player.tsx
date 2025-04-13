@@ -32,30 +32,30 @@ const Player = () => {
       {!isHidden && (
         <div className="absolute top-3 left-0 w-full text-center z-10">
           {/* Mode Switcher Tabs */}
-          <div className="flex justify-center gap-2 mb-3">
+          <div className="flex justify-center gap-1 mb-3">
             <button 
               onClick={() => state.isMixMode && toggleMixMode()}
               className={cn(
-                "flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-colors",
+                "flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-colors",
                 !state.isMixMode 
                   ? "bg-white/20 text-white" 
                   : "bg-transparent text-white/50 hover:text-white/70"
               )}
             >
-              <PlayCircle size={14} />
+              <PlayCircle size={12} />
               <span>Play</span>
             </button>
 
             <button 
               onClick={() => !state.isMixMode && toggleMixMode()}
               className={cn(
-                "flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-colors",
+                "flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-colors",
                 state.isMixMode 
                   ? "bg-white/20 text-white" 
                   : "bg-transparent text-white/50 hover:text-white/70"
               )}
             >
-              <Layers size={14} />
+              <Layers size={12} />
               <span>Mix</span>
             </button>
           </div>

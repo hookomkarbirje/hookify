@@ -24,7 +24,7 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
   const handleClick = () => {
     playSound(sound);
     if (isActive) {
-      setShowVolumeSlider(true);
+      setShowVolumeSlider(!showVolumeSlider);
     }
   };
 
