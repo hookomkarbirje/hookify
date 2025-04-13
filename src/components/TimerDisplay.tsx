@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { usePlayer } from '@/context/PlayerContext';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
-import { CircleDot } from 'lucide-react';
 
 const TimerDisplay = () => {
   const { state, resetTimer, cancelTimer, pauseResumeTimer } = usePlayer();

@@ -1,3 +1,4 @@
+
 import { Sound, BackgroundImage, SoundCategory } from '@/types';
 
 // Function to create a sound with default values
@@ -19,15 +20,6 @@ const createSound = (
 
 // Sound collection
 export const sounds: Sound[] = [
-  createSound('focus-1', 'Focus', 'Focus', 'grid', 'https://cdn.pixabay.com/download/audio/2021/10/25/audio_dafb863ed3.mp3?filename=ambient-piano-amp-strings-10711.mp3'),
-  createSound('colored-noise', 'Colored Noises', 'Focus', 'circle-dot-dashed', 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c3d73e2de0.mp3?filename=white-noise-10-min-22976.mp3'),
-  createSound('dynamic-focus', 'Dynamic Focus', 'Focus', 'aperture', 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d16737d55c.mp3?filename=ambient-cinematic-background-music-21339.mp3'),
-  createSound('study', 'Study', 'Focus', 'book-open', 'https://cdn.pixabay.com/download/audio/2022/04/20/audio_374cab6a9d.mp3?filename=study-music-25556.mp3'),
-  createSound('deeper-focus', 'Deeper Focus', 'Focus', 'brain', 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_ef34d84af7.mp3?filename=cinematic-ambient-10566.mp3'),
-  createSound('relax-1', 'Relax', 'Relax', 'circle', 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_d16325d61e.mp3?filename=gentle-ocean-waves-birdsong-and-gull-21879.mp3'),
-  createSound('8d-odyssey', '8D Odyssey', 'Relax', 'infinity', 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1b8e5bc88d.mp3?filename=water-meditation-126120.mp3'),
-  createSound('nature-elements', 'Nature Elements', 'Nature', 'leaf', 'https://cdn.pixabay.com/download/audio/2021/10/25/audio_ed33c93f85.mp3?filename=forest-with-small-river-birds-and-nature-field-recording-6735.mp3'),
-  
   createSound('traffic', 'Traffic', 'Urban', 'car', 'https://cdn.jsdelivr.net/gh/lofidot/moodist@main/public/sounds/urban/traffic.mp3'),
   createSound('road', 'Road', 'Urban', 'road', 'https://cdn.jsdelivr.net/gh/lofidot/moodist@main/public/sounds/urban/road.mp3'),
   createSound('highway', 'Highway', 'Urban', 'route', 'https://cdn.jsdelivr.net/gh/lofidot/moodist@main/public/sounds/urban/highway.mp3'),
