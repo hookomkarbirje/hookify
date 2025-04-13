@@ -4,6 +4,7 @@ import { usePlayer } from "@/context/PlayerContext";
 import { Icon } from "./Icon";
 import { Slider } from "@/components/ui/slider";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useEffect, useState } from "react";
 
 interface SoundMixTileProps {
   sound: Sound;
@@ -13,21 +14,26 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
   const { state, playSound, updateSoundVolume } = usePlayer();
   const isMobile = useIsMobile();
   const isActive = state.activeSounds.some(s => s.id === sound.id) && state.isPlaying;
+  const [localVolume, setLocalVolume] = useState(state.volume);
   
-  const getActiveSoundVolume = (): number => {
-    const activeSound = state.activeSounds.find(s => s.id === sound.id);
-    return activeSound?.volume || state.volume;
-  };
+  // Sync local volume with active sound's volume when it changes
+  useEffect(() => {
+    if (isActive) {
+      const activeSound = state.activeSounds.find(s => s.id === sound.id);
+      if (activeSound?.volume !== undefined) {
+        setLocalVolume(activeSound.volume);
+      }
+    }
+  }, [isActive, sound.id, state.activeSounds]);
 
   const handleClick = () => {
-    // Simple toggle behavior:
-    // If sound is playing, stop it
-    // If sound is not playing, play it and show volume slider
     playSound(sound);
   };
 
   const handleVolumeChange = (values: number[]) => {
-    updateSoundVolume(sound.id, values[0]);
+    const newVolume = values[0];
+    setLocalVolume(newVolume);
+    updateSoundVolume(sound.id, newVolume);
   };
 
   return (
@@ -54,7 +60,7 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
       {isActive && (
         <div className={`w-full px-4 ${isMobile ? "py-5" : "py-1"}`}>
           <Slider
-            value={[getActiveSoundVolume()]}
+            value={[localVolume]}
             min={0}
             max={1}
             step={0.01}
