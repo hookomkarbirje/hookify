@@ -9,7 +9,6 @@ const TimerDisplay = () => {
   const { timer } = state;
   const [displayTime, setDisplayTime] = useState('');
   const [progress, setProgress] = useState(0);
-  const [completedRounds, setCompletedRounds] = useState(0);
   
   useEffect(() => {
     if (timer.remaining > 0) {
@@ -19,21 +18,29 @@ const TimerDisplay = () => {
       setDisplayTime(formattedTime);
       
       // Calculate progress percentage for the progress bar (0 to 100)
-      const progressPercent = 100 - ((timer.remaining / timer.duration) * 100);
+      const currentDuration = timer.mode === 'focus' ? timer.duration : (timer.breakDuration || 0);
+      const progressPercent = 100 - ((timer.remaining / currentDuration) * 100);
       setProgress(progressPercent);
     } else {
       setDisplayTime('00:00');
       setProgress(0);
     }
-  }, [timer.remaining, timer.duration]);
+  }, [timer.remaining, timer.duration, timer.breakDuration, timer.mode]);
   
   // Don't render if timer isn't active
   if (!timer.isActive) {
     return null;
   }
 
-  // For demonstration, assuming 4 total rounds
-  const totalRounds = 4;
+  // Calculate completed rounds
+  // A round is completed when both focus and break are done
+  // Current round is in progress
+  const completedRounds = (timer.currentRound || 1) - 1;
+  // If in break mode of current round, add it to visual completion
+  const visualCompletedRounds = timer.mode === 'break' ? completedRounds + 0.5 : completedRounds;
+  
+  // Get total rounds from timer or fallback to 1
+  const totalRounds = timer.totalRounds || 1;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -72,10 +79,18 @@ const TimerDisplay = () => {
               key={index}
               className={cn(
                 "w-2 h-2 rounded-full", 
-                index < completedRounds ? "bg-white" : "bg-white/30"
+                index < completedRounds ? "bg-white" : // Completed round
+                (index === Math.floor(visualCompletedRounds) && timer.mode === 'break') ? "bg-white/70" : // Current round in break mode
+                index === timer.currentRound - 1 ? "bg-white/50" : // Current round in focus mode
+                "bg-white/30" // Future round
               )}
             />
           ))}
+        </div>
+        
+        {/* Current round indicator */}
+        <div className="text-white/80 text-sm mb-2">
+          Round {timer.currentRound} of {totalRounds}
         </div>
         
         {/* Task display - What's getting done */}
