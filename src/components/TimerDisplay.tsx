@@ -3,12 +3,14 @@ import { useEffect, useState } from 'react';
 import { usePlayer } from '@/context/PlayerContext';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const TimerDisplay = () => {
   const { state, resetTimer, cancelTimer, pauseResumeTimer } = usePlayer();
   const { timer } = state;
   const [displayTime, setDisplayTime] = useState('');
   const [progress, setProgress] = useState(0);
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     if (timer.remaining > 0) {
@@ -49,7 +51,7 @@ const TimerDisplay = () => {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
+    <div className={`fixed inset-0 flex items-center justify-center z-10 pointer-events-none ${isMobile ? 'pt-0 -mt-16' : ''}`}>
       <div className="relative flex flex-col items-center justify-center pointer-events-auto max-w-md w-full px-6">
         {/* Timer mode tabs - FOCUS/BREAK switcher */}
         <div className="flex gap-10 mb-4">
@@ -74,7 +76,10 @@ const TimerDisplay = () => {
         </div>
 
         {/* Timer display */}
-        <div className="text-white text-8xl font-extralight mb-4">
+        <div className={cn(
+          "text-white font-extralight mb-4",
+          isMobile ? "text-6xl" : "text-8xl"
+        )}>
           {displayTime}
         </div>
         

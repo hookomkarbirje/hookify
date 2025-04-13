@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Button } from "@/components/ui/button";
@@ -82,10 +83,10 @@ const TimerModal = ({
                 </div>
                 <div className="flex flex-col items-center">
                   <div className="flex items-center text-white/80">
+                    <Settings size={16} className="mr-1" />
                     <span className="mr-1">Custom</span>
                     <ChevronRight size={18} />
                   </div>
-                  
                 </div>
               </div>
             </div>

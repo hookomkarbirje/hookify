@@ -92,7 +92,7 @@ const PlayerControls = () => {
             </button>
           </div>
           
-          <button onClick={togglePlayPause} className={cn("w-16 h-16 rounded-full flex items-center justify-center", state.isPlaying ? "bg-white text-black hover:bg-white/90" : "bg-player-medium text-white hover:bg-player-light border border-white/10")} title={state.isPlaying ? "Pause" : "Play"}>
+          <button onClick={togglePlayPause} className={cn("w-16 h-16 rounded-full flex items-center justify-center", state.isPlaying ? "bg-white text-black hover:bg-white/90" : "bg-[#0061EF] text-white hover:bg-[#0061EF]/90 border border-white/10")} title={state.isPlaying ? "Pause" : "Play"}>
             {state.isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
           </button>
           
