@@ -11,7 +11,7 @@ interface PlayerContextType {
   toggleHideInterface: () => void;
   setBackground: (background: BackgroundImage) => void;
   toggleUseBackgroundFromSound: () => void;
-  setTimer: (duration: number, task?: string, breakDuration?: number, rounds: number = 1) => void;
+  setTimer: (duration: number, task?: string, breakDuration?: number) => void;
   cancelTimer: () => void;
   resetTimer: (mode?: 'focus' | 'break') => void;
   pauseResumeTimer: () => void;
@@ -36,9 +36,6 @@ const initialState: PlayerState = {
     mode: 'focus',
     isPaused: false,
     task: "",
-    totalRounds: 1,
-    currentRound: 1,
-    completed: false,
   },
   currentBackground: backgroundImages[0],
   volume: 0.8,
@@ -89,47 +86,31 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       
       return () => clearInterval(interval);
     } else if (state.timer.isActive && state.timer.remaining === 0) {
-      if (state.timer.mode === 'focus') {
+      if (state.timer.mode === 'focus' && state.timer.breakDuration > 0) {
         setState(prevState => ({
           ...prevState,
           timer: {
             ...prevState.timer,
             mode: 'break',
-            remaining: prevState.timer.breakDuration || 0,
+            remaining: prevState.timer.breakDuration,
+            duration: prevState.timer.breakDuration,
           }
         }));
         toast('Focus time completed', {
           description: 'Taking a break now',
         });
-      } else if (state.timer.mode === 'break') {
-        const nextRound = (state.timer.currentRound || 1) + 1;
-        if (nextRound <= (state.timer.totalRounds || 1)) {
-          setState(prevState => ({
-            ...prevState,
-            timer: {
-              ...prevState.timer,
-              mode: 'focus',
-              remaining: prevState.timer.duration,
-              currentRound: nextRound,
-            }
-          }));
-          toast(`Round ${state.timer.currentRound} completed`, {
-            description: `Starting round ${nextRound}`,
-          });
-        } else {
-          pauseSound();
-          setState(prevState => ({
-            ...prevState,
-            timer: {
-              ...prevState.timer,
-              isActive: false,
-              completed: true,
-            }
-          }));
-          toast('All rounds completed!', {
-            description: 'Your ambient sound session has ended',
-          });
-        }
+      } else {
+        pauseSound();
+        setState(prevState => ({
+          ...prevState,
+          timer: {
+            ...prevState.timer,
+            isActive: false,
+          }
+        }));
+        toast('Timer completed', {
+          description: 'Your ambient sound session has ended',
+        });
       }
     }
     
@@ -308,7 +289,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       : 'Using sound\'s background image');
   };
 
-  const setTimer = (duration: number, task?: string, breakDuration: number = 0, rounds: number = 1) => {
+  const setTimer = (duration: number, task?: string, breakDuration: number = 0) => {
     if (timerInterval) {
       clearInterval(timerInterval);
       setTimerInterval(null);
@@ -325,14 +306,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         mode: 'focus',
         isPaused: false,
         task: task || "",
-        totalRounds: rounds,
-        currentRound: 1,
-        completed: false,
       }
     }));
     
-    const roundsText = rounds > 1 ? `${rounds} rounds` : '1 round';
-    toast(`Timer set for ${Math.floor(duration / 60)} minutes x ${roundsText}`);
+    toast(`Timer set for ${Math.floor(duration / 60)} minutes`);
   };
 
   const cancelTimer = () => {
@@ -368,7 +345,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         timer: {
           ...prevState.timer,
           mode,
-          remaining: mode === 'focus' ? prevState.timer.duration : prevState.timer.breakDuration || 0,
+          remaining: mode === 'focus' ? prevState.timer.duration : prevState.timer.breakDuration,
           isPaused: false,
         },
       }));
@@ -382,8 +359,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           remaining: prevState.timer.duration,
           mode: 'focus',
           isPaused: false,
-          currentRound: 1,
-          completed: false,
         },
       }));
       

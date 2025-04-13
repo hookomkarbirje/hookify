@@ -36,12 +36,11 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
     const focusMinutes = customFocusMinutes ? parseInt(customFocusMinutes) : selectedMinutes;
     const breakMinutes = customBreakMinutes ? parseInt(customBreakMinutes) : shortBreakMinutes;
     
-    // Pass both duration, break duration, task and rounds to setTimer
+    // Pass both duration, break duration and task to setTimer
     setTimer(
       focusMinutes * 60, // Convert focus time to seconds
       task,
-      breakMinutes * 60,  // Convert break time to seconds
-      rounds // Number of rounds
+      breakMinutes * 60  // Convert break time to seconds
     );
     onClose();
   };

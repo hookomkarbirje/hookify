@@ -1,3 +1,4 @@
+
 export interface Sound {
   id: string;
   name: string;
@@ -28,9 +29,6 @@ export interface TimerConfig {
   mode?: 'focus' | 'break'; // Current mode
   isPaused?: boolean; // Timer paused state
   task?: string; // What's getting done
-  totalRounds?: number; // Total rounds to complete
-  currentRound?: number; // Current round being worked on
-  completed?: boolean; // Whether the timer has completed all rounds
 }
 
 export interface PlayerState {
