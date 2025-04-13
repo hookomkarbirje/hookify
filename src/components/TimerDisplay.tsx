@@ -20,11 +20,28 @@ const TimerDisplay = () => {
       // Calculate progress percentage for the progress bar (0 to 100)
       const progressPercent = 100 - ((timer.remaining / timer.duration) * 100);
       setProgress(progressPercent);
+      
+      // Update document title when timer is active
+      const mode = timer.mode === 'focus' ? 'FOCUS' : 'BREAK';
+      document.title = `${formattedTime} - ${mode}`;
     } else {
       setDisplayTime('00:00');
       setProgress(0);
+      // Reset title when timer is inactive
+      document.title = 'serene-soundscapes-player';
     }
-  }, [timer.remaining, timer.duration]);
+  }, [timer.remaining, timer.duration, timer.mode]);
+  
+  // Reset title when component unmounts or timer becomes inactive
+  useEffect(() => {
+    if (!timer.isActive) {
+      document.title = 'serene-soundscapes-player';
+    }
+    
+    return () => {
+      document.title = 'serene-soundscapes-player';
+    };
+  }, [timer.isActive]);
   
   // Don't render if timer isn't active
   if (!timer.isActive) {

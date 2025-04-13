@@ -3,7 +3,7 @@ import { useState } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Timer, Minus, Plus, ChevronRight } from "lucide-react";
+import { Timer, Minus, Plus, ChevronRight, Settings } from "lucide-react";
 import { 
   Dialog,
   DialogContent,
@@ -88,10 +88,9 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
             
             {/* Timer settings preview */}
             <div 
-              className="bg-white/5 rounded-lg p-4 mb-6 cursor-pointer flex justify-between items-center"
-              onClick={() => setShowSettings(true)}
+              className="bg-white/5 rounded-lg p-4 mb-6 cursor-pointer"
             >
-              <div className="flex justify-between items-center flex-1">
+              <div className="flex justify-between items-center" onClick={() => setShowSettings(true)}>
                 <div className="text-center">
                   <div className="text-4xl font-light">{selectedMinutes}</div>
                   <div className="text-white/60 text-xs">Focus</div>
@@ -100,8 +99,15 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
                   <div className="text-4xl font-light">{shortBreakMinutes}</div>
                   <div className="text-white/60 text-xs">Short Break</div>
                 </div>
-                <div className="text-white/60">
-                  <ChevronRight size={24} />
+                <div className="flex flex-col items-center">
+                  <div className="flex items-center text-white/80">
+                    <span className="mr-1">Custom</span>
+                    <ChevronRight size={18} />
+                  </div>
+                  <div className="text-white/60 text-xs mt-1">
+                    <Settings size={14} className="inline mr-1" />
+                    Settings
+                  </div>
                 </div>
               </div>
             </div>
