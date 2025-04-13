@@ -10,6 +10,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import TimerSettingsModal from "./TimerSettingsModal";
@@ -65,10 +66,11 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
               </div>
             </div>
             <DialogTitle className="text-white text-2xl font-light">Focus Timer</DialogTitle>
+            <DialogDescription className="text-white/70 text-sm">Set your timer for focused work</DialogDescription>
           </DialogHeader>
 
           <div className="py-4">
-            {/* Task input */}
+            {/* Task input - removed autofocus */}
             <Input
               type="text"
               placeholder="What's getting done?"

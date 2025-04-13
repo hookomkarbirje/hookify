@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -8,6 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 
 interface TimerSettingsModalProps {
@@ -69,11 +71,11 @@ const TimerSettingsModal = ({
       <DialogContent className="bg-black border-white/10 text-white max-w-sm">
         <DialogHeader className="text-center">
           <DialogTitle className="text-white text-2xl font-light">Settings</DialogTitle>
-          <p className="text-white/70 text-sm mt-2">Adjust Focus Timer Intervals:</p>
+          <DialogDescription className="text-white/70 text-sm">Adjust Focus Timer Intervals</DialogDescription>
         </DialogHeader>
 
         <div className="py-4">
-          {/* Focus time slider and custom input */}
+          {/* Focus time slider and custom input - removed autofocus */}
           <div className="mb-6">
             <div className="flex justify-between mb-2">
               <label className="text-white/80">Focus Time</label>
@@ -101,7 +103,7 @@ const TimerSettingsModal = ({
             />
           </div>
           
-          {/* Short break slider and custom input */}
+          {/* Short break slider and custom input - removed autofocus */}
           <div className="mb-2">
             <div className="flex justify-between mb-2">
               <label className="text-white/80">Short break</label>
