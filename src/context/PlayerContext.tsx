@@ -10,6 +10,7 @@ interface PlayerContextType {
   togglePlayPause: () => void;
   toggleHideInterface: () => void;
   setBackground: (background: BackgroundImage) => void;
+  toggleUseBackgroundFromSound: () => void;
   setTimer: (duration: number, task?: string, breakDuration?: number) => void;
   cancelTimer: () => void;
   resetTimer: (mode?: 'focus' | 'break') => void;
@@ -38,6 +39,7 @@ const initialState: PlayerState = {
   },
   currentBackground: backgroundImages[0],
   volume: 0.8,
+  useBackgroundFromSound: true,
 };
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -84,9 +86,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       
       return () => clearInterval(interval);
     } else if (state.timer.isActive && state.timer.remaining === 0) {
-      // Timer completed, switch mode or end
       if (state.timer.mode === 'focus' && state.timer.breakDuration > 0) {
-        // Switch to break mode
         setState(prevState => ({
           ...prevState,
           timer: {
@@ -100,7 +100,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           description: 'Taking a break now',
         });
       } else {
-        // End timer
         pauseSound();
         setState(prevState => ({
           ...prevState,
@@ -223,6 +222,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         isMixMode: !prevState.isMixMode,
         activeSounds: newActiveSounds,
         currentSound: !prevState.isMixMode ? null : (newActiveSounds.length > 0 ? newActiveSounds[0] : null),
+        useBackgroundFromSound: !prevState.isMixMode ? false : prevState.useBackgroundFromSound,
       };
     });
     
@@ -273,8 +273,20 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setState(prevState => ({
       ...prevState,
       currentBackground: background,
+      useBackgroundFromSound: false,
     }));
     toast(`Background changed to ${background.name}`);
+  };
+
+  const toggleUseBackgroundFromSound = () => {
+    setState(prevState => ({
+      ...prevState,
+      useBackgroundFromSound: !prevState.useBackgroundFromSound,
+    }));
+    
+    toast(state.useBackgroundFromSound 
+      ? 'Using custom background' 
+      : 'Using sound\'s background image');
   };
 
   const setTimer = (duration: number, task?: string, breakDuration: number = 0) => {
@@ -380,6 +392,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         togglePlayPause,
         toggleHideInterface,
         setBackground,
+        toggleUseBackgroundFromSound,
         setTimer,
         cancelTimer,
         resetTimer,

@@ -26,26 +26,35 @@ const SoundIcon = ({ sound, size = 'md', onClick }: SoundIconProps) => {
     md: "w-12 h-12",
     lg: "w-14 h-14",
   };
-
-  const iconSizes = {
-    sm: 18,
-    md: 22,
-    lg: 26,
-  };
   
   return (
     <button
       onClick={handleClick}
       className={cn(
-        "rounded-full flex items-center justify-center transition-all duration-300",
+        "rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden",
         sizeClasses[size],
         isActive 
-          ? "bg-white text-player-dark ring-2 ring-white" 
-          : "bg-player-medium text-white/80 hover:text-white hover:bg-player-light ring-1 ring-white/30"
+          ? "ring-2 ring-white" 
+          : "ring-1 ring-white/30 hover:ring-white/50"
       )}
       title={sound.name}
     >
-      <Icon name={sound.icon} size={iconSizes[size]} />
+      {sound.imageUrl ? (
+        <img 
+          src={sound.imageUrl} 
+          alt={sound.name}
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <div className={cn(
+          "w-full h-full flex items-center justify-center",
+          isActive 
+            ? "bg-white text-player-dark" 
+            : "bg-player-medium text-white/80 hover:text-white hover:bg-player-light"
+        )}>
+          <Icon name={sound.icon} size={size === 'sm' ? 18 : size === 'md' ? 22 : 26} />
+        </div>
+      )}
     </button>
   );
 };

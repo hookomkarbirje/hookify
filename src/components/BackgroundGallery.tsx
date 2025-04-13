@@ -7,7 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Image } from "lucide-react";
+import { Image, Music } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface BackgroundGalleryProps {
   isOpen: boolean;
@@ -15,7 +16,7 @@ interface BackgroundGalleryProps {
 }
 
 const BackgroundGallery = ({ isOpen, onClose }: BackgroundGalleryProps) => {
-  const { state, setBackground } = usePlayer();
+  const { state, setBackground, toggleUseBackgroundFromSound } = usePlayer();
   
   const handleSelectBackground = (backgroundId: string) => {
     const selected = backgroundImages.find(bg => bg.id === backgroundId);
@@ -38,13 +39,26 @@ const BackgroundGallery = ({ isOpen, onClose }: BackgroundGalleryProps) => {
           </DialogTitle>
         </DialogHeader>
         
+        {!state.isMixMode && state.currentSound?.backgroundUrl && (
+          <div className="flex items-center justify-between py-3 px-2 bg-player-medium/50 rounded-md mb-4">
+            <div className="flex items-center gap-2">
+              <Music className="w-4 h-4 text-white/70" />
+              <span className="text-sm">Use sound image as background</span>
+            </div>
+            <Switch 
+              checked={state.useBackgroundFromSound} 
+              onCheckedChange={toggleUseBackgroundFromSound}
+            />
+          </div>
+        )}
+        
         <div className="grid grid-cols-2 gap-3 py-4">
           {backgroundImages.map((bg) => (
             <div 
               key={bg.id}
               className={`
                 relative aspect-video cursor-pointer overflow-hidden rounded-md 
-                ${state.currentBackground.id === bg.id ? 'ring-2 ring-white' : 'hover:opacity-90'}
+                ${state.currentBackground.id === bg.id && !state.useBackgroundFromSound ? 'ring-2 ring-white' : 'hover:opacity-90'}
               `}
               onClick={() => handleSelectBackground(bg.id)}
             >

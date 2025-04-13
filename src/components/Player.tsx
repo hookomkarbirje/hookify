@@ -8,7 +8,12 @@ import { cn } from "@/lib/utils";
 
 const Player = () => {
   const { state, toggleMixMode } = usePlayer();
-  const { currentSound, currentBackground, isHidden } = state;
+  const { currentSound, currentBackground, isHidden, isMixMode, useBackgroundFromSound } = state;
+
+  // Determine which background image to use
+  const backgroundImage = (!isMixMode && currentSound?.backgroundUrl && useBackgroundFromSound) 
+    ? currentSound.backgroundUrl
+    : currentBackground.url;
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-black">
@@ -19,7 +24,7 @@ const Player = () => {
         
         {/* Background image */}
         <img
-          src={currentBackground.url}
+          src={backgroundImage}
           alt={currentBackground.name}
           className="object-cover w-full h-full opacity-80"
         />

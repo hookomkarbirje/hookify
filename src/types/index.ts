@@ -7,6 +7,8 @@ export interface Sound {
   audio: string;
   isActive?: boolean;
   volume?: number; // Individual sound volume
+  imageUrl?: string; // Small thumbnail for sound card
+  backgroundUrl?: string; // High-resolution image for background
 }
 
 export type SoundCategory = 'Focus' | 'Relax' | 'Sleep' | 'Nature' | 'Urban' | 'Transport' | 'Things' | 'Rain';
@@ -16,6 +18,7 @@ export interface BackgroundImage {
   name: string;
   url: string;
   thumbnailUrl: string;
+  isDefault?: boolean; // Indicates if this is a user-selected background
 }
 
 export interface TimerConfig {
@@ -37,4 +40,5 @@ export interface PlayerState {
   timer: TimerConfig;
   currentBackground: BackgroundImage;
   volume: number; // Master volume
+  useBackgroundFromSound: boolean; // Whether to use sound's background image
 }
