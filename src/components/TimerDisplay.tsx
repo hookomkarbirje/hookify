@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from 'react';
 import { usePlayer } from '@/context/PlayerContext';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const TimerDisplay = () => {
@@ -86,7 +85,7 @@ const TimerDisplay = () => {
           {/* Content inside the circle */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             {/* Timer mode tabs */}
-            <div className="flex gap-4 mb-4">
+            <div className="flex gap-6 mb-4">
               <button 
                 onClick={() => timer.mode === 'break' && resetTimer('focus')}
                 className={cn(
@@ -94,7 +93,7 @@ const TimerDisplay = () => {
                   timer.mode === 'focus' ? "text-white" : "text-gray-400"
                 )}
               >
-                Focus
+                FOCUS
               </button>
               <button 
                 onClick={() => timer.mode === 'focus' && resetTimer('break')}
@@ -103,28 +102,21 @@ const TimerDisplay = () => {
                   timer.mode === 'break' ? "text-white" : "text-gray-400"
                 )}
               >
-                Break
+                BREAK
               </button>
             </div>
 
             {/* Timer display */}
-            <div className="text-white text-7xl font-light">
+            <div className="text-white text-8xl font-light">
               {displayTime}
             </div>
 
-            {/* Task name if available */}
-            {timer.task && (
-              <div className="text-white/60 text-sm mt-2 max-w-48 truncate">
-                {timer.task}
-              </div>
-            )}
-
-            {/* Pause/Resume button */}
+            {/* Start/Pause button */}
             <button
               onClick={pauseResumeTimer}
-              className="mt-8 bg-white/10 hover:bg-white/20 text-white uppercase tracking-wider text-sm font-medium py-2 px-8 rounded-sm transition-colors"
+              className="mt-10 bg-gray-300 hover:bg-white text-black uppercase tracking-wider text-sm font-medium py-2 px-10 rounded-sm transition-colors"
             >
-              {timer.isPaused ? "RESUME" : "PAUSE"}
+              {timer.isPaused ? "START" : "PAUSE"}
             </button>
           </div>
         </div>
