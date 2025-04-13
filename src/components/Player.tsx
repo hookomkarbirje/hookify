@@ -82,7 +82,7 @@ const Player = () => {
       {/* Timer Display */}
       <TimerDisplay />
 
-      {/* Player Controls */}
+      {/* Player Controls - Always visible regardless of timer state */}
       <PlayerControls />
     </div>
   );

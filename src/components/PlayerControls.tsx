@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Play, Pause, Timer, Image, Eye, EyeOff, ChevronUp, Layers } from "lucide-react";
@@ -41,10 +42,6 @@ const PlayerControls = () => {
           </button>
         </div>
       </div>;
-  }
-  
-  if (state.timer.isActive) {
-    return null;
   }
   
   const buttonStyles = `
