@@ -76,7 +76,7 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
           </DialogHeader>
 
           <div className="py-4">
-            {/* Task input - removed autofocus */}
+            {/* Task input */}
             <Input
               type="text"
               placeholder="What's getting done?"
