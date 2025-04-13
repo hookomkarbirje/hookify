@@ -50,6 +50,10 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
     setRounds(prev => Math.max(prev - 1, 1));
   };
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -134,19 +138,21 @@ const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
         </DialogContent>
       </Dialog>
 
-      {/* Timer Settings Modal */}
-      <TimerSettingsModal 
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-        selectedMinutes={selectedMinutes}
-        setSelectedMinutes={setSelectedMinutes}
-        shortBreakMinutes={shortBreakMinutes}
-        setShortBreakMinutes={setShortBreakMinutes}
-        customFocusMinutes={customFocusMinutes}
-        setCustomFocusMinutes={setCustomFocusMinutes}
-        customBreakMinutes={customBreakMinutes}
-        setCustomBreakMinutes={setCustomBreakMinutes}
-      />
+      {/* Only render the settings modal when needed */}
+      {showSettings && (
+        <TimerSettingsModal 
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
+          selectedMinutes={selectedMinutes}
+          setSelectedMinutes={setSelectedMinutes}
+          shortBreakMinutes={shortBreakMinutes}
+          setShortBreakMinutes={setShortBreakMinutes}
+          customFocusMinutes={customFocusMinutes}
+          setCustomFocusMinutes={setCustomFocusMinutes}
+          customBreakMinutes={customBreakMinutes}
+          setCustomBreakMinutes={setCustomBreakMinutes}
+        />
+      )}
     </>
   );
 };

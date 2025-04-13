@@ -23,6 +23,10 @@ const ExploreModal = ({ isOpen, onClose }: ExploreModalProps) => {
   
   const filteredSounds = sounds.filter(sound => sound.category === activeCategory);
   
+  if (!isOpen) {
+    return null;
+  }
+  
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="bg-player-dark border-white/10 text-white max-w-lg">
