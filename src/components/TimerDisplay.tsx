@@ -30,9 +30,9 @@ const TimerDisplay = () => {
     return null;
   }
   
-  // Arc parameters for a one-third circle starting from left to right
-  const startAngle = 150; // Start from left side
-  const endAngle = 30; // End at right side
+  // Arc parameters for a semicircle starting from left to right
+  const startAngle = 210; // Start from left-bottom side
+  const endAngle = -30; // End at right-bottom side (330 degrees)
   const radius = 140;
   const centerX = 150;
   const centerY = 150;
@@ -42,7 +42,7 @@ const TimerDisplay = () => {
   const endRadians = (endAngle * Math.PI) / 180;
   
   // Calculate the sweep flag (0 for minor arc, 1 for major arc)
-  const sweepFlag = 1;
+  const sweepFlag = 0;
   
   // Calculate start and end points
   const startX = centerX + radius * Math.cos(startRadians);
@@ -64,33 +64,35 @@ const TimerDisplay = () => {
           <svg viewBox="0 0 300 300" className="w-full h-full">
             {/* Background arc (gray) */}
             <path 
-              d={`M ${startX} ${startY} A ${radius} ${radius} 0 ${sweepFlag} 0 ${endX} ${endY}`}
+              d={`M ${startX} ${startY} A ${radius} ${radius} 0 ${sweepFlag} 1 ${endX} ${endY}`}
               fill="none" 
               stroke="#444444" 
-              strokeWidth="10" 
+              strokeWidth="8" 
               strokeLinecap="round"
             />
             
             {/* Progress arc (white) */}
-            <path 
-              d={`M ${startX} ${startY} A ${radius} ${radius} 0 ${progress > 50 ? sweepFlag : 0} 0 ${progressX} ${progressY}`}
-              fill="none" 
-              stroke="white" 
-              strokeWidth="10" 
-              strokeLinecap="round"
-              className="transition-all duration-1000 ease-linear"
-            />
+            {progress > 0 && (
+              <path 
+                d={`M ${startX} ${startY} A ${radius} ${radius} 0 ${progress > 50 ? sweepFlag : 0} 1 ${progressX} ${progressY}`}
+                fill="none" 
+                stroke="white" 
+                strokeWidth="8" 
+                strokeLinecap="round"
+                className="transition-all duration-1000 ease-linear"
+              />
+            )}
           </svg>
 
           {/* Content inside the circle */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             {/* Timer mode tabs */}
-            <div className="flex gap-6 mb-4">
+            <div className="flex gap-10 mb-4">
               <button 
                 onClick={() => timer.mode === 'break' && resetTimer('focus')}
                 className={cn(
-                  "text-sm uppercase tracking-wider font-medium",
-                  timer.mode === 'focus' ? "text-white" : "text-gray-400"
+                  "text-xs uppercase tracking-widest font-medium",
+                  timer.mode === 'focus' ? "text-white" : "text-gray-500"
                 )}
               >
                 FOCUS
@@ -98,8 +100,8 @@ const TimerDisplay = () => {
               <button 
                 onClick={() => timer.mode === 'focus' && resetTimer('break')}
                 className={cn(
-                  "text-sm uppercase tracking-wider font-medium",
-                  timer.mode === 'break' ? "text-white" : "text-gray-400"
+                  "text-xs uppercase tracking-widest font-medium",
+                  timer.mode === 'break' ? "text-white" : "text-gray-500"
                 )}
               >
                 BREAK
@@ -107,14 +109,14 @@ const TimerDisplay = () => {
             </div>
 
             {/* Timer display */}
-            <div className="text-white text-8xl font-light">
+            <div className="text-white text-8xl font-extralight">
               {displayTime}
             </div>
 
             {/* Start/Pause button */}
             <button
               onClick={pauseResumeTimer}
-              className="mt-10 bg-gray-300 hover:bg-white text-black uppercase tracking-wider text-sm font-medium py-2 px-10 rounded-sm transition-colors"
+              className="mt-10 bg-gray-300 hover:bg-white text-black uppercase tracking-wider text-sm py-1.5 px-8 rounded-sm transition-colors"
             >
               {timer.isPaused ? "START" : "PAUSE"}
             </button>
