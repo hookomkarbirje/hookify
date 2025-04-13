@@ -38,7 +38,6 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
         className="w-20 h-20 rounded-full overflow-hidden relative cursor-pointer"
         onClick={handleClick}
       >
-        {/* Sound image could be added here in the future */}
         <div className={`
           absolute inset-0 flex items-center justify-center 
           ${isActive 
@@ -54,7 +53,7 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
         {sound.name}
       </div>
       
-      {isActive && (showVolumeSlider || isActive) && (
+      {isActive && showVolumeSlider && (
         <div className={`w-full px-4 ${isMobile ? "py-5" : "py-1"}`}>
           <Slider
             value={[getActiveSoundVolume()]}
