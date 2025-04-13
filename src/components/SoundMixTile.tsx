@@ -22,9 +22,14 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
   };
 
   const handleClick = () => {
-    playSound(sound);
     if (isActive) {
+      // If sound is already active, toggle the volume slider
       setShowVolumeSlider(!showVolumeSlider);
+    } else {
+      // If sound is not active, play it and don't show slider yet
+      playSound(sound);
+      // Reset slider state when playing a new sound
+      setShowVolumeSlider(false);
     }
   };
 
