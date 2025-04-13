@@ -9,7 +9,6 @@ const TimerDisplay = () => {
   const { timer } = state;
   const [displayTime, setDisplayTime] = useState('');
   const [progress, setProgress] = useState(0);
-  const [completedRounds, setCompletedRounds] = useState(0);
   
   useEffect(() => {
     if (timer.remaining > 0) {
@@ -31,9 +30,6 @@ const TimerDisplay = () => {
   if (!timer.isActive) {
     return null;
   }
-
-  // For demonstration, assuming 4 total rounds
-  const totalRounds = 4;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -67,16 +63,25 @@ const TimerDisplay = () => {
         
         {/* Round indicators as dots */}
         <div className="flex space-x-2 mb-4">
-          {Array.from({ length: totalRounds }).map((_, index) => (
+          {Array.from({ length: timer.totalRounds }).map((_, index) => (
             <div 
               key={index}
               className={cn(
                 "w-2 h-2 rounded-full", 
-                index < completedRounds ? "bg-white" : "bg-white/30"
+                index < timer.completedRounds || (index === timer.currentRound && timer.mode === 'break') 
+                  ? "bg-white" 
+                  : "bg-white/30"
               )}
             />
           ))}
         </div>
+        
+        {/* Round info text */}
+        {timer.totalRounds > 1 && (
+          <div className="text-white/60 text-xs mb-2">
+            Round {timer.currentRound + 1} of {timer.totalRounds}
+          </div>
+        )}
         
         {/* Task display - What's getting done */}
         {timer.task && (

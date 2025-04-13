@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { PlayerState, Sound, BackgroundImage, TimerConfig } from '@/types';
 import { sounds, backgroundImages } from '@/data/soundData';
@@ -11,7 +12,7 @@ interface PlayerContextType {
   toggleHideInterface: () => void;
   setBackground: (background: BackgroundImage) => void;
   toggleUseBackgroundFromSound: () => void;
-  setTimer: (duration: number, task?: string, breakDuration?: number) => void;
+  setTimer: (duration: number, task?: string, breakDuration?: number, rounds?: number) => void;
   cancelTimer: () => void;
   resetTimer: (mode?: 'focus' | 'break') => void;
   pauseResumeTimer: () => void;
@@ -33,6 +34,9 @@ const initialState: PlayerState = {
     duration: 0,
     remaining: 0,
     breakDuration: 0,
+    totalRounds: 1,
+    currentRound: 0,
+    completedRounds: 0,
     mode: 'focus',
     isPaused: false,
     task: "",
@@ -86,7 +90,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       
       return () => clearInterval(interval);
     } else if (state.timer.isActive && state.timer.remaining === 0) {
-      if (state.timer.mode === 'focus' && state.timer.breakDuration > 0) {
+      // Timer has reached zero
+      if (state.timer.mode === 'focus') {
+        // Focus mode ended, switch to break mode
         setState(prevState => ({
           ...prevState,
           timer: {
@@ -99,18 +105,39 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         toast('Focus time completed', {
           description: 'Taking a break now',
         });
-      } else {
-        pauseSound();
-        setState(prevState => ({
-          ...prevState,
-          timer: {
-            ...prevState.timer,
-            isActive: false,
-          }
-        }));
-        toast('Timer completed', {
-          description: 'Your ambient sound session has ended',
-        });
+      } else if (state.timer.mode === 'break') {
+        // Break mode ended, check if we've completed all rounds
+        const completedRounds = state.timer.completedRounds + 1;
+        
+        if (completedRounds < state.timer.totalRounds) {
+          // Start next round (focus session)
+          setState(prevState => ({
+            ...prevState,
+            timer: {
+              ...prevState.timer,
+              mode: 'focus',
+              remaining: prevState.timer.duration,
+              currentRound: prevState.timer.currentRound + 1,
+              completedRounds: completedRounds,
+            }
+          }));
+          toast('Break completed', {
+            description: `Starting round ${completedRounds + 1} of ${state.timer.totalRounds}`,
+          });
+        } else {
+          // All rounds completed
+          pauseSound();
+          setState(prevState => ({
+            ...prevState,
+            timer: {
+              ...prevState.timer,
+              isActive: false,
+            }
+          }));
+          toast('Timer completed', {
+            description: `Completed all ${state.timer.totalRounds} rounds`,
+          });
+        }
       }
     }
     
@@ -289,7 +316,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       : 'Using sound\'s background image');
   };
 
-  const setTimer = (duration: number, task?: string, breakDuration: number = 0) => {
+  const setTimer = (duration: number, task?: string, breakDuration: number = 0, rounds: number = 1) => {
     if (timerInterval) {
       clearInterval(timerInterval);
       setTimerInterval(null);
@@ -303,13 +330,17 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         duration,
         remaining: duration,
         breakDuration,
+        totalRounds: rounds,
+        currentRound: 0,
+        completedRounds: 0,
         mode: 'focus',
         isPaused: false,
         task: task || "",
       }
     }));
     
-    toast(`Timer set for ${Math.floor(duration / 60)} minutes`);
+    const roundsLabel = rounds > 1 ? `${rounds} rounds` : '1 round';
+    toast(`Timer set for ${Math.floor(duration / 60)} min focus, ${Math.floor(breakDuration / 60)} min break, ${roundsLabel}`);
   };
 
   const cancelTimer = () => {
@@ -321,12 +352,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setState(prevState => ({
       ...prevState,
       timer: {
-        isActive: false,
-        duration: 0,
-        remaining: 0,
-        breakDuration: 0,
-        mode: 'focus',
-        isPaused: false,
+        ...initialState.timer,
       },
     }));
     
@@ -359,6 +385,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           remaining: prevState.timer.duration,
           mode: 'focus',
           isPaused: false,
+          currentRound: 0,
+          completedRounds: 0,
         },
       }));
       

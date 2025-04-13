@@ -26,6 +26,9 @@ export interface TimerConfig {
   duration: number; // in seconds (focus time)
   remaining: number; // in seconds
   breakDuration?: number; // in seconds (break time)
+  totalRounds: number; // Total number of rounds
+  currentRound: number; // Current round (0-indexed)
+  completedRounds: number; // Number of completed rounds
   mode?: 'focus' | 'break'; // Current mode
   isPaused?: boolean; // Timer paused state
   task?: string; // What's getting done
