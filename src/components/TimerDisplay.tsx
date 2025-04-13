@@ -20,7 +20,8 @@ const TimerDisplay = () => {
     }
   }, [timer.remaining]);
   
-  if (!timer.isActive || isHidden || displayTime === '') {
+  // Remove the condition that was hiding the timer
+  if (isHidden || !timer.isActive) {
     return null;
   }
   

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Play, Pause, Timer, Image, Eye, EyeOff, ChevronUp, Layers } from "lucide-react";
@@ -42,6 +43,19 @@ const PlayerControls = () => {
         </div>
       </div>;
   }
+  
+  const buttonStyles = `
+    bg-player-medium/80 hover:bg-player-medium 
+    text-white/80 hover:text-white 
+    px-6 py-2 rounded-full text-sm 
+    flex items-center gap-1 transition-colors
+    transform-gpu hover:transform hover:-translate-y-2
+    border-bottom-left-radius-0 border-bottom-right-radius-0
+    border-radius-20 w-[200px] flex justify-center
+    hover:transform hover:translate-y(-8px)
+    transform-none
+  `;
+  
   return <>
       {!state.isMixMode && <div className="fixed bottom-36 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-4xl px-4">
           <ScrollArea className="w-full overflow-x-auto">
@@ -103,14 +117,24 @@ const PlayerControls = () => {
               setIsMixDrawerOpen(true);
               setShowMixPanel(true);
             }}
-            className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors transform-gpu hover:transform hover:-translate-y-2 border-bottom-left-radius-0 border-bottom-right-radius-0 border-radius-20 w-[200px] flex justify-center"
+            className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors transform-none hover:transform hover:-translate-y-2 w-[200px] flex justify-center"
+            style={{
+              borderBottomLeftRadius: "0px !important",
+              borderBottomRightRadius: "0px !important",
+              borderRadius: "20px"
+            }}
           >
             <Layers className="w-4 h-4" /> Mix Sounds
           </button>
         ) : (
           <button 
             onClick={() => setIsExploreDrawerOpen(true)}
-            className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors transform-gpu hover:transform hover:-translate-y-2 border-bottom-left-radius-0 border-bottom-right-radius-0 border-radius-20 w-[200px] flex justify-center"
+            className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors transform-none hover:transform hover:-translate-y-2 w-[200px] flex justify-center"
+            style={{
+              borderBottomLeftRadius: "0px !important",
+              borderBottomRightRadius: "0px !important",
+              borderRadius: "20px"
+            }}
           >
             Explore <ChevronUp className="w-4 h-4" />
           </button>

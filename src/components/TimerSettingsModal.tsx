@@ -75,19 +75,12 @@ const TimerSettingsModal = ({
         </DialogHeader>
 
         <div className="py-4">
-          {/* Focus time slider and custom input - removed autofocus */}
+          {/* Focus time slider */}
           <div className="mb-6">
             <div className="flex justify-between mb-2">
               <label className="text-white/80">Focus Time</label>
-              <div className="text-white flex items-center gap-2">
+              <div className="text-white">
                 <span>{formatTimeDisplay(selectedMinutes)}</span>
-                <Input
-                  type="text"
-                  value={customFocusMinutes}
-                  onChange={handleCustomFocusChange}
-                  placeholder="Custom"
-                  className="w-16 h-7 bg-white/10 border-white/10 text-white text-xs"
-                />
               </div>
             </div>
             <Slider
@@ -103,19 +96,12 @@ const TimerSettingsModal = ({
             />
           </div>
           
-          {/* Short break slider and custom input - removed autofocus */}
-          <div className="mb-2">
+          {/* Short break slider */}
+          <div className="mb-6">
             <div className="flex justify-between mb-2">
               <label className="text-white/80">Short break</label>
-              <div className="text-white flex items-center gap-2">
+              <div className="text-white">
                 <span>{formatTimeDisplay(shortBreakMinutes)}</span>
-                <Input
-                  type="text"
-                  value={customBreakMinutes}
-                  onChange={handleCustomBreakChange}
-                  placeholder="Custom"
-                  className="w-16 h-7 bg-white/10 border-white/10 text-white text-xs"
-                />
               </div>
             </div>
             <Slider
@@ -129,6 +115,33 @@ const TimerSettingsModal = ({
               }}
               className="my-2"
             />
+          </div>
+          
+          {/* Custom time inputs */}
+          <div className="bg-white/5 rounded-lg p-4 mb-4">
+            <h3 className="text-white text-sm font-medium mb-3">Custom Time</h3>
+            
+            <div className="mb-3">
+              <label className="text-white/70 text-xs block mb-1">Focus Time (1-120 min)</label>
+              <Input
+                type="text"
+                value={customFocusMinutes}
+                onChange={handleCustomFocusChange}
+                placeholder="Enter minutes"
+                className="bg-white/10 border-white/10 text-white text-sm h-9"
+              />
+            </div>
+            
+            <div>
+              <label className="text-white/70 text-xs block mb-1">Break Time (1-30 min)</label>
+              <Input
+                type="text"
+                value={customBreakMinutes}
+                onChange={handleCustomBreakChange}
+                placeholder="Enter minutes"
+                className="bg-white/10 border-white/10 text-white text-sm h-9"
+              />
+            </div>
           </div>
         </div>
 
