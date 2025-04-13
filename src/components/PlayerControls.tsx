@@ -48,7 +48,7 @@ const PlayerControls = () => {
   return <>
       {/* Sound Category Grid/Scroll (only when mix mode is not active) */}
       {!state.isMixMode && <div className="fixed bottom-36 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-4xl px-4">
-          <ScrollArea className="w-full overflow-x-auto" type="scroll" orientation="horizontal">
+          <ScrollArea className="w-full overflow-x-auto">
             <div className="flex space-x-4 pb-2 min-w-max py-[5px]">
               {sounds.map(sound => <div key={sound.id} className="flex flex-col items-center">
                   <SoundIcon sound={sound} />
