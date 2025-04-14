@@ -1,10 +1,9 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { PlayerState, Sound, BackgroundImage, TimerConfig } from '@/types';
 import { sounds, backgroundImages } from '@/data/soundData';
 import { toast } from 'sonner';
 import { setCookie, getCookie } from '@/lib/cookieUtils';
-import { playTimerSound, showTimerNotification } from '@/lib/soundService';
+import { playTimerSound, showTimerNotification, requestNotificationPermission } from '@/lib/soundService';
 
 interface PlayerContextType {
   state: PlayerState;
@@ -21,6 +20,7 @@ interface PlayerContextType {
   setVolume: (volume: number) => void;
   toggleMixMode: () => void;
   updateSoundVolume: (soundId: string, volume: number) => void;
+  updateTimerSettings: (settings: Partial<TimerConfig>) => void;
   showMixPanel: boolean;
   setShowMixPanel: (show: boolean) => void;
 }
@@ -46,7 +46,7 @@ const initialState: PlayerState = {
     playSound: true,
     soundType: 'beep',
     autoStart: true,
-    showNotifications: true,
+    showNotifications: false,
   },
   currentBackground: backgroundImages[0],
   volume: 0.8,
@@ -72,6 +72,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     });
     
     setAudioElements(elementsMap);
+    
+    requestNotificationPermission();
 
     return () => {
       elementsMap.forEach(audio => {
@@ -184,50 +186,49 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         );
       }
       
-      if (state.timer.mode === 'focus') {
-        setState(prevState => ({
-          ...prevState,
-          timer: {
-            ...prevState.timer,
-            mode: 'break',
-            remaining: prevState.timer.breakDuration,
-            duration: prevState.timer.breakDuration,
-          }
-        }));
-        toast('Focus time completed', {
-          description: 'Taking a break now',
-        });
-      } else if (state.timer.mode === 'break') {
-        const completedRounds = state.timer.completedRounds + 1;
-        
-        if (completedRounds < state.timer.totalRounds) {
+      if (state.timer.breakDuration > 0) {
+        if (state.timer.mode === 'focus') {
           setState(prevState => ({
             ...prevState,
             timer: {
               ...prevState.timer,
-              mode: 'focus',
-              remaining: prevState.timer.duration,
-              currentRound: prevState.timer.currentRound + 1,
-              completedRounds: completedRounds,
+              mode: 'break',
+              remaining: prevState.timer.breakDuration,
+              duration: prevState.timer.breakDuration,
               isPaused: !prevState.timer.autoStart,
             }
           }));
-          toast('Break completed', {
-            description: `Starting round ${completedRounds + 1} of ${state.timer.totalRounds}`,
+          toast('Focus time completed', {
+            description: 'Taking a break now',
           });
-        } else {
-          pauseSound();
-          setState(prevState => ({
-            ...prevState,
-            timer: {
-              ...prevState.timer,
-              isActive: false,
-            }
-          }));
-          toast('Timer completed', {
-            description: `Completed all ${state.timer.totalRounds} rounds`,
-          });
+        } else if (state.timer.mode === 'break') {
+          const completedRounds = state.timer.completedRounds + 1;
+          
+          if (completedRounds < state.timer.totalRounds) {
+            setState(prevState => ({
+              ...prevState,
+              timer: {
+                ...prevState.timer,
+                mode: 'focus',
+                remaining: prevState.timer.duration,
+                currentRound: prevState.timer.currentRound + 1,
+                completedRounds: completedRounds,
+                isPaused: !prevState.timer.autoStart,
+              }
+            }));
+            toast('Break completed', {
+              description: `Starting round ${completedRounds + 1} of ${state.timer.totalRounds}`,
+            });
+          } else {
+            toast('Timer completed', {
+              description: `Completed all ${state.timer.totalRounds} rounds`,
+            });
+            cancelTimer();
+          }
         }
+      } else {
+        toast('Timer completed!');
+        cancelTimer();
       }
     }
     
@@ -406,6 +407,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       : 'Using sound\'s background image');
   };
 
+  const updateTimerSettings = (settings: Partial<TimerConfig>) => {
+    setState(prevState => ({
+      ...prevState,
+      timer: {
+        ...prevState.timer,
+        ...settings,
+      }
+    }));
+  };
+
   const setTimer = (duration: number, task?: string, breakDuration: number = 0, rounds: number = 1) => {
     if (timerInterval) {
       clearInterval(timerInterval);
@@ -430,7 +441,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }));
     
     const roundsLabel = rounds > 1 ? `${rounds} rounds` : '1 round';
-    toast(`Timer set for ${Math.floor(duration / 60)} min focus, ${Math.floor(breakDuration / 60)} min break, ${roundsLabel}`);
+    const breakInfo = breakDuration > 0 ? `, ${Math.floor(breakDuration / 60)} min break` : '';
+    toast(`Timer set for ${Math.floor(duration / 60)} min focus${breakInfo}, ${roundsLabel}`);
   };
 
   const cancelTimer = () => {
@@ -523,6 +535,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         setVolume,
         toggleMixMode,
         updateSoundVolume,
+        updateTimerSettings,
         showMixPanel,
         setShowMixPanel,
       }}

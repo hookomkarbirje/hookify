@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { 
   MoreHorizontal, 
@@ -26,19 +26,43 @@ interface TimerMenuProps {
 }
 
 const TimerMenu = ({ className }: TimerMenuProps) => {
-  const { state, setTimer, resetTimer, cancelTimer, pauseResumeTimer } = usePlayer();
+  const { state, setTimer, resetTimer, cancelTimer, pauseResumeTimer, updateTimerSettings } = usePlayer();
   const [timerType, setTimerType] = useState<'pomodoro' | 'simple'>(
     state.timer.breakDuration > 0 ? 'pomodoro' : 'simple'
   );
   const [customFocusMin, setCustomFocusMin] = useState("");
   const [customBreakMin, setCustomBreakMin] = useState("");
-  const [alertSound, setAlertSound] = useState<string>("beep");
-  const [autoStartTimers, setAutoStartTimers] = useState(true);
-  const [hideSeconds, setHideSeconds] = useState(false);
-  const [browserNotifications, setBrowserNotifications] = useState(true);
+  const [alertSound, setAlertSound] = useState<"beep" | "bell">(state.timer.soundType || "beep");
+  const [autoStartTimers, setAutoStartTimers] = useState(state.timer.autoStart !== false);
+  const [hideSeconds, setHideSeconds] = useState(state.timer.hideSeconds || false);
+  const [enableSound, setEnableSound] = useState(state.timer.playSound !== false);
+  const [browserNotifications, setBrowserNotifications] = useState(state.timer.showNotifications || false);
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+
+  // Sync state with timer settings when menu opens
+  useEffect(() => {
+    if (isOpen) {
+      setTimerType(state.timer.breakDuration > 0 ? 'pomodoro' : 'simple');
+      setAlertSound(state.timer.soundType || "beep");
+      setAutoStartTimers(state.timer.autoStart !== false);
+      setHideSeconds(state.timer.hideSeconds || false);
+      setEnableSound(state.timer.playSound !== false);
+      setBrowserNotifications(state.timer.showNotifications || false);
+    }
+  }, [isOpen, state.timer]);
+
+  // Update settings when they change
+  useEffect(() => {
+    updateTimerSettings({
+      soundType: alertSound,
+      autoStart: autoStartTimers,
+      hideSeconds: hideSeconds,
+      playSound: enableSound,
+      showNotifications: browserNotifications
+    });
+  }, [alertSound, autoStartTimers, hideSeconds, enableSound, browserNotifications, updateTimerSettings]);
 
   const handleSwitchTimerType = (value: string) => {
     const type = value as 'pomodoro' | 'simple';
@@ -104,6 +128,17 @@ const TimerMenu = ({ className }: TimerMenuProps) => {
     setCustomFocusMin("");
     setCustomBreakMin("");
     setIsOpen(false);
+  };
+
+  const handleToggleSound = (checked: boolean) => {
+    setEnableSound(checked);
+  };
+
+  const handleToggleNotifications = (checked: boolean) => {
+    setBrowserNotifications(checked);
+    if (checked && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
   };
 
   return (
@@ -238,27 +273,35 @@ const TimerMenu = ({ className }: TimerMenuProps) => {
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-white/70">Enabled</span>
                 <Switch 
-                  checked={true}
+                  checked={enableSound}
+                  onCheckedChange={handleToggleSound}
                   className="data-[state=checked]:bg-white/30"
                 />
               </div>
               
-              <RadioGroup defaultValue="beep" value={alertSound} onValueChange={setAlertSound} className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="beep" id="beep" className="border-white" />
-                  <Label htmlFor="beep" className="text-sm flex items-center cursor-pointer">
-                    <Bell className="h-3.5 w-3.5 mr-1.5 text-white/70" />
-                    Beep Sound
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="bell" id="bell" className="border-white" />
-                  <Label htmlFor="bell" className="text-sm flex items-center cursor-pointer">
-                    <Bell className="h-3.5 w-3.5 mr-1.5 text-white/70" />
-                    Bell Sound
-                  </Label>
-                </div>
-              </RadioGroup>
+              {enableSound && (
+                <RadioGroup 
+                  defaultValue="beep" 
+                  value={alertSound} 
+                  onValueChange={(value) => setAlertSound(value as 'beep' | 'bell')} 
+                  className="space-y-1"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="beep" id="beep" className="border-white" />
+                    <Label htmlFor="beep" className="text-sm flex items-center cursor-pointer">
+                      <Bell className="h-3.5 w-3.5 mr-1.5 text-white/70" />
+                      Beep Sound
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="bell" id="bell" className="border-white" />
+                    <Label htmlFor="bell" className="text-sm flex items-center cursor-pointer">
+                      <Bell className="h-3.5 w-3.5 mr-1.5 text-white/70" />
+                      Bell Sound
+                    </Label>
+                  </div>
+                </RadioGroup>
+              )}
             </div>
             
             {/* Additional settings */}
@@ -285,7 +328,7 @@ const TimerMenu = ({ className }: TimerMenuProps) => {
                 <span className="text-sm text-white/80">Browser Notifications</span>
                 <Switch 
                   checked={browserNotifications}
-                  onCheckedChange={setBrowserNotifications} 
+                  onCheckedChange={handleToggleNotifications}
                   className="data-[state=checked]:bg-white/30"
                 />
               </div>
