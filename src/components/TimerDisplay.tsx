@@ -4,6 +4,7 @@ import { usePlayer } from '@/context/PlayerContext';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { useIsMobile } from '@/hooks/use-mobile';
+import TimerMenu from './TimerMenu';
 
 const TimerDisplay = () => {
   const { state, resetTimer, cancelTimer, pauseResumeTimer } = usePlayer();
@@ -14,9 +15,17 @@ const TimerDisplay = () => {
   
   useEffect(() => {
     if (timer.remaining > 0) {
-      const minutes = Math.floor(timer.remaining / 60);
-      const seconds = timer.remaining % 60;
-      const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      let formattedTime;
+      
+      if (timer.hideSeconds) {
+        const minutes = Math.ceil(timer.remaining / 60);
+        formattedTime = `${minutes.toString().padStart(2, '0')}:00`;
+      } else {
+        const minutes = Math.floor(timer.remaining / 60);
+        const seconds = timer.remaining % 60;
+        formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }
+      
       setDisplayTime(formattedTime);
       
       // Calculate progress percentage for the progress bar (0 to 100)
@@ -32,7 +41,7 @@ const TimerDisplay = () => {
       // Reset title when timer is inactive
       document.title = 'serene-soundscapes-player';
     }
-  }, [timer.remaining, timer.duration, timer.mode]);
+  }, [timer.remaining, timer.duration, timer.mode, timer.hideSeconds]);
   
   // Reset title when component unmounts or timer becomes inactive
   useEffect(() => {
@@ -51,8 +60,11 @@ const TimerDisplay = () => {
   }
 
   return (
-    <div className={`fixed inset-0 flex items-center justify-center z-10 pointer-events-none ${isMobile ? 'pt-0 -mt-16' : ''}`}>
-      <div className="relative flex flex-col items-center justify-center pointer-events-auto max-w-md w-full px-6">
+    <div className={`fixed inset-0 flex items-center justify-center z-10 pointer-events-none ${isMobile ? 'pt-0 -mt-24' : ''}`}>
+      <div className="relative flex flex-col items-center justify-center pointer-events-auto max-w-md w-full px-6 group">
+        {/* Timer menu */}
+        <TimerMenu />
+        
         {/* Timer mode tabs - FOCUS/BREAK switcher */}
         <div className="flex gap-10 mb-4">
           <button 
@@ -78,7 +90,7 @@ const TimerDisplay = () => {
         {/* Timer display */}
         <div className={cn(
           "text-white font-extralight mb-4",
-          isMobile ? "text-6xl" : "text-8xl"
+          isMobile ? "text-8xl" : "text-8xl"
         )}>
           {displayTime}
         </div>
@@ -123,7 +135,7 @@ const TimerDisplay = () => {
         {/* Start/Pause button */}
         <button
           onClick={pauseResumeTimer}
-          className="bg-gray-300 hover:bg-white text-black uppercase tracking-wider text-sm py-1.5 px-8 rounded-sm transition-colors"
+          className="bg-[#0061EF] hover:bg-blue-600 text-white uppercase tracking-wider text-sm py-1.5 px-8 rounded-sm transition-colors h-16 w-16 flex items-center justify-center"
         >
           {timer.isPaused ? "START" : "PAUSE"}
         </button>
