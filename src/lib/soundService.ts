@@ -14,16 +14,10 @@ export const playTimerSound = (sound: 'beep' | 'bell' = 'beep') => {
   }
   
   try {
-    // Reset the audio playback position
     audioCache[sound].currentTime = 0;
-    // Use the play() promise API properly
-    const playPromise = audioCache[sound].play();
-    
-    if (playPromise !== undefined) {
-      playPromise.catch(err => {
-        console.error('Error playing timer sound:', err);
-      });
-    }
+    audioCache[sound].play().catch(err => {
+      console.error('Error playing timer sound:', err);
+    });
   } catch (error) {
     console.error('Error playing timer sound:', error);
   }
@@ -51,12 +45,5 @@ export const showTimerNotification = (title: string, body: string) => {
         new Notification(title, { body });
       }
     });
-  }
-};
-
-// Request notification permission early
-export const requestNotificationPermission = () => {
-  if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
-    Notification.requestPermission();
   }
 };

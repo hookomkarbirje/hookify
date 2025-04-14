@@ -17,12 +17,7 @@ const TimerDisplay = () => {
     if (timer.remaining > 0) {
       const minutes = Math.floor(timer.remaining / 60);
       const seconds = timer.remaining % 60;
-      
-      // Format time based on hideSeconds setting
-      const formattedTime = timer.hideSeconds 
-        ? `${minutes.toString().padStart(2, '0')}:00`
-        : `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      
+      const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       setDisplayTime(formattedTime);
       
       // Calculate progress percentage for the progress bar (0 to 100)
@@ -33,12 +28,12 @@ const TimerDisplay = () => {
       const mode = timer.mode === 'focus' ? 'FOCUS' : 'BREAK';
       document.title = `${formattedTime} - ${mode}`;
     } else {
-      setDisplayTime(timer.hideSeconds ? '00:00' : '00:00');
+      setDisplayTime('00:00');
       setProgress(0);
       // Reset title when timer is inactive
       document.title = 'serene-soundscapes-player';
     }
-  }, [timer.remaining, timer.duration, timer.mode, timer.hideSeconds]);
+  }, [timer.remaining, timer.duration, timer.mode]);
   
   // Reset title when component unmounts or timer becomes inactive
   useEffect(() => {
@@ -62,29 +57,27 @@ const TimerDisplay = () => {
         {/* Timer menu (dots) that appears on hover */}
         <TimerMenu className="absolute right-2 top-0" />
         
-        {/* Timer mode tabs - FOCUS/BREAK switcher - only show for Pomodoro timer */}
-        {timer.breakDuration > 0 && (
-          <div className="flex gap-10 mb-4">
-            <button 
-              onClick={() => timer.mode === 'break' && resetTimer('focus')}
-              className={cn(
-                "text-xs uppercase tracking-widest font-medium",
-                timer.mode === 'focus' ? "text-white" : "text-gray-500"
-              )}
-            >
-              FOCUS
-            </button>
-            <button 
-              onClick={() => timer.mode === 'focus' && resetTimer('break')}
-              className={cn(
-                "text-xs uppercase tracking-widest font-medium",
-                timer.mode === 'break' ? "text-white" : "text-gray-500"
-              )}
-            >
-              BREAK
-            </button>
-          </div>
-        )}
+        {/* Timer mode tabs - FOCUS/BREAK switcher */}
+        <div className="flex gap-10 mb-4">
+          <button 
+            onClick={() => timer.mode === 'break' && resetTimer('focus')}
+            className={cn(
+              "text-xs uppercase tracking-widest font-medium",
+              timer.mode === 'focus' ? "text-white" : "text-gray-500"
+            )}
+          >
+            FOCUS
+          </button>
+          <button 
+            onClick={() => timer.mode === 'focus' && resetTimer('break')}
+            className={cn(
+              "text-xs uppercase tracking-widest font-medium",
+              timer.mode === 'break' ? "text-white" : "text-gray-500"
+            )}
+          >
+            BREAK
+          </button>
+        </div>
 
         {/* Timer display */}
         <div className={cn(
@@ -94,25 +87,23 @@ const TimerDisplay = () => {
           {displayTime}
         </div>
         
-        {/* Round indicators as dots - only show for Pomodoro timer with multiple rounds */}
-        {timer.breakDuration > 0 && timer.totalRounds > 1 && (
-          <div className="flex space-x-2 mb-4">
-            {Array.from({ length: timer.totalRounds }).map((_, index) => (
-              <div 
-                key={index}
-                className={cn(
-                  "w-2 h-2 rounded-full", 
-                  index < timer.completedRounds || (index === timer.currentRound && timer.mode === 'break') 
-                    ? "bg-white" 
-                    : "bg-white/30"
-                )}
-              />
-            ))}
-          </div>
-        )}
+        {/* Round indicators as dots */}
+        <div className="flex space-x-2 mb-4">
+          {Array.from({ length: timer.totalRounds }).map((_, index) => (
+            <div 
+              key={index}
+              className={cn(
+                "w-2 h-2 rounded-full", 
+                index < timer.completedRounds || (index === timer.currentRound && timer.mode === 'break') 
+                  ? "bg-white" 
+                  : "bg-white/30"
+              )}
+            />
+          ))}
+        </div>
         
-        {/* Round info text - only show for Pomodoro timer with multiple rounds */}
-        {timer.breakDuration > 0 && timer.totalRounds > 1 && (
+        {/* Round info text */}
+        {timer.totalRounds > 1 && (
           <div className="text-white/60 text-xs mb-2">
             Round {timer.currentRound + 1} of {timer.totalRounds}
           </div>
