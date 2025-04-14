@@ -4,6 +4,7 @@ import { usePlayer } from '@/context/PlayerContext';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { useIsMobile } from '@/hooks/use-mobile';
+import TimerMenu from './TimerMenu';
 
 const TimerDisplay = () => {
   const { state, resetTimer, cancelTimer, pauseResumeTimer } = usePlayer();
@@ -53,6 +54,9 @@ const TimerDisplay = () => {
   return (
     <div className={`fixed inset-0 flex items-center justify-center z-10 pointer-events-none ${isMobile ? 'pt-0 -mt-16' : ''}`}>
       <div className="relative flex flex-col items-center justify-center pointer-events-auto max-w-md w-full px-6">
+        {/* Timer menu (dots) that appears on hover */}
+        <TimerMenu className="absolute right-2 top-0" />
+        
         {/* Timer mode tabs - FOCUS/BREAK switcher */}
         <div className="flex gap-10 mb-4">
           <button 

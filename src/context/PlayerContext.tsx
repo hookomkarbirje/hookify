@@ -1,8 +1,10 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { PlayerState, Sound, BackgroundImage, TimerConfig } from '@/types';
 import { sounds, backgroundImages } from '@/data/soundData';
 import { toast } from 'sonner';
 import { setCookie, getCookie } from '@/lib/cookieUtils';
+import { playTimerSound, showTimerNotification } from '@/lib/soundService';
 
 interface PlayerContextType {
   state: PlayerState;
@@ -40,6 +42,11 @@ const initialState: PlayerState = {
     mode: 'focus',
     isPaused: false,
     task: "",
+    hideSeconds: false,
+    playSound: true,
+    soundType: 'beep',
+    autoStart: true,
+    showNotifications: true,
   },
   currentBackground: backgroundImages[0],
   volume: 0.8,
@@ -164,6 +171,19 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       
       return () => clearInterval(interval);
     } else if (state.timer.isActive && state.timer.remaining === 0) {
+      if (state.timer.playSound) {
+        playTimerSound(state.timer.soundType || 'beep');
+      }
+      
+      if (state.timer.showNotifications) {
+        const mode = state.timer.mode === 'focus' ? 'Focus' : 'Break';
+        showTimerNotification(`${mode} Time Complete`, 
+          state.timer.mode === 'focus' 
+            ? 'Time to take a break!' 
+            : 'Time to focus again!'
+        );
+      }
+      
       if (state.timer.mode === 'focus') {
         setState(prevState => ({
           ...prevState,
@@ -189,6 +209,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
               remaining: prevState.timer.duration,
               currentRound: prevState.timer.currentRound + 1,
               completedRounds: completedRounds,
+              isPaused: !prevState.timer.autoStart,
             }
           }));
           toast('Break completed', {
@@ -422,6 +443,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       ...prevState,
       timer: {
         ...initialState.timer,
+        playSound: prevState.timer.playSound,
+        soundType: prevState.timer.soundType,
+        hideSeconds: prevState.timer.hideSeconds,
+        autoStart: prevState.timer.autoStart,
+        showNotifications: prevState.timer.showNotifications,
       },
     }));
     

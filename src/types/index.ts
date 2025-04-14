@@ -32,6 +32,11 @@ export interface TimerConfig {
   mode?: 'focus' | 'break'; // Current mode
   isPaused?: boolean; // Timer paused state
   task?: string; // What's getting done
+  hideSeconds?: boolean; // Whether to hide seconds in the display
+  playSound?: boolean; // Whether to play a sound when timer ends
+  soundType?: 'beep' | 'bell'; // Which sound to play
+  autoStart?: boolean; // Whether to auto-start the next timer
+  showNotifications?: boolean; // Whether to show browser notifications
 }
 
 export interface PlayerState {
