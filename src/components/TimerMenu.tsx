@@ -1,3 +1,4 @@
+
 import { MoreVertical } from 'lucide-react';
 import { usePlayer } from '@/context/PlayerContext';
 import {
@@ -13,7 +14,7 @@ interface TimerMenuProps {
 }
 
 const TimerMenu = ({ className }: TimerMenuProps) => {
-  const { resetTimer, cancelTimer, state } = usePlayer();
+  const { resetTimer, cancelTimer, state, updateTimerSettings } = usePlayer();
   const { timer } = state;
 
   const handleAddTime = () => {
