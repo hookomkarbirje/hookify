@@ -1,192 +1,161 @@
 
-import { useState } from "react";
-import { usePlayer } from "@/context/PlayerContext";
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Timer, Minus, Plus, ChevronRight, Settings } from "lucide-react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useIsMobile } from "@/hooks/use-mobile";
-import TimerSettingsModal from "./TimerSettingsModal";
+import { usePlayer } from '@/context/PlayerContext';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 interface TimerModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const TimerModal = ({
-  isOpen,
-  onClose
-}: TimerModalProps) => {
-  const {
-    state,
-    setTimer
-  } = usePlayer();
-  
-  const [selectedMinutes, setSelectedMinutes] = useState(25);
-  const [shortBreakMinutes, setShortBreakMinutes] = useState(5);
-  const [rounds, setRounds] = useState(1);
-  const [task, setTask] = useState("");
-  const [customFocusMinutes, setCustomFocusMinutes] = useState<string>("");
-  const [customBreakMinutes, setCustomBreakMinutes] = useState<string>("");
-  const [showSettings, setShowSettings] = useState(false);
+const TimerModal = ({ isOpen, onClose }: TimerModalProps) => {
+  const { state, setTimer, updateTimerSettings } = usePlayer();
+  const [focusMinutes, setFocusMinutes] = useState('25');
+  const [breakMinutes, setBreakMinutes] = useState('5');
+  const [rounds, setRounds] = useState('4');
   const [timerType, setTimerType] = useState<'pomodoro' | 'simple'>('pomodoro');
-  
-  const isMobile = useIsMobile();
-  
-  const handleSetTimer = () => {
-    // Use custom values if provided, otherwise use slider values
-    const focusMinutes = customFocusMinutes ? parseInt(customFocusMinutes) : selectedMinutes;
-    const breakMinutes = customBreakMinutes ? parseInt(customBreakMinutes) : shortBreakMinutes;
 
-    // For simple timer, set break duration to 0
-    const breakDuration = timerType === 'simple' ? 0 : breakMinutes * 60;
-
-    // Pass both duration, break duration, rounds, and task to setTimer
-    setTimer(
-      focusMinutes * 60, // Convert focus time to seconds
-      task,
-      breakDuration, // Convert break time to seconds or 0 for simple timer
-      timerType === 'simple' ? 1 : rounds // Simple timer always has 1 round
-    );
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const duration = parseInt(focusMinutes) * 60;
+    const breakDuration = timerType === 'pomodoro' ? parseInt(breakMinutes) * 60 : 0;
+    const totalRounds = timerType === 'pomodoro' ? parseInt(rounds) : 1;
     
+    setTimer(duration, undefined, breakDuration, totalRounds);
     onClose();
   };
-  
-  const formatTimeDisplay = (minutes: number) => {
-    return `${minutes < 10 ? '0' : ''}${minutes}:00`;
-  };
-  
-  const incrementRounds = () => {
-    setRounds(prev => Math.min(prev + 1, 10));
-  };
-  
-  const decrementRounds = () => {
-    setRounds(prev => Math.max(prev - 1, 1));
-  };
-
-  if (!isOpen) {
-    return null;
-  }
 
   return (
-    <>
-      <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-        <DialogContent className="bg-black border-white/10 text-white max-w-sm sm:max-w-md">
-          <DialogHeader className="text-center">
-            <div className="flex justify-center mb-2">
-              <div className="bg-white/10 rounded-full p-3">
-                <Timer className="h-6 w-6 text-white" />
-              </div>
-            </div>
-            <DialogTitle className="text-white text-2xl font-light">Focus Timer</DialogTitle>
-            <DialogDescription className="text-white/70 text-sm">Set your timer for focused work</DialogDescription>
-          </DialogHeader>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md bg-black text-white border-white/10">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-light">Focus Timer Settings</DialogTitle>
+          <DialogDescription className="text-white/70">
+            Configure your focus timer preferences
+          </DialogDescription>
+        </DialogHeader>
 
-          <div className="py-4">
-            {/* Timer Type Selection */}
-            <div className="mb-4">
-              <Tabs 
-                defaultValue={timerType} 
-                value={timerType}
-                onValueChange={(value) => setTimerType(value as 'pomodoro' | 'simple')}
-                className="w-full"
-              >
-                <TabsList className="w-full bg-white/5">
-                  <TabsTrigger 
-                    value="pomodoro"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white flex-1 text-white/70"
-                  >
-                    Pomodoro
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="simple"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white flex-1 text-white/70"
-                  >
-                    Simple Timer
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Timer Type Selection */}
+          <div className="space-y-2">
+            <label className="text-sm text-white/70">Timer Type</label>
+            <Tabs 
+              defaultValue={timerType} 
+              value={timerType}
+              onValueChange={(value) => setTimerType(value as 'pomodoro' | 'simple')}
+              className="w-full"
+            >
+              <TabsList className="w-full bg-white/5">
+                <TabsTrigger 
+                  value="pomodoro"
+                  className="flex-1 data-[state=active]:bg-white/10"
+                >
+                  Pomodoro
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="simple"
+                  className="flex-1 data-[state=active]:bg-white/10"
+                >
+                  Simple Timer
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
+          {/* Timer Duration Settings */}
+          <div className="grid gap-4">
+            <div>
+              <label className="text-sm text-white/70 block mb-2">Focus Time (minutes)</label>
+              <Input
+                type="number"
+                min="1"
+                max="120"
+                value={focusMinutes}
+                onChange={(e) => setFocusMinutes(e.target.value)}
+                className="bg-white/5 border-white/10"
+              />
             </div>
-            
-            {/* Task input */}
-            <Input 
-              type="text" 
-              placeholder="What's getting done?" 
-              value={task} 
-              onChange={e => setTask(e.target.value)} 
-              className="bg-white/5 border-white/10 text-white mb-6 p-4 h-12 rounded-lg" 
-            />
-            
-            {/* Timer settings preview */}
-            <div className="bg-white/5 rounded-lg p-4 mb-6 cursor-pointer">
-              <div className="flex justify-between items-center" onClick={() => setShowSettings(true)}>
-                <div className="text-center">
-                  <div className="text-4xl font-light">{selectedMinutes}</div>
-                  <div className="text-white/60 text-xs">Focus</div>
-                </div>
-                {timerType === 'pomodoro' && (
-                  <div className="text-center">
-                    <div className="text-4xl font-light">{shortBreakMinutes}</div>
-                    <div className="text-white/60 text-xs">Short Break</div>
-                  </div>
-                )}
-                <div className="flex flex-col items-center">
-                  <div className="flex items-center text-white/80">
-                    <Settings size={16} className="mr-1" />
-                    <span className="mr-1">Custom</span>
-                    <ChevronRight size={18} />
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Rounds adjuster - only show for pomodoro */}
+
             {timerType === 'pomodoro' && (
-              <div className="flex justify-between items-center mb-2">
-                <button onClick={decrementRounds} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center">
-                  <Minus size={20} className="text-white" />
-                </button>
-                <div className="text-center">
-                  <div className="text-white">Rounds: {rounds}</div>
-                  <div className="text-white/60 text-xs mt-1">
-                    {rounds} × Focus Time + {rounds} × Short Break
-                  </div>
+              <>
+                <div>
+                  <label className="text-sm text-white/70 block mb-2">Break Time (minutes)</label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="30"
+                    value={breakMinutes}
+                    onChange={(e) => setBreakMinutes(e.target.value)}
+                    className="bg-white/5 border-white/10"
+                  />
                 </div>
-                <button onClick={incrementRounds} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center">
-                  <Plus size={20} className="text-white" />
-                </button>
-              </div>
+
+                <div>
+                  <label className="text-sm text-white/70 block mb-2">Number of Rounds</label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={rounds}
+                    onChange={(e) => setRounds(e.target.value)}
+                    className="bg-white/5 border-white/10"
+                  />
+                </div>
+              </>
             )}
           </div>
 
-          <DialogFooter className="flex flex-col gap-2 sm:flex-row">
-            <Button variant="outline" onClick={onClose} className="w-full sm:w-1/2 bg-transparent border-white/10 text-white hover:bg-white/10">
-              Done
-            </Button>
-            <Button onClick={handleSetTimer} className="w-full sm:w-1/2 bg-white text-black hover:bg-white/90">
-              Start
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          {/* Timer Settings */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-sm text-white/70">Timer Sound Effect</label>
+              <Switch
+                checked={state.timer.playSound}
+                onCheckedChange={(checked) => updateTimerSettings({ playSound: checked })}
+              />
+            </div>
 
-      {/* Only render the settings modal when needed */}
-      {showSettings && (
-        <TimerSettingsModal 
-          isOpen={showSettings} 
-          onClose={() => setShowSettings(false)} 
-          selectedMinutes={selectedMinutes} 
-          setSelectedMinutes={setSelectedMinutes} 
-          shortBreakMinutes={shortBreakMinutes} 
-          setShortBreakMinutes={setShortBreakMinutes} 
-          customFocusMinutes={customFocusMinutes} 
-          setCustomFocusMinutes={setCustomFocusMinutes} 
-          customBreakMinutes={customBreakMinutes} 
-          setCustomBreakMinutes={setCustomBreakMinutes} 
-        />
-      )}
-    </>
+            <div className="flex items-center justify-between">
+              <label className="text-sm text-white/70">Auto Start Timers</label>
+              <Switch
+                checked={state.timer.autoStart}
+                onCheckedChange={(checked) => updateTimerSettings({ autoStart: checked })}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label className="text-sm text-white/70">Hide Seconds</label>
+              <Switch
+                checked={state.timer.hideSeconds}
+                onCheckedChange={(checked) => updateTimerSettings({ hideSeconds: checked })}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label className="text-sm text-white/70">Browser Notifications</label>
+              <Switch
+                checked={state.timer.showNotifications}
+                onCheckedChange={(checked) => updateTimerSettings({ showNotifications: checked })}
+              />
+            </div>
+          </div>
+
+          <Button type="submit" className="w-full bg-white text-black hover:bg-white/90">
+            Start Timer
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
