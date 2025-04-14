@@ -1,8 +1,8 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { PlayerState, Sound, BackgroundImage, TimerConfig } from '@/types';
 import { sounds, backgroundImages } from '@/data/soundData';
 import { toast } from 'sonner';
+import { setCookie, getCookie } from '@/lib/cookieUtils';
 
 interface PlayerContextType {
   state: PlayerState;
@@ -75,6 +75,80 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const savedSoundId = getCookie('currentSoundId');
+    const savedVolume = getCookie('soundVolume');
+    const savedIsPlaying = getCookie('isPlaying');
+    const savedIsMixMode = getCookie('isMixMode');
+    const savedActiveSounds = getCookie('activeSounds');
+    
+    if (savedVolume) {
+      setState(prev => ({
+        ...prev,
+        volume: parseFloat(savedVolume)
+      }));
+    }
+    
+    if (savedIsMixMode === 'true') {
+      setState(prev => ({
+        ...prev,
+        isMixMode: true
+      }));
+      
+      if (savedActiveSounds) {
+        try {
+          const activeSoundIds = JSON.parse(savedActiveSounds) as string[];
+          const activeSoundObjects = sounds.filter(sound => 
+            activeSoundIds.includes(sound.id)
+          ).map(sound => ({
+            ...sound,
+            volume: savedVolume ? parseFloat(savedVolume) : initialState.volume
+          }));
+          
+          setState(prev => ({
+            ...prev,
+            activeSounds: activeSoundObjects,
+            isPlaying: savedIsPlaying === 'true'
+          }));
+          
+          if (savedIsPlaying === 'true') {
+            setTimeout(() => {
+              activeSoundObjects.forEach(sound => {
+                const audio = audioElements.get(sound.id);
+                if (audio) {
+                  audio.volume = sound.volume || parseFloat(savedVolume || '0.8');
+                  audio.play().catch(console.error);
+                }
+              });
+            }, 500);
+          }
+        } catch (e) {
+          console.error('Error parsing saved active sounds:', e);
+        }
+      }
+    } else if (savedSoundId) {
+      const sound = sounds.find(s => s.id === savedSoundId);
+      if (sound) {
+        setState(prev => ({
+          ...prev,
+          currentSound: sound,
+          activeSounds: [{ ...sound, volume: savedVolume ? parseFloat(savedVolume) : initialState.volume }],
+          isPlaying: savedIsPlaying === 'true'
+        }));
+        
+        if (savedIsPlaying === 'true') {
+          setTimeout(() => {
+            const audio = audioElements.get(sound.id);
+            if (audio) {
+              audio.volume = savedVolume ? parseFloat(savedVolume) : initialState.volume;
+              audio.play().catch(console.error);
+            }
+          }, 500);
+        }
+      }
+    }
+  }, [audioElements]);
+
+  useEffect(() => {
     if (state.timer.isActive && state.timer.remaining > 0 && !state.timer.isPaused) {
       const interval = window.setInterval(() => {
         setState(prevState => ({
@@ -90,9 +164,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       
       return () => clearInterval(interval);
     } else if (state.timer.isActive && state.timer.remaining === 0) {
-      // Timer has reached zero
       if (state.timer.mode === 'focus') {
-        // Focus mode ended, switch to break mode
         setState(prevState => ({
           ...prevState,
           timer: {
@@ -106,11 +178,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           description: 'Taking a break now',
         });
       } else if (state.timer.mode === 'break') {
-        // Break mode ended, check if we've completed all rounds
         const completedRounds = state.timer.completedRounds + 1;
         
         if (completedRounds < state.timer.totalRounds) {
-          // Start next round (focus session)
           setState(prevState => ({
             ...prevState,
             timer: {
@@ -125,7 +195,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
             description: `Starting round ${completedRounds + 1} of ${state.timer.totalRounds}`,
           });
         } else {
-          // All rounds completed
           pauseSound();
           setState(prevState => ({
             ...prevState,
