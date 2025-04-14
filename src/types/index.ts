@@ -32,12 +32,6 @@ export interface TimerConfig {
   mode?: 'focus' | 'break'; // Current mode
   isPaused?: boolean; // Timer paused state
   task?: string; // What's getting done
-  timerType?: 'Pomodoro' | 'Simple Timer'; // Timer type 
-  hideSeconds?: boolean; // Whether to hide seconds
-  autoStartTimers?: boolean; // Auto start next timer
-  timerSoundEffects?: boolean; // Play sound when timer ends
-  browserNotifications?: boolean; // Show browser notifications
-  alertSound?: 'beep' | 'bell'; // Sound to play when timer ends
 }
 
 export interface PlayerState {

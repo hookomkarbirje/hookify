@@ -1,9 +1,8 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { PlayerState, Sound, BackgroundImage, TimerConfig } from '@/types';
 import { sounds, backgroundImages } from '@/data/soundData';
 import { toast } from 'sonner';
-import { setCookie, getCookie, setJsonCookie, getJsonCookie } from '@/lib/cookieUtils';
+import { setCookie, getCookie } from '@/lib/cookieUtils';
 
 interface PlayerContextType {
   state: PlayerState;
@@ -22,19 +21,7 @@ interface PlayerContextType {
   updateSoundVolume: (soundId: string, volume: number) => void;
   showMixPanel: boolean;
   setShowMixPanel: (show: boolean) => void;
-  toggleTimerType: () => void;
-  toggleHideSeconds: () => void;
-  toggleAutoStartTimers: () => void;
-  toggleTimerSoundEffects: () => void;
-  toggleBrowserNotifications: () => void;
-  setTimerAlertSound: (sound: 'beep' | 'bell') => void;
 }
-
-// Timer alert sounds
-const timerSounds = {
-  beep: 'https://api.substack.com/feed/podcast/159247735/d47b8fa79d5b4c3e0171d2d1b0f50e48.mp3',
-  bell: 'https://api.substack.com/feed/podcast/159247735/d47b8fa79d5b4c3e0171d2d1b0f50e48.mp3',
-};
 
 const initialState: PlayerState = {
   isPlaying: false,
@@ -53,12 +40,6 @@ const initialState: PlayerState = {
     mode: 'focus',
     isPaused: false,
     task: "",
-    timerType: 'Pomodoro',
-    hideSeconds: false,
-    autoStartTimers: true,
-    timerSoundEffects: true,
-    browserNotifications: false,
-    alertSound: 'bell',
   },
   currentBackground: backgroundImages[0],
   volume: 0.8,
@@ -72,9 +53,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [audioElements, setAudioElements] = useState<Map<string, HTMLAudioElement>>(new Map());
   const [timerInterval, setTimerInterval] = useState<number | null>(null);
   const [showMixPanel, setShowMixPanel] = useState(false);
-  const [timerAlertAudio, setTimerAlertAudio] = useState<HTMLAudioElement | null>(null);
 
-  // Initialize audio elements
   useEffect(() => {
     const elementsMap = new Map<string, HTMLAudioElement>();
     
@@ -87,31 +66,20 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     
     setAudioElements(elementsMap);
 
-    // Initialize timer alert sound
-    const alertAudio = new Audio(timerSounds.bell);
-    setTimerAlertAudio(alertAudio);
-
     return () => {
       elementsMap.forEach(audio => {
         audio.pause();
         audio.src = '';
       });
-      
-      if (timerAlertAudio) {
-        timerAlertAudio.pause();
-        timerAlertAudio.src = '';
-      }
     };
   }, []);
 
-  // Load saved state from cookies
   useEffect(() => {
     const savedSoundId = getCookie('currentSoundId');
     const savedVolume = getCookie('soundVolume');
     const savedIsPlaying = getCookie('isPlaying');
     const savedIsMixMode = getCookie('isMixMode');
     const savedActiveSounds = getCookie('activeSounds');
-    const savedTimerSettings = getJsonCookie<Partial<TimerConfig>>('timerSettings');
     
     if (savedVolume) {
       setState(prev => ({
@@ -178,24 +146,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         }
       }
     }
-
-    // Apply saved timer settings
-    if (savedTimerSettings) {
-      setState(prev => ({
-        ...prev,
-        timer: {
-          ...prev.timer,
-          ...savedTimerSettings,
-        }
-      }));
-
-      if (savedTimerSettings.alertSound && timerAlertAudio) {
-        timerAlertAudio.src = timerSounds[savedTimerSettings.alertSound];
-      }
-    }
   }, [audioElements]);
 
-  // Timer logic
   useEffect(() => {
     if (state.timer.isActive && state.timer.remaining > 0 && !state.timer.isPaused) {
       const interval = window.setInterval(() => {
@@ -212,37 +164,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       
       return () => clearInterval(interval);
     } else if (state.timer.isActive && state.timer.remaining === 0) {
-      // Play alert sound if enabled
-      if (state.timer.timerSoundEffects && timerAlertAudio) {
-        timerAlertAudio.play().catch(error => {
-          console.error('Error playing timer alert sound:', error);
-        });
-      }
-
-      // Show browser notification if enabled
-      if (state.timer.browserNotifications) {
-        sendBrowserNotification(
-          state.timer.mode === 'focus' ? 'Focus time completed' : 'Break time completed'
-        );
-      }
-
       if (state.timer.mode === 'focus') {
-        // If Simple Timer, just stop
-        if (state.timer.timerType === 'Simple Timer') {
-          if (state.isPlaying) {
-            pauseSound();
-          }
-          setState(prevState => ({
-            ...prevState,
-            timer: {
-              ...prevState.timer,
-              isActive: false,
-            }
-          }));
-          toast('Timer completed');
-          return;
-        }
-
         setState(prevState => ({
           ...prevState,
           timer: {
@@ -250,7 +172,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
             mode: 'break',
             remaining: prevState.timer.breakDuration,
             duration: prevState.timer.breakDuration,
-            isPaused: !prevState.timer.autoStartTimers,
           }
         }));
         toast('Focus time completed', {
@@ -268,16 +189,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
               remaining: prevState.timer.duration,
               currentRound: prevState.timer.currentRound + 1,
               completedRounds: completedRounds,
-              isPaused: !prevState.timer.autoStartTimers,
             }
           }));
           toast('Break completed', {
             description: `Starting round ${completedRounds + 1} of ${state.timer.totalRounds}`,
           });
         } else {
-          if (state.isPlaying && state.timer.timerType === 'Simple Timer') {
-            pauseSound();
-          }
+          pauseSound();
           setState(prevState => ({
             ...prevState,
             timer: {
@@ -296,21 +214,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       if (timerInterval) clearInterval(timerInterval);
     };
   }, [state.timer.isActive, state.timer.remaining, state.timer.isPaused, state.timer.mode]);
-
-  // Helper function for browser notifications
-  const sendBrowserNotification = (message: string) => {
-    if ('Notification' in window) {
-      if (Notification.permission === 'granted') {
-        new Notification('Timer Alert', { body: message });
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            new Notification('Timer Alert', { body: message });
-          }
-        });
-      }
-    }
-  };
 
   const playSound = (sound: Sound) => {
     const audioElement = audioElements.get(sound.id);
@@ -488,32 +391,22 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       setTimerInterval(null);
     }
     
-    const updatedTimer = {
-      isActive: true,
-      duration,
-      remaining: duration,
-      breakDuration,
-      totalRounds: rounds,
-      currentRound: 0,
-      completedRounds: 0,
-      mode: 'focus' as const,
-      isPaused: false,
-      task: task || "",
-    };
-    
     setState(prevState => ({
       ...prevState,
       timer: {
         ...prevState.timer,
-        ...updatedTimer
+        isActive: true,
+        duration,
+        remaining: duration,
+        breakDuration,
+        totalRounds: rounds,
+        currentRound: 0,
+        completedRounds: 0,
+        mode: 'focus',
+        isPaused: false,
+        task: task || "",
       }
     }));
-    
-    // Save timer settings to cookie
-    setJsonCookie('timerSettings', {
-      ...state.timer,
-      ...updatedTimer
-    });
     
     const roundsLabel = rounds > 1 ? `${rounds} rounds` : '1 round';
     toast(`Timer set for ${Math.floor(duration / 60)} min focus, ${Math.floor(breakDuration / 60)} min break, ${roundsLabel}`);
@@ -528,9 +421,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setState(prevState => ({
       ...prevState,
       timer: {
-        ...prevState.timer,
-        isActive: false,
-        remaining: 0,
+        ...initialState.timer,
       },
     }));
     
@@ -589,139 +480,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     toast(state.timer.isPaused ? 'Timer resumed' : 'Timer paused');
   };
 
-  // New timer feature toggle functions
-  const toggleTimerType = () => {
-    const newTimerType = state.timer.timerType === 'Pomodoro' ? 'Simple Timer' : 'Pomodoro';
-    
-    setState(prevState => ({
-      ...prevState,
-      timer: {
-        ...prevState.timer,
-        timerType: newTimerType,
-      },
-    }));
-    
-    // Save to cookie
-    setJsonCookie('timerSettings', {
-      ...state.timer,
-      timerType: newTimerType,
-    });
-    
-    toast(`Switched to ${newTimerType}`);
-  };
-
-  const toggleHideSeconds = () => {
-    setState(prevState => {
-      const newHideSeconds = !prevState.timer.hideSeconds;
-      
-      // Save to cookie
-      setJsonCookie('timerSettings', {
-        ...prevState.timer,
-        hideSeconds: newHideSeconds,
-      });
-      
-      return {
-        ...prevState,
-        timer: {
-          ...prevState.timer,
-          hideSeconds: newHideSeconds,
-        },
-      };
-    });
-  };
-
-  const toggleAutoStartTimers = () => {
-    setState(prevState => {
-      const newAutoStartTimers = !prevState.timer.autoStartTimers;
-      
-      // Save to cookie
-      setJsonCookie('timerSettings', {
-        ...prevState.timer,
-        autoStartTimers: newAutoStartTimers,
-      });
-      
-      return {
-        ...prevState,
-        timer: {
-          ...prevState.timer,
-          autoStartTimers: newAutoStartTimers,
-        },
-      };
-    });
-  };
-
-  const toggleTimerSoundEffects = () => {
-    setState(prevState => {
-      const newTimerSoundEffects = !prevState.timer.timerSoundEffects;
-      
-      // Save to cookie
-      setJsonCookie('timerSettings', {
-        ...prevState.timer,
-        timerSoundEffects: newTimerSoundEffects,
-      });
-      
-      return {
-        ...prevState,
-        timer: {
-          ...prevState.timer,
-          timerSoundEffects: newTimerSoundEffects,
-        },
-      };
-    });
-  };
-
-  const toggleBrowserNotifications = () => {
-    // Request notification permission if needed
-    if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-      Notification.requestPermission();
-    }
-    
-    setState(prevState => {
-      const newBrowserNotifications = !prevState.timer.browserNotifications;
-      
-      // Save to cookie
-      setJsonCookie('timerSettings', {
-        ...prevState.timer,
-        browserNotifications: newBrowserNotifications,
-      });
-      
-      return {
-        ...prevState,
-        timer: {
-          ...prevState.timer,
-          browserNotifications: newBrowserNotifications,
-        },
-      };
-    });
-  };
-
-  const setTimerAlertSound = (sound: 'beep' | 'bell') => {
-    if (timerAlertAudio) {
-      timerAlertAudio.src = timerSounds[sound];
-    }
-    
-    setState(prevState => {
-      const updatedTimer = {
-        ...prevState.timer,
-        alertSound: sound,
-      };
-      
-      // Save to cookie
-      setJsonCookie('timerSettings', updatedTimer);
-      
-      return {
-        ...prevState,
-        timer: updatedTimer,
-      };
-    });
-    
-    // Play a preview
-    if (timerAlertAudio) {
-      timerAlertAudio.currentTime = 0;
-      timerAlertAudio.play().catch(console.error);
-    }
-  };
-
   return (
     <PlayerContext.Provider
       value={{
@@ -741,12 +499,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         updateSoundVolume,
         showMixPanel,
         setShowMixPanel,
-        toggleTimerType,
-        toggleHideSeconds,
-        toggleAutoStartTimers,
-        toggleTimerSoundEffects,
-        toggleBrowserNotifications,
-        setTimerAlertSound,
       }}
     >
       {children}
