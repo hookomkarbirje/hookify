@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface TimerSettingsModalProps {
   isOpen: boolean;
@@ -41,6 +42,7 @@ const TimerSettingsModal = ({
   customBreakMinutes,
   setCustomBreakMinutes,
 }: TimerSettingsModalProps) => {
+  const [timerType, setTimerType] = useState<'pomodoro' | 'simple'>('pomodoro');
   
   const handleCustomFocusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -75,6 +77,31 @@ const TimerSettingsModal = ({
         </DialogHeader>
 
         <div className="py-4">
+          {/* Timer Type Selector */}
+          <div className="mb-4">
+            <Tabs 
+              defaultValue={timerType} 
+              value={timerType}
+              onValueChange={(value) => setTimerType(value as 'pomodoro' | 'simple')}
+              className="w-full"
+            >
+              <TabsList className="w-full bg-white/5">
+                <TabsTrigger 
+                  value="pomodoro"
+                  className="data-[state=active]:bg-white/10 data-[state=active]:text-white flex-1 text-white/70"
+                >
+                  Pomodoro
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="simple"
+                  className="data-[state=active]:bg-white/10 data-[state=active]:text-white flex-1 text-white/70"
+                >
+                  Simple Timer
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
           {/* Focus time slider */}
           <div className="mb-6">
             <div className="flex justify-between mb-2">
@@ -96,26 +123,28 @@ const TimerSettingsModal = ({
             />
           </div>
           
-          {/* Short break slider */}
-          <div className="mb-6">
-            <div className="flex justify-between mb-2">
-              <label className="text-white/80">Short break</label>
-              <div className="text-white">
-                <span>{formatTimeDisplay(shortBreakMinutes)}</span>
+          {/* Short break slider - only for Pomodoro */}
+          {timerType === 'pomodoro' && (
+            <div className="mb-6">
+              <div className="flex justify-between mb-2">
+                <label className="text-white/80">Short break</label>
+                <div className="text-white">
+                  <span>{formatTimeDisplay(shortBreakMinutes)}</span>
+                </div>
               </div>
+              <Slider
+                value={[shortBreakMinutes]}
+                min={1}
+                max={15}
+                step={1}
+                onValueChange={(value) => {
+                  setShortBreakMinutes(value[0]);
+                  setCustomBreakMinutes("");
+                }}
+                className="my-2"
+              />
             </div>
-            <Slider
-              value={[shortBreakMinutes]}
-              min={1}
-              max={15}
-              step={1}
-              onValueChange={(value) => {
-                setShortBreakMinutes(value[0]);
-                setCustomBreakMinutes("");
-              }}
-              className="my-2"
-            />
-          </div>
+          )}
           
           {/* Custom time inputs */}
           <div className="bg-white/5 rounded-lg p-4 mb-4">
@@ -132,16 +161,18 @@ const TimerSettingsModal = ({
               />
             </div>
             
-            <div>
-              <label className="text-white/70 text-xs block mb-1">Break Time (1-30 min)</label>
-              <Input
-                type="text"
-                value={customBreakMinutes}
-                onChange={handleCustomBreakChange}
-                placeholder="Enter minutes"
-                className="bg-white/10 border-white/10 text-white text-sm h-9"
-              />
-            </div>
+            {timerType === 'pomodoro' && (
+              <div>
+                <label className="text-white/70 text-xs block mb-1">Break Time (1-30 min)</label>
+                <Input
+                  type="text"
+                  value={customBreakMinutes}
+                  onChange={handleCustomBreakChange}
+                  placeholder="Enter minutes"
+                  className="bg-white/10 border-white/10 text-white text-sm h-9"
+                />
+              </div>
+            )}
           </div>
         </div>
 
