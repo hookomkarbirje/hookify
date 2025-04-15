@@ -59,7 +59,7 @@ const TimerModal = ({
               </div>
             </div>
             <DialogTitle className="text-white text-2xl font-light">Focus Timer</DialogTitle>
-            <DialogDescription className="text-white/70 text-sm">Set your timer for focused work</DialogDescription>
+            
           </DialogHeader>
 
           <div className="py-4">
