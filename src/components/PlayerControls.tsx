@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
-import { Play, Pause, Timer, Image, Eye, EyeOff, Settings2, Library, Mix, MusicIcon } from "lucide-react";
+import { Play, Pause, Timer, Image, Eye, EyeOff, Settings2, Library, MusicIcon } from "lucide-react";
 import { sounds } from "@/data/soundData";
 import SoundIcon from "./SoundIcon";
 import TimerModal from "./TimerModal";
