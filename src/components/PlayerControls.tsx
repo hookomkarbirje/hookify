@@ -21,7 +21,6 @@ const PlayerControls = () => {
     toggleHideInterface,
     toggleMixMode,
     setShowMixPanel,
-    saveMix,
   } = usePlayer();
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
   const [isBackgroundGalleryOpen, setIsBackgroundGalleryOpen] = useState(false);
@@ -62,12 +61,6 @@ const PlayerControls = () => {
       toggleMixMode();
     } else {
       setIsMixDrawerOpen(true);
-    }
-  };
-
-  const handleSaveMix = () => {
-    if (state.activeSounds.length > 0) {
-      saveMix();
     }
   };
   
@@ -131,12 +124,6 @@ const PlayerControls = () => {
         {/* Save/Library buttons when in mix mode */}
         {state.isMixMode && state.activeSounds.length > 0 && (
           <div className="mt-2 flex justify-center gap-2">
-            <button 
-              onClick={handleSaveMix} 
-              className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full"
-            >
-              Save Mix
-            </button>
             <button 
               onClick={() => setIsSavedMixesOpen(true)} 
               className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full"

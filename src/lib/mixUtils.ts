@@ -12,7 +12,8 @@ export const generateShareableUrl = (mix: SavedMix): string => {
       i: sound.id,
       v: Math.round(sound.volume * 100) / 100
     })),
-    b: mix.backgroundId
+    b: mix.backgroundId,
+    p: true // Flag to indicate this mix should auto-play
   };
   
   // Convert to base64
@@ -43,7 +44,8 @@ export const parseMixFromUrl = (encodedMix: string): SavedMix | null => {
         volume: s.v
       })),
       createdAt: new Date().toISOString(),
-      backgroundId: mixData.b
+      backgroundId: mixData.b,
+      autoPlay: mixData.p || false // New property to handle auto-play
     };
   } catch (error) {
     console.error('Error parsing mix from URL:', error);

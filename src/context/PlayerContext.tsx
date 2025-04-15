@@ -67,6 +67,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [audioElements, setAudioElements] = useState<Map<string, HTMLAudioElement>>(new Map());
   const [timerInterval, setTimerInterval] = useState<number | null>(null);
   const [showMixPanel, setShowMixPanel] = useState(false);
+  const [mixNameInput, setMixNameInput] = useState("");
 
   useEffect(() => {
     const elementsMap = new Map<string, HTMLAudioElement>();
@@ -99,6 +100,24 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         const mixData = parseMixFromUrl(mixParam);
         if (mixData && mixData.sounds.length > 0) {
           loadMixFromData(mixData);
+          
+          if (mixData.autoPlay) {
+            setTimeout(() => {
+              mixData.sounds.forEach(soundInfo => {
+                const audio = elementsMap.get(soundInfo.id);
+                if (audio) {
+                  audio.volume = soundInfo.volume;
+                  audio.play().catch(console.error);
+                }
+              });
+              
+              setState(prev => ({
+                ...prev,
+                isPlaying: true
+              }));
+            }, 1000);
+          }
+          
           toast.success("Mix loaded from shared link!");
         }
       } catch (e) {

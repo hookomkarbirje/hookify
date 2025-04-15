@@ -50,6 +50,7 @@ export interface SavedMix {
   sounds: SoundMixItem[];
   createdAt: string;
   backgroundId?: string;
+  autoPlay?: boolean; // Flag to indicate if mix should auto-play when loaded
 }
 
 export interface PlayerState {

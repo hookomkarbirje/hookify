@@ -13,7 +13,7 @@ interface SavedMixesDrawerProps {
 }
 
 const SavedMixesDrawer = ({ isOpen, onClose }: SavedMixesDrawerProps) => {
-  const { getSavedMixes, loadMix, deleteMix, shareMix } = usePlayer();
+  const { getSavedMixes, loadMix, deleteMix, shareMix, togglePlayPause } = usePlayer();
   const [selectedMix, setSelectedMix] = useState<string | null>(null);
   
   const savedMixes = getSavedMixes();
@@ -35,6 +35,13 @@ const SavedMixesDrawer = ({ isOpen, onClose }: SavedMixesDrawerProps) => {
     if (selectedMix === mixId) {
       setSelectedMix(null);
     }
+  };
+
+  const handlePlayMix = (mixId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    loadMix(mixId);
+    togglePlayPause(); // This will start playback immediately
+    setSelectedMix(mixId);
   };
   
   if (!isOpen) return null;
@@ -93,8 +100,9 @@ const SavedMixesDrawer = ({ isOpen, onClose }: SavedMixesDrawerProps) => {
                         <Trash2 className="h-3.5 w-3.5 text-white/80" />
                       </button>
                       <button
+                        onClick={(e) => handlePlayMix(mix.id, e)}
                         className="p-1.5 rounded-full bg-white/10 hover:bg-white/20"
-                        title="Load mix"
+                        title="Play mix"
                       >
                         <Play className="h-3.5 w-3.5 text-white/80 fill-white/80" />
                       </button>
