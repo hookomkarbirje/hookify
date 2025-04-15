@@ -45,15 +45,23 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
           transform: isActive ? 'scale(1.05)' : 'scale(1)',
         }}
       >
-        <div className={`
-          absolute inset-0 flex items-center justify-center 
-          ${isActive 
-            ? "bg-[#0061EF] text-white" 
-            : "bg-player-medium text-white/80 hover:bg-player-light hover:text-white"}
-          ${isActive ? "border-2 border-white" : "border border-white/30"}
-        `}>
-          <Icon name={sound.icon} size={32} />
-        </div>
+        {sound.imageUrl ? (
+          <img 
+            src={sound.imageUrl} 
+            alt={sound.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className={`
+            absolute inset-0 flex items-center justify-center 
+            ${isActive 
+              ? "bg-[#0061EF] text-white" 
+              : "bg-player-medium text-white/80 hover:bg-player-light hover:text-white"}
+            ${isActive ? "border-2 border-white" : "border border-white/30"}
+          `}>
+            <Icon name={sound.icon} size={32} />
+          </div>
+        )}
       </div>
       
       <div className="text-white text-xs font-medium mt-1">
