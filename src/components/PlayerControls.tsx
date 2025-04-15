@@ -120,16 +120,6 @@ const PlayerControls = () => {
             <Library className="w-4 h-4" />
           </button>
         </div>
-        
-        {/* Save/Library buttons - now always visible with improved styling */}
-        <div className="mt-2 flex justify-center gap-2">
-          <button 
-            onClick={() => setIsSavedMixesOpen(true)} 
-            className="text-xs bg-gradient-to-r from-blue-500/30 to-purple-500/30 hover:from-blue-500/40 hover:to-purple-500/40 text-white px-3 py-1.5 rounded-full transition-all hover:scale-105 shadow-lg shadow-black/20 border border-white/10"
-          >
-            Saved Mixes
-          </button>
-        </div>
       </div>
       
       {/* Sound Icons Scroll Area */}
@@ -173,6 +163,10 @@ const PlayerControls = () => {
               
               <button onClick={() => setIsTimerModalOpen(true)} className="control-button" title="Set timer">
                 <Timer className="w-4 h-4" />
+              </button>
+              
+              <button onClick={() => setIsSavedMixesOpen(true)} className="control-button" title="Saved Mixes">
+                <Library className="w-4 h-4" />
               </button>
             </div>
             

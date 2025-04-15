@@ -131,6 +131,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         audio.pause();
         audio.src = '';
       });
+      
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
     };
   }, []);
 
@@ -413,6 +417,95 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         task: task || "",
       }
     }));
+    
+    // Start the timer countdown interval
+    const interval = window.setInterval(() => {
+      setState(prevState => {
+        if (prevState.timer.isPaused) {
+          return prevState;
+        }
+
+        const remaining = prevState.timer.remaining - 1;
+        
+        if (remaining <= 0) {
+          // Timer finished
+          if (prevState.timer.playSound) {
+            playTimerSound(prevState.timer.soundType || 'beep');
+          }
+          
+          if (prevState.timer.showNotifications) {
+            const mode = prevState.timer.mode === 'focus' ? 'Focus' : 'Break';
+            showTimerNotification(`${mode} time is up!`, `Your ${mode.toLowerCase()} time has ended.`);
+          }
+          
+          // Handle rounds and breaks
+          if (prevState.timer.mode === 'focus' && prevState.timer.breakDuration > 0) {
+            // Switch to break mode
+            return {
+              ...prevState,
+              timer: {
+                ...prevState.timer,
+                mode: 'break',
+                remaining: prevState.timer.breakDuration,
+              }
+            };
+          } else if (prevState.timer.mode === 'break') {
+            // Completed a full round
+            const completedRounds = prevState.timer.completedRounds + 1;
+            const currentRound = prevState.timer.currentRound + 1;
+            
+            // Check if all rounds are completed
+            if (currentRound >= prevState.timer.totalRounds) {
+              // All rounds completed
+              clearInterval(interval);
+              return {
+                ...prevState,
+                timer: {
+                  ...prevState.timer,
+                  isActive: false,
+                  remaining: 0,
+                  completedRounds,
+                }
+              };
+            } else {
+              // Start next round
+              return {
+                ...prevState,
+                timer: {
+                  ...prevState.timer,
+                  mode: 'focus',
+                  remaining: prevState.timer.duration,
+                  currentRound,
+                  completedRounds,
+                }
+              };
+            }
+          } else {
+            // Simple timer with no breaks, just end it
+            clearInterval(interval);
+            return {
+              ...prevState,
+              timer: {
+                ...prevState.timer,
+                isActive: false,
+                remaining: 0,
+              }
+            };
+          }
+        } else {
+          // Just update the remaining time
+          return {
+            ...prevState,
+            timer: {
+              ...prevState.timer,
+              remaining,
+            }
+          };
+        }
+      });
+    }, 1000);
+    
+    setTimerInterval(interval);
     
     const roundsLabel = rounds > 1 ? `${rounds} rounds` : '1 round';
     const breakInfo = breakDuration > 0 ? `, ${Math.floor(breakDuration / 60)} min break` : '';

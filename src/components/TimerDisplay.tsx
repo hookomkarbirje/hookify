@@ -31,7 +31,9 @@ const TimerDisplay = () => {
       setDisplayTime(formattedTime);
 
       // Calculate progress percentage for the progress bar (0 to 100)
-      const progressPercent = 100 - timer.remaining / timer.duration * 100;
+      // Use the correct total time based on mode
+      const totalTime = timer.mode === 'focus' ? timer.duration : timer.breakDuration;
+      const progressPercent = 100 - timer.remaining / totalTime * 100;
       setProgress(progressPercent);
 
       // Update document title when timer is active
