@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Play, Pause, Timer, Image, Eye, EyeOff, Settings2, Library } from "lucide-react";
@@ -52,10 +51,13 @@ const PlayerControls = () => {
       {!state.isMixMode && (
         <div className="fixed bottom-36 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-4xl px-4">
           <ScrollArea className="w-full overflow-x-auto">
-            <div className="flex space-x-4 pb-2 min-w-max py-[5px]">
+            <div className="flex space-x-3 pb-2 min-w-max py-[5px] items-center justify-center">
               {sounds.map(sound => (
                 <div key={sound.id} className="flex flex-col items-center">
-                  <SoundIcon sound={sound} />
+                  <SoundIcon 
+                    sound={sound} 
+                    size="sm" 
+                  />
                   <span className="text-white/70 text-xs mt-1 truncate w-14 text-center">
                     {sound.name}
                   </span>
