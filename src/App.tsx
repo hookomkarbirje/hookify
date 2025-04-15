@@ -7,10 +7,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
-// Create the client outside of the component
-const queryClient = new QueryClient();
-
 const App = () => {
+  // Create the client inside of the component
+  // This ensures React is properly initialized before the QueryClient is created
+  const queryClient = new QueryClient();
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
