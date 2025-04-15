@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { useIsMobile } from '@/hooks/use-mobile';
 import TimerMenu from './TimerMenu';
+import { Play, Pause } from 'lucide-react';
 
 const TimerDisplay = () => {
   const { state, resetTimer, cancelTimer, pauseResumeTimer } = usePlayer();
@@ -59,8 +60,21 @@ const TimerDisplay = () => {
   return (
     <div className={`fixed inset-0 flex items-center justify-center z-10 pointer-events-none ${isMobile ? 'pt-0 -mt-16' : ''}`}>
       <div className="relative flex flex-col items-center justify-center pointer-events-auto max-w-md w-full px-6">
-        {/* Timer menu (dots) that appears on hover */}
+        {/* Timer menu in the top-right */}
         <TimerMenu className="absolute right-2 top-0" />
+        
+        {/* Play/Pause button in the top-left */}
+        <button
+          onClick={pauseResumeTimer}
+          className="absolute left-2 top-0 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+          aria-label={timer.isPaused ? "Start timer" : "Pause timer"}
+        >
+          {timer.isPaused ? (
+            <Play className="h-5 w-5 text-white" />
+          ) : (
+            <Pause className="h-5 w-5 text-white" />
+          )}
+        </button>
         
         {/* Timer mode tabs - FOCUS/BREAK switcher - only show for Pomodoro timer */}
         {timer.breakDuration > 0 && (
@@ -132,14 +146,6 @@ const TimerDisplay = () => {
             className="h-1 bg-white/10" 
           />
         </div>
-
-        {/* Start/Pause button */}
-        <button
-          onClick={pauseResumeTimer}
-          className="bg-gray-300 hover:bg-white text-black uppercase tracking-wider text-sm py-1.5 px-8 rounded-sm transition-colors"
-        >
-          {timer.isPaused ? "START" : "PAUSE"}
-        </button>
       </div>
     </div>
   );

@@ -39,13 +39,16 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
   return (
     <div className="flex flex-col items-center gap-3">
       <div 
-        className="w-20 h-20 rounded-full overflow-hidden relative cursor-pointer"
+        className="w-20 h-20 rounded-full overflow-hidden relative cursor-pointer shadow-lg transition-all duration-300"
         onClick={handleClick}
+        style={{
+          transform: isActive ? 'scale(1.05)' : 'scale(1)',
+        }}
       >
         <div className={`
           absolute inset-0 flex items-center justify-center 
           ${isActive 
-            ? "bg-white text-player-dark" 
+            ? "bg-[#0061EF] text-white" 
             : "bg-player-medium text-white/80 hover:bg-player-light hover:text-white"}
           ${isActive ? "border-2 border-white" : "border border-white/30"}
         `}>

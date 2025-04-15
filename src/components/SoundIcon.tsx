@@ -31,11 +31,11 @@ const SoundIcon = ({ sound, size = 'md', onClick }: SoundIconProps) => {
     <button
       onClick={handleClick}
       className={cn(
-        "rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden",
+        "rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden shadow-md",
         sizeClasses[size],
         isActive 
-          ? "ring-2 ring-white" 
-          : "ring-1 ring-white/30 hover:ring-white/50"
+          ? "ring-2 ring-white scale-110" 
+          : "ring-1 ring-white/30 hover:ring-white/50 hover:scale-105"
       )}
       title={sound.name}
     >
@@ -49,7 +49,7 @@ const SoundIcon = ({ sound, size = 'md', onClick }: SoundIconProps) => {
         <div className={cn(
           "w-full h-full flex items-center justify-center",
           isActive 
-            ? "bg-white text-player-dark" 
+            ? "bg-[#0061EF] text-white" 
             : "bg-player-medium text-white/80 hover:text-white hover:bg-player-light"
         )}>
           <Icon name={sound.icon} size={size === 'sm' ? 18 : size === 'md' ? 22 : 26} />
