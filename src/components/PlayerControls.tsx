@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Play, Pause, Timer, Image, Eye, EyeOff, Settings2, Library, MusicIcon } from "lucide-react";
@@ -42,6 +43,24 @@ const PlayerControls = () => {
       </div>
     );
   }
+  
+  // Function to handle PLAY mode button click
+  const handlePlayModeClick = () => {
+    if (state.isMixMode) {
+      toggleMixMode();
+    } else {
+      setIsExploreDrawerOpen(true);
+    }
+  };
+  
+  // Function to handle MIX mode button click
+  const handleMixModeClick = () => {
+    if (!state.isMixMode) {
+      toggleMixMode();
+    } else {
+      setIsMixDrawerOpen(true);
+    }
+  };
   
   return (
     <>
@@ -133,11 +152,11 @@ const PlayerControls = () => {
           {/* Mode Switcher */}
           <div className="flex items-center bg-black/20 rounded-full p-1 text-xs font-medium">
             <button
-              onClick={() => state.isMixMode && toggleMixMode()}
+              onClick={handlePlayModeClick}
               className={cn(
                 "px-3 py-1 rounded-full transition-colors",
                 !state.isMixMode
-                  ? "bg-[#0061EF]/90 text-white"
+                  ? "bg-gray-500/70 text-white"
                   : "text-white/50 hover:text-white"
               )}
             >
@@ -145,11 +164,11 @@ const PlayerControls = () => {
             </button>
             
             <button
-              onClick={() => !state.isMixMode && toggleMixMode()}
+              onClick={handleMixModeClick}
               className={cn(
                 "px-3 py-1 rounded-full transition-colors",
                 state.isMixMode
-                  ? "bg-[#0061EF]/90 text-white"
+                  ? "bg-gray-500/70 text-white"
                   : "text-white/50 hover:text-white"
               )}
             >
