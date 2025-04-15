@@ -39,14 +39,23 @@ const SoundIcon = ({ sound, size = 'md', onClick }: SoundIconProps) => {
       )}
       title={sound.name}
     >
-      <div className={cn(
-        "w-full h-full flex items-center justify-center",
-        isActive 
-          ? "bg-[#0061EF] text-white" 
-          : "bg-player-medium text-white/80 hover:text-white hover:bg-player-light"
-      )}>
-        <Icon name={sound.icon} size={size === 'sm' ? 18 : size === 'md' ? 22 : 26} />
-      </div>
+      {/* In normal play mode, use image if available */}
+      {!state.isMixMode && sound.imageUrl ? (
+        <img 
+          src={sound.imageUrl} 
+          alt={sound.name}
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <div className={cn(
+          "w-full h-full flex items-center justify-center",
+          isActive 
+            ? "bg-[#0061EF] text-white" 
+            : "bg-player-medium text-white/80 hover:text-white hover:bg-player-light"
+        )}>
+          <Icon name={sound.icon} size={size === 'sm' ? 18 : size === 'md' ? 22 : 26} />
+        </div>
+      )}
     </button>
   );
 };

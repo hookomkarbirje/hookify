@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
-import { X, ChevronDown, ChevronUp, Save } from "lucide-react";
+import { X, ChevronDown, ChevronUp, Save, BookMarked } from "lucide-react";
 import SoundMixTile from "./SoundMixTile";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { sounds } from "@/data/soundData";
@@ -72,7 +72,15 @@ const MixModeDrawer = ({ isOpen, onOpenChange }: MixModeDrawerProps) => {
           <div className="flex justify-between items-center mb-4 px-4 pt-4">
             <h3 className="text-white font-medium text-lg">Sound Mix</h3>
             <div className="flex gap-2">
-              {/* Save button only */}
+              {/* Saved Mixes button */}
+              <button
+                onClick={() => setIsSavedMixesOpen(true)}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all hover:scale-105"
+                title="View saved mixes"
+              >
+                <BookMarked className="h-4 w-4 text-white/70" />
+              </button>
+              {/* Save button */}
               <button
                 onClick={handleSaveMix}
                 className={`p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all ${state.activeSounds.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
