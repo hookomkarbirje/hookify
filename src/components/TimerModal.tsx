@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogD
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import TimerSettingsModal from "./TimerSettingsModal";
+import AdvancedSettingsDrawer from "./AdvancedSettingsDrawer";
 
 interface TimerModalProps {
   isOpen: boolean;
@@ -30,24 +30,22 @@ const TimerModal = ({
   const [customFocusMinutes, setCustomFocusMinutes] = useState<string>("");
   const [customBreakMinutes, setCustomBreakMinutes] = useState<string>("");
   const [showSettings, setShowSettings] = useState(false);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [timerType, setTimerType] = useState<'pomodoro' | 'simple'>('pomodoro');
   
   const isMobile = useIsMobile();
   
   const handleSetTimer = () => {
-    // Use custom values if provided, otherwise use slider values
     const focusMinutes = customFocusMinutes ? parseInt(customFocusMinutes) : selectedMinutes;
     const breakMinutes = customBreakMinutes ? parseInt(customBreakMinutes) : shortBreakMinutes;
 
-    // For simple timer, set break duration to 0
     const breakDuration = timerType === 'simple' ? 0 : breakMinutes * 60;
 
-    // Pass both duration, break duration, rounds, and task to setTimer
     setTimer(
-      focusMinutes * 60, // Convert focus time to seconds
+      focusMinutes * 60,
       task,
-      breakDuration, // Convert break time to seconds or 0 for simple timer
-      timerType === 'simple' ? 1 : rounds // Simple timer always has 1 round
+      breakDuration,
+      timerType === 'simple' ? 1 : rounds
     );
     
     onClose();
@@ -84,7 +82,6 @@ const TimerModal = ({
           </DialogHeader>
 
           <div className="py-4">
-            {/* Timer Type Selection */}
             <div className="mb-4">
               <Tabs 
                 defaultValue={timerType} 
@@ -109,7 +106,6 @@ const TimerModal = ({
               </Tabs>
             </div>
             
-            {/* Task input */}
             <Input 
               type="text" 
               placeholder="What's getting done?" 
@@ -118,8 +114,7 @@ const TimerModal = ({
               className="bg-white/5 border-white/10 text-white mb-6 p-4 h-12 rounded-lg" 
             />
             
-            {/* Timer settings preview */}
-            <div className="bg-white/5 rounded-lg p-4 mb-6 cursor-pointer">
+            <div className="bg-white/5 rounded-lg p-4 mb-6">
               <div className="flex justify-between items-center" onClick={() => setShowSettings(true)}>
                 <div className="text-center">
                   <div className="text-4xl font-light">{selectedMinutes}</div>
@@ -141,7 +136,15 @@ const TimerModal = ({
               </div>
             </div>
             
-            {/* Rounds adjuster - only show for pomodoro */}
+            <Button 
+              variant="outline" 
+              className="w-full bg-white/5 hover:bg-white/10 border-white/10 text-white"
+              onClick={() => setShowAdvancedSettings(true)}
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Advanced Settings
+            </Button>
+
             {timerType === 'pomodoro' && (
               <div className="flex justify-between items-center mb-2">
                 <button onClick={decrementRounds} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center">
@@ -171,7 +174,6 @@ const TimerModal = ({
         </DialogContent>
       </Dialog>
 
-      {/* Only render the settings modal when needed */}
       {showSettings && (
         <TimerSettingsModal 
           isOpen={showSettings} 
@@ -186,6 +188,11 @@ const TimerModal = ({
           setCustomBreakMinutes={setCustomBreakMinutes} 
         />
       )}
+
+      <AdvancedSettingsDrawer 
+        isOpen={showAdvancedSettings}
+        onOpenChange={setShowAdvancedSettings}
+      />
     </>
   );
 };
