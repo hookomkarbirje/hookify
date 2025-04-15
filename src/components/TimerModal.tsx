@@ -5,15 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Timer, Minus, Plus, ChevronRight, Settings } from "lucide-react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import TimerSettingsModal from "./TimerSettingsModal";
-
 interface TimerModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 const TimerModal = ({
   isOpen,
   onClose
@@ -22,7 +19,6 @@ const TimerModal = ({
     state,
     setTimer
   } = usePlayer();
-  
   const [selectedMinutes, setSelectedMinutes] = useState(25);
   const [shortBreakMinutes, setShortBreakMinutes] = useState(5);
   const [rounds, setRounds] = useState(1);
@@ -30,47 +26,34 @@ const TimerModal = ({
   const [customFocusMinutes, setCustomFocusMinutes] = useState<string>("");
   const [customBreakMinutes, setCustomBreakMinutes] = useState<string>("");
   const [showSettings, setShowSettings] = useState(false);
-  const [timerType, setTimerType] = useState<'pomodoro' | 'simple'>('pomodoro');
-  
   const isMobile = useIsMobile();
-  
   const handleSetTimer = () => {
     // Use custom values if provided, otherwise use slider values
     const focusMinutes = customFocusMinutes ? parseInt(customFocusMinutes) : selectedMinutes;
     const breakMinutes = customBreakMinutes ? parseInt(customBreakMinutes) : shortBreakMinutes;
 
-    // For simple timer, set break duration to 0
-    const breakDuration = timerType === 'simple' ? 0 : breakMinutes * 60;
-
     // Pass both duration, break duration, rounds, and task to setTimer
-    setTimer(
-      focusMinutes * 60, // Convert focus time to seconds
-      task,
-      breakDuration, // Convert break time to seconds or 0 for simple timer
-      timerType === 'simple' ? 1 : rounds // Simple timer always has 1 round
+    setTimer(focusMinutes * 60,
+    // Convert focus time to seconds
+    task, breakMinutes * 60,
+    // Convert break time to seconds
+    rounds // Pass the number of rounds
     );
-    
     onClose();
   };
-  
   const formatTimeDisplay = (minutes: number) => {
     return `${minutes < 10 ? '0' : ''}${minutes}:00`;
   };
-  
   const incrementRounds = () => {
     setRounds(prev => Math.min(prev + 1, 10));
   };
-  
   const decrementRounds = () => {
     setRounds(prev => Math.max(prev - 1, 1));
   };
-
   if (!isOpen) {
     return null;
   }
-
-  return (
-    <>
+  return <>
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
         <DialogContent className="bg-black border-white/10 text-white max-w-sm sm:max-w-md">
           <DialogHeader className="text-center">
@@ -84,39 +67,8 @@ const TimerModal = ({
           </DialogHeader>
 
           <div className="py-4">
-            {/* Timer Type Selection */}
-            <div className="mb-4">
-              <Tabs 
-                defaultValue={timerType} 
-                value={timerType}
-                onValueChange={(value) => setTimerType(value as 'pomodoro' | 'simple')}
-                className="w-full"
-              >
-                <TabsList className="w-full bg-white/5">
-                  <TabsTrigger 
-                    value="pomodoro"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white flex-1 text-white/70"
-                  >
-                    Pomodoro
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="simple"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white flex-1 text-white/70"
-                  >
-                    Simple Timer
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-            
             {/* Task input */}
-            <Input 
-              type="text" 
-              placeholder="What's getting done?" 
-              value={task} 
-              onChange={e => setTask(e.target.value)} 
-              className="bg-white/5 border-white/10 text-white mb-6 p-4 h-12 rounded-lg" 
-            />
+            <Input type="text" placeholder="What's getting done?" value={task} onChange={e => setTask(e.target.value)} className="bg-white/5 border-white/10 text-white mb-6 p-4 h-12 rounded-lg" />
             
             {/* Timer settings preview */}
             <div className="bg-white/5 rounded-lg p-4 mb-6 cursor-pointer">
@@ -125,12 +77,10 @@ const TimerModal = ({
                   <div className="text-4xl font-light">{selectedMinutes}</div>
                   <div className="text-white/60 text-xs">Focus</div>
                 </div>
-                {timerType === 'pomodoro' && (
-                  <div className="text-center">
-                    <div className="text-4xl font-light">{shortBreakMinutes}</div>
-                    <div className="text-white/60 text-xs">Short Break</div>
-                  </div>
-                )}
+                <div className="text-center">
+                  <div className="text-4xl font-light">{shortBreakMinutes}</div>
+                  <div className="text-white/60 text-xs">Short Break</div>
+                </div>
                 <div className="flex flex-col items-center">
                   <div className="flex items-center text-white/80">
                     <Settings size={16} className="mr-1" />
@@ -141,23 +91,21 @@ const TimerModal = ({
               </div>
             </div>
             
-            {/* Rounds adjuster - only show for pomodoro */}
-            {timerType === 'pomodoro' && (
-              <div className="flex justify-between items-center mb-2">
-                <button onClick={decrementRounds} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center">
-                  <Minus size={20} className="text-white" />
-                </button>
-                <div className="text-center">
-                  <div className="text-white">Rounds: {rounds}</div>
-                  <div className="text-white/60 text-xs mt-1">
-                    {rounds} × Focus Time + {rounds} × Short Break
-                  </div>
+            {/* Rounds adjuster */}
+            <div className="flex justify-between items-center mb-2">
+              <button onClick={decrementRounds} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center">
+                <Minus size={20} className="text-white" />
+              </button>
+              <div className="text-center">
+                <div className="text-white">Rounds: {rounds}</div>
+                <div className="text-white/60 text-xs mt-1">
+                  {rounds} × Focus Time + {rounds} × Short Break
                 </div>
-                <button onClick={incrementRounds} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center">
-                  <Plus size={20} className="text-white" />
-                </button>
               </div>
-            )}
+              <button onClick={incrementRounds} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center">
+                <Plus size={20} className="text-white" />
+              </button>
+            </div>
           </div>
 
           <DialogFooter className="flex flex-col gap-2 sm:flex-row">
@@ -172,22 +120,7 @@ const TimerModal = ({
       </Dialog>
 
       {/* Only render the settings modal when needed */}
-      {showSettings && (
-        <TimerSettingsModal 
-          isOpen={showSettings} 
-          onClose={() => setShowSettings(false)} 
-          selectedMinutes={selectedMinutes} 
-          setSelectedMinutes={setSelectedMinutes} 
-          shortBreakMinutes={shortBreakMinutes} 
-          setShortBreakMinutes={setShortBreakMinutes} 
-          customFocusMinutes={customFocusMinutes} 
-          setCustomFocusMinutes={setCustomFocusMinutes} 
-          customBreakMinutes={customBreakMinutes} 
-          setCustomBreakMinutes={setCustomBreakMinutes} 
-        />
-      )}
-    </>
-  );
+      {showSettings && <TimerSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} selectedMinutes={selectedMinutes} setSelectedMinutes={setSelectedMinutes} shortBreakMinutes={shortBreakMinutes} setShortBreakMinutes={setShortBreakMinutes} customFocusMinutes={customFocusMinutes} setCustomFocusMinutes={setCustomFocusMinutes} customBreakMinutes={customBreakMinutes} setCustomBreakMinutes={setCustomBreakMinutes} />}
+    </>;
 };
-
 export default TimerModal;
