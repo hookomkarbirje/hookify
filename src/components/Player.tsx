@@ -2,7 +2,6 @@
 import { usePlayer } from "@/context/PlayerContext";
 import PlayerControls from "./PlayerControls";
 import TimerDisplay from "./TimerDisplay";
-import { Icon } from "./Icon";
 
 const Player = () => {
   const { state } = usePlayer();
@@ -40,11 +39,7 @@ const Player = () => {
             </p>
           ) : currentSound ? (
             <>
-              <div className="flex items-center justify-center gap-1 mb-1">
-                <Icon name={currentSound.icon} size={16} className="text-white/70" />
-                <span className="text-white text-base font-light">{currentSound.name}</span>
-              </div>
-              <p className="text-white/70 text-xs mt-1">{currentSound.category}</p>
+              <span className="text-white text-base font-light">{currentSound.name}</span>
             </>
           ) : (
             <p className="text-white/70 text-sm">Select a sound to begin</p>

@@ -1,9 +1,8 @@
 
 import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
-import { Play, Pause, Timer, Image, Eye, EyeOff, Settings2 } from "lucide-react";
+import { Play, Pause, Timer, Image, Eye, EyeOff, Settings2, Library } from "lucide-react";
 import { sounds } from "@/data/soundData";
-import SoundIcon from "./SoundIcon";
 import TimerModal from "./TimerModal";
 import BackgroundGallery from "./BackgroundGallery";
 import ExploreDrawer from "./ExploreDrawer";
@@ -105,45 +104,58 @@ const PlayerControls = () => {
           </div>
         </div>
 
-        {/* Mode Switcher */}
-        <div className="flex items-center bg-player-medium/80 rounded-full p-1 text-sm">
-          <div className="flex items-center">
+        {/* Mode Switcher and Library Access */}
+        <div className="flex items-center gap-4">
+          {/* Library button for PLAY mode */}
+          <button
+            onClick={() => setIsExploreDrawerOpen(true)}
+            className={cn(
+              "control-button",
+              !state.isMixMode && "text-white bg-player-light border-white/20"
+            )}
+            title="Sound library"
+          >
+            <Library className="w-5 h-5" />
+          </button>
+
+          {/* Mode Switcher */}
+          <div className="flex items-center bg-player-medium/80 rounded-full p-1 text-sm font-medium">
             <button
               onClick={() => state.isMixMode && toggleMixMode()}
               className={cn(
-                "px-4 py-1 rounded-full transition-colors",
+                "px-4 py-1.5 rounded-full transition-colors",
                 !state.isMixMode
-                  ? "bg-white text-black"
-                  : "text-white/70 hover:text-white"
+                  ? "bg-player-light text-white"
+                  : "text-white/50 hover:text-white"
               )}
             >
               PLAY
-              <button 
-                onClick={() => setIsExploreDrawerOpen(true)}
-                className="ml-2 px-2 py-0.5 text-xs rounded bg-black/20 hover:bg-black/30"
-              >
-                Library
-              </button>
             </button>
             
             <button
               onClick={() => !state.isMixMode && toggleMixMode()}
               className={cn(
-                "px-4 py-1 rounded-full transition-colors",
+                "px-4 py-1.5 rounded-full transition-colors",
                 state.isMixMode
-                  ? "bg-white text-black"
-                  : "text-white/70 hover:text-white"
+                  ? "bg-player-light text-white"
+                  : "text-white/50 hover:text-white"
               )}
             >
               MIX
-              <button 
-                onClick={() => setIsMixDrawerOpen(true)}
-                className="ml-2 px-2 py-0.5 text-xs rounded bg-black/20 hover:bg-black/30"
-              >
-                Library
-              </button>
             </button>
           </div>
+
+          {/* Library button for MIX mode */}
+          <button
+            onClick={() => setIsMixDrawerOpen(true)}
+            className={cn(
+              "control-button",
+              state.isMixMode && "text-white bg-player-light border-white/20"
+            )}
+            title="Mix library"
+          >
+            <Library className="w-5 h-5" />
+          </button>
         </div>
       </div>
       
