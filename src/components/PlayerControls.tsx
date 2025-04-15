@@ -12,6 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import MixModeDrawer from "./MixModeDrawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import AdvancedSettingsDrawer from "./AdvancedSettingsDrawer";
+import SavedMixesDrawer from "./SavedMixesDrawer";
 
 const PlayerControls = () => {
   const {
@@ -19,13 +20,15 @@ const PlayerControls = () => {
     togglePlayPause,
     toggleHideInterface,
     toggleMixMode,
-    setShowMixPanel
+    setShowMixPanel,
+    saveMix,
   } = usePlayer();
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
   const [isBackgroundGalleryOpen, setIsBackgroundGalleryOpen] = useState(false);
   const [isExploreDrawerOpen, setIsExploreDrawerOpen] = useState(false);
   const [isMixDrawerOpen, setIsMixDrawerOpen] = useState(false);
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
+  const [isSavedMixesOpen, setIsSavedMixesOpen] = useState(false);
   const isMobile = useIsMobile();
   
   useEffect(() => {
@@ -61,9 +64,89 @@ const PlayerControls = () => {
       setIsMixDrawerOpen(true);
     }
   };
+
+  const handleSaveMix = () => {
+    if (state.activeSounds.length > 0) {
+      saveMix();
+    }
+  };
   
   return (
     <>
+      {/* Mode Switcher at the top */}
+      <div className="fixed top-12 left-1/2 transform -translate-x-1/2 z-10">
+        <div className="flex items-center gap-3 bg-black/40 backdrop-blur-sm rounded-full p-1.5 border border-white/10">
+          {/* Library button for PLAY mode */}
+          <button
+            onClick={() => setIsExploreDrawerOpen(true)}
+            className={cn(
+              "p-2 rounded-full transition-colors flex items-center justify-center",
+              !state.isMixMode && "text-white bg-white/10"
+            )}
+            title="Sound library"
+          >
+            <MusicIcon className="w-4 h-4" />
+          </button>
+
+          {/* Mode Switcher */}
+          <div className="flex items-center bg-black/20 rounded-full p-1 text-xs font-medium">
+            <button
+              onClick={handlePlayModeClick}
+              className={cn(
+                "px-3 py-1 rounded-full transition-colors",
+                !state.isMixMode
+                  ? "bg-gray-500/70 text-white"
+                  : "text-white/50 hover:text-white"
+              )}
+            >
+              PLAY
+            </button>
+            
+            <button
+              onClick={handleMixModeClick}
+              className={cn(
+                "px-3 py-1 rounded-full transition-colors",
+                state.isMixMode
+                  ? "bg-gray-500/70 text-white"
+                  : "text-white/50 hover:text-white"
+              )}
+            >
+              MIX
+            </button>
+          </div>
+
+          {/* Library button for MIX mode */}
+          <button
+            onClick={() => state.isMixMode ? setIsMixDrawerOpen(true) : null}
+            className={cn(
+              "p-2 rounded-full transition-colors flex items-center justify-center",
+              state.isMixMode && "text-white bg-white/10"
+            )}
+            title="Mix library"
+          >
+            <Library className="w-4 h-4" />
+          </button>
+        </div>
+        
+        {/* Save/Library buttons when in mix mode */}
+        {state.isMixMode && state.activeSounds.length > 0 && (
+          <div className="mt-2 flex justify-center gap-2">
+            <button 
+              onClick={handleSaveMix} 
+              className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full"
+            >
+              Save Mix
+            </button>
+            <button 
+              onClick={() => setIsSavedMixesOpen(true)} 
+              className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full"
+            >
+              Saved Mixes
+            </button>
+          </div>
+        )}
+      </div>
+      
       {/* Sound Icons Scroll Area */}
       {!state.isMixMode && (
         <div className="fixed bottom-36 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-4xl px-4">
@@ -134,60 +217,6 @@ const PlayerControls = () => {
             </div>
           </div>
         </div>
-
-        {/* Mode Switcher and Library Access */}
-        <div className="flex items-center gap-3 bg-black/20 backdrop-blur-sm rounded-full p-1.5 border border-white/10">
-          {/* Library button for PLAY mode */}
-          <button
-            onClick={() => setIsExploreDrawerOpen(true)}
-            className={cn(
-              "p-2 rounded-full transition-colors flex items-center justify-center",
-              !state.isMixMode && "text-white bg-white/10"
-            )}
-            title="Sound library"
-          >
-            <MusicIcon className="w-4 h-4" />
-          </button>
-
-          {/* Mode Switcher */}
-          <div className="flex items-center bg-black/20 rounded-full p-1 text-xs font-medium">
-            <button
-              onClick={handlePlayModeClick}
-              className={cn(
-                "px-3 py-1 rounded-full transition-colors",
-                !state.isMixMode
-                  ? "bg-gray-500/70 text-white"
-                  : "text-white/50 hover:text-white"
-              )}
-            >
-              PLAY
-            </button>
-            
-            <button
-              onClick={handleMixModeClick}
-              className={cn(
-                "px-3 py-1 rounded-full transition-colors",
-                state.isMixMode
-                  ? "bg-gray-500/70 text-white"
-                  : "text-white/50 hover:text-white"
-              )}
-            >
-              MIX
-            </button>
-          </div>
-
-          {/* Library button for MIX mode */}
-          <button
-            onClick={() => setIsMixDrawerOpen(true)}
-            className={cn(
-              "p-2 rounded-full transition-colors flex items-center justify-center",
-              state.isMixMode && "text-white bg-white/10"
-            )}
-            title="Mix library"
-          >
-            <Library className="w-4 h-4" />
-          </button>
-        </div>
       </div>
       
       <TimerModal isOpen={isTimerModalOpen} onClose={() => setIsTimerModalOpen(false)} />
@@ -196,6 +225,10 @@ const PlayerControls = () => {
       <AdvancedSettingsDrawer 
         isOpen={isAdvancedSettingsOpen} 
         onOpenChange={setIsAdvancedSettingsOpen}
+      />
+      <SavedMixesDrawer
+        isOpen={isSavedMixesOpen}
+        onClose={() => setIsSavedMixesOpen(false)}
       />
     </>
   );

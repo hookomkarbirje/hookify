@@ -39,6 +39,19 @@ export interface TimerConfig {
   showNotifications?: boolean; // Whether to show browser notifications
 }
 
+export interface SoundMixItem {
+  id: string;
+  volume: number;
+}
+
+export interface SavedMix {
+  id: string;
+  name: string;
+  sounds: SoundMixItem[];
+  createdAt: string;
+  backgroundId?: string;
+}
+
 export interface PlayerState {
   isPlaying: boolean;
   isHidden: boolean;
@@ -49,4 +62,5 @@ export interface PlayerState {
   currentBackground: BackgroundImage;
   volume: number; // Master volume
   useBackgroundFromSound: boolean; // Whether to use sound's background image
+  savedMixes: SavedMix[]; // User's saved mixes
 }

@@ -1,9 +1,10 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { PlayerState, Sound, BackgroundImage, TimerConfig } from '@/types';
+import { PlayerState, Sound, BackgroundImage, TimerConfig, SavedMix } from '@/types';
 import { sounds, backgroundImages } from '@/data/soundData';
 import { toast } from 'sonner';
 import { setCookie, getCookie } from '@/lib/cookieUtils';
 import { playTimerSound, showTimerNotification, requestNotificationPermission } from '@/lib/soundService';
+import { generateShareableUrl, parseMixFromUrl } from '@/lib/mixUtils';
 
 interface PlayerContextType {
   state: PlayerState;
@@ -23,6 +24,11 @@ interface PlayerContextType {
   updateTimerSettings: (settings: Partial<TimerConfig>) => void;
   showMixPanel: boolean;
   setShowMixPanel: (show: boolean) => void;
+  saveMix: (name?: string) => string;
+  loadMix: (mixId: string) => void;
+  deleteMix: (mixId: string) => void;
+  getSavedMixes: () => SavedMix[];
+  shareMix: (mixId: string) => string;
 }
 
 const initialState: PlayerState = {
@@ -51,6 +57,7 @@ const initialState: PlayerState = {
   currentBackground: backgroundImages[0],
   volume: 0.8,
   useBackgroundFromSound: true,
+  savedMixes: [],
 };
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -74,6 +81,31 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setAudioElements(elementsMap);
     
     requestNotificationPermission();
+    
+    const savedMixesJson = localStorage.getItem('savedMixes');
+    if (savedMixesJson) {
+      try {
+        const savedMixes = JSON.parse(savedMixesJson) as SavedMix[];
+        setState(prev => ({ ...prev, savedMixes }));
+      } catch (e) {
+        console.error('Error parsing saved mixes:', e);
+      }
+    }
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const mixParam = urlParams.get('mix');
+    if (mixParam) {
+      try {
+        const mixData = parseMixFromUrl(mixParam);
+        if (mixData && mixData.sounds.length > 0) {
+          loadMixFromData(mixData);
+          toast.success("Mix loaded from shared link!");
+        }
+      } catch (e) {
+        console.error('Error loading mix from URL:', e);
+        toast.error('Could not load the shared mix');
+      }
+    }
 
     return () => {
       elementsMap.forEach(audio => {
@@ -159,86 +191,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       }
     }
   }, [audioElements]);
-
-  useEffect(() => {
-    if (state.timer.isActive && state.timer.remaining > 0 && !state.timer.isPaused) {
-      const interval = window.setInterval(() => {
-        setState(prevState => ({
-          ...prevState,
-          timer: {
-            ...prevState.timer,
-            remaining: prevState.timer.remaining - 1,
-          }
-        }));
-      }, 1000);
-      
-      setTimerInterval(interval);
-      
-      return () => clearInterval(interval);
-    } else if (state.timer.isActive && state.timer.remaining === 0) {
-      if (state.timer.playSound) {
-        playTimerSound(state.timer.soundType || 'beep');
-      }
-      
-      if (state.timer.showNotifications) {
-        const mode = state.timer.mode === 'focus' ? 'Focus' : 'Break';
-        showTimerNotification(`${mode} Time Complete`, 
-          state.timer.mode === 'focus' 
-            ? 'Time to take a break!' 
-            : 'Time to focus again!'
-        );
-      }
-      
-      if (state.timer.breakDuration > 0) {
-        if (state.timer.mode === 'focus') {
-          setState(prevState => ({
-            ...prevState,
-            timer: {
-              ...prevState.timer,
-              mode: 'break',
-              remaining: prevState.timer.breakDuration,
-              duration: prevState.timer.breakDuration,
-              isPaused: !prevState.timer.autoStart,
-            }
-          }));
-          toast('Focus time completed', {
-            description: 'Taking a break now',
-          });
-        } else if (state.timer.mode === 'break') {
-          const completedRounds = state.timer.completedRounds + 1;
-          
-          if (completedRounds < state.timer.totalRounds) {
-            setState(prevState => ({
-              ...prevState,
-              timer: {
-                ...prevState.timer,
-                mode: 'focus',
-                remaining: prevState.timer.duration,
-                currentRound: prevState.timer.currentRound + 1,
-                completedRounds: completedRounds,
-                isPaused: !prevState.timer.autoStart,
-              }
-            }));
-            toast('Break completed', {
-              description: `Starting round ${completedRounds + 1} of ${state.timer.totalRounds}`,
-            });
-          } else {
-            toast('Timer completed', {
-              description: `Completed all ${state.timer.totalRounds} rounds`,
-            });
-            cancelTimer();
-          }
-        }
-      } else {
-        toast('Timer completed!');
-        cancelTimer();
-      }
-    }
-    
-    return () => {
-      if (timerInterval) clearInterval(timerInterval);
-    };
-  }, [state.timer.isActive, state.timer.remaining, state.timer.isPaused, state.timer.mode]);
 
   const playSound = (sound: Sound) => {
     const audioElement = audioElements.get(sound.id);
@@ -521,6 +473,114 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     toast(state.timer.isPaused ? 'Timer resumed' : 'Timer paused');
   };
 
+  const saveMix = (name?: string) => {
+    if (state.activeSounds.length === 0) {
+      toast.error("No sounds to save");
+      return "";
+    }
+    
+    const mixName = name || `Mix ${state.savedMixes.length + 1}`;
+    const timestamp = new Date().toISOString();
+    const id = `mix_${Date.now().toString(36)}`;
+    
+    const mixData: SavedMix = {
+      id,
+      name: mixName,
+      sounds: state.activeSounds.map(sound => ({
+        id: sound.id,
+        volume: sound.volume || state.volume
+      })),
+      createdAt: timestamp,
+      backgroundId: state.currentBackground.id
+    };
+    
+    const updatedMixes = [...state.savedMixes, mixData];
+    
+    setState(prev => ({
+      ...prev,
+      savedMixes: updatedMixes
+    }));
+    
+    localStorage.setItem('savedMixes', JSON.stringify(updatedMixes));
+    
+    toast.success(`Mix "${mixName}" saved`);
+    return id;
+  };
+  
+  const loadMix = (mixId: string) => {
+    const mix = state.savedMixes.find(m => m.id === mixId);
+    if (!mix) {
+      toast.error("Mix not found");
+      return;
+    }
+    
+    loadMixFromData(mix);
+  };
+  
+  const loadMixFromData = (mix: SavedMix) => {
+    audioElements.forEach(audio => audio.pause());
+    
+    if (!state.isMixMode) {
+      setState(prev => ({ ...prev, isMixMode: true }));
+    }
+    
+    const activeSoundObjects = mix.sounds.map(soundInfo => {
+      const sound = sounds.find(s => s.id === soundInfo.id);
+      return sound ? { ...sound, volume: soundInfo.volume } : null;
+    }).filter(Boolean) as Sound[];
+    
+    if (mix.backgroundId) {
+      const background = backgroundImages.find(bg => bg.id === mix.backgroundId);
+      if (background) {
+        setState(prev => ({
+          ...prev,
+          currentBackground: background,
+        }));
+      }
+    }
+    
+    setState(prev => ({
+      ...prev,
+      activeSounds: activeSoundObjects,
+      isPlaying: false
+    }));
+    
+    toast.success(`Loaded mix "${mix.name}"`);
+  };
+  
+  const deleteMix = (mixId: string) => {
+    const updatedMixes = state.savedMixes.filter(mix => mix.id !== mixId);
+    
+    setState(prev => ({
+      ...prev,
+      savedMixes: updatedMixes
+    }));
+    
+    localStorage.setItem('savedMixes', JSON.stringify(updatedMixes));
+    toast.success("Mix deleted");
+  };
+  
+  const getSavedMixes = () => {
+    return state.savedMixes;
+  };
+  
+  const shareMix = (mixId: string) => {
+    const mix = state.savedMixes.find(m => m.id === mixId);
+    if (!mix) {
+      toast.error("Mix not found");
+      return "";
+    }
+    
+    const shareUrl = generateShareableUrl(mix);
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      toast.success("Share link copied to clipboard");
+    }).catch(() => {
+      toast.error("Failed to copy link");
+    });
+    
+    return shareUrl;
+  };
+
   return (
     <PlayerContext.Provider
       value={{
@@ -541,6 +601,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         updateTimerSettings,
         showMixPanel,
         setShowMixPanel,
+        saveMix,
+        loadMix,
+        deleteMix,
+        getSavedMixes,
+        shareMix,
       }}
     >
       {children}

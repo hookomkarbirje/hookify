@@ -66,7 +66,7 @@ const TimerDisplay = () => {
         {/* Timer menu in the top-right */}
         <TimerMenu className="absolute right-2 top-0" />
         
-        {/* Play/Pause button in the top-left */}
+        {/* Play/Pause button positioned in the top-left */}
         <button 
           onClick={pauseResumeTimer} 
           aria-label={timer.isPaused ? "Start timer" : "Pause timer"} 
