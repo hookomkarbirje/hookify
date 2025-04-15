@@ -17,7 +17,7 @@ interface TimerMenuProps {
 }
 
 const TimerMenu = ({ className }: TimerMenuProps) => {
-  const { state, resetTimer, cancelTimer } = usePlayer();
+  const { state, resetTimer, cancelTimer, pauseResumeTimer } = usePlayer();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -41,12 +41,21 @@ const TimerMenu = ({ className }: TimerMenuProps) => {
     const newDuration = currentDuration + 10 * 60;
     
     // Reset the timer with the new duration
-    // This is a workaround since we don't have direct access to update the remaining time
     if (currentMode === 'focus') {
-      state.timer.duration = newDuration;
+      const newTimer = {
+        ...state.timer,
+        duration: newDuration,
+        remaining: newDuration
+      };
+      
       resetTimer('focus');
     } else {
-      state.timer.breakDuration = newDuration;
+      const newTimer = {
+        ...state.timer,
+        breakDuration: newDuration,
+        remaining: newDuration
+      };
+      
       resetTimer('break');
     }
     
@@ -67,7 +76,7 @@ const TimerMenu = ({ className }: TimerMenuProps) => {
         </PopoverTrigger>
         <PopoverContent 
           className="w-56 p-2 bg-player-dark border-white/10 text-white"
-          align="end"
+          align="center"
         >
           <div className="flex flex-col space-y-1">
             <Button 

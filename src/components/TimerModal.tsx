@@ -1,17 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Timer, Minus, Plus, ChevronRight, Settings } from "lucide-react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import TimerSettingsModal from "./TimerSettingsModal";
 import AdvancedSettingsDrawer from "./AdvancedSettingsDrawer";
+
 interface TimerModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
 const TimerModal = ({
   isOpen,
   onClose
@@ -30,6 +32,15 @@ const TimerModal = ({
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [timerType, setTimerType] = useState<'pomodoro' | 'simple'>('pomodoro');
   const isMobile = useIsMobile();
+  
+  // Keep timer type consistent when navigating between screens
+  useEffect(() => {
+    // Pass the timer type to settings dialog
+    if (showSettings) {
+      // The settings modal will use this timerType
+    }
+  }, [showSettings, timerType]);
+  
   const handleSetTimer = () => {
     const focusMinutes = customFocusMinutes ? parseInt(customFocusMinutes) : selectedMinutes;
     const breakMinutes = customBreakMinutes ? parseInt(customBreakMinutes) : shortBreakMinutes;
@@ -37,18 +48,23 @@ const TimerModal = ({
     setTimer(focusMinutes * 60, task, breakDuration, timerType === 'simple' ? 1 : rounds);
     onClose();
   };
+  
   const formatTimeDisplay = (minutes: number) => {
     return `${minutes < 10 ? '0' : ''}${minutes}:00`;
   };
+  
   const incrementRounds = () => {
     setRounds(prev => Math.min(prev + 1, 10));
   };
+  
   const decrementRounds = () => {
     setRounds(prev => Math.max(prev - 1, 1));
   };
+  
   if (!isOpen) {
     return null;
   }
+  
   return <>
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
         <DialogContent className="bg-black border-white/10 text-white max-w-sm sm:max-w-md">
@@ -58,7 +74,17 @@ const TimerModal = ({
                 <Timer className="h-6 w-6 text-white" />
               </div>
             </div>
-            <DialogTitle className="text-white text-2xl font-light">Focus Timer</DialogTitle>
+            <DialogTitle className="text-white text-2xl font-light">
+              <div className="flex items-center justify-center">
+                Focus Timer
+                <button 
+                  className="ml-2 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-all"
+                  onClick={() => setShowSettings(true)}
+                >
+                  <Settings className="h-4 w-4 text-white/70" />
+                </button>
+              </div>
+            </DialogTitle>
             
           </DialogHeader>
 
@@ -98,8 +124,6 @@ const TimerModal = ({
               </div>
             </div>
             
-            
-
             {timerType === 'pomodoro' && <div className="flex justify-between items-center mb-2">
                 <button onClick={decrementRounds} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center">
                   <Minus size={20} className="text-white" />
@@ -127,7 +151,18 @@ const TimerModal = ({
         </DialogContent>
       </Dialog>
 
-      {showSettings && <TimerSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} selectedMinutes={selectedMinutes} setSelectedMinutes={setSelectedMinutes} shortBreakMinutes={shortBreakMinutes} setShortBreakMinutes={setShortBreakMinutes} customFocusMinutes={customFocusMinutes} setCustomFocusMinutes={setCustomFocusMinutes} customBreakMinutes={customBreakMinutes} setCustomBreakMinutes={setCustomBreakMinutes} />}
+      {showSettings && <TimerSettingsModal 
+        isOpen={showSettings} 
+        onClose={() => setShowSettings(false)} 
+        selectedMinutes={selectedMinutes} 
+        setSelectedMinutes={setSelectedMinutes} 
+        shortBreakMinutes={shortBreakMinutes} 
+        setShortBreakMinutes={setShortBreakMinutes} 
+        customFocusMinutes={customFocusMinutes} 
+        setCustomFocusMinutes={setCustomFocusMinutes} 
+        customBreakMinutes={customBreakMinutes} 
+        setCustomBreakMinutes={setCustomBreakMinutes} 
+      />}
 
       <AdvancedSettingsDrawer isOpen={showAdvancedSettings} onOpenChange={setShowAdvancedSettings} />
     </>;

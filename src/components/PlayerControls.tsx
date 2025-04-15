@@ -63,36 +63,45 @@ const PlayerControls = () => {
   return <>
       {/* Mode Switcher at the top */}
       <div className="fixed top-12 left-1/2 transform -translate-x-1/2 z-10">
-        <div className="flex items-center gap-3 bg-black/40 backdrop-blur-sm rounded-full p-1.5 border border-white/10">
-          {/* Library button for PLAY mode */}
-          <button onClick={() => setIsExploreDrawerOpen(true)} className={cn("p-2 rounded-full transition-colors flex items-center justify-center", !state.isMixMode && "text-white bg-white/10")} title="Sound library">
-            <MusicIcon className="w-4 h-4" />
-          </button>
-
-          {/* Mode Switcher */}
-          <div className="flex items-center bg-black/20 rounded-full p-1 text-xs font-medium">
-            <button onClick={handlePlayModeClick} className={cn("px-3 py-1 rounded-full transition-colors", !state.isMixMode ? "bg-gray-500/70 text-white" : "text-white/50 hover:text-white")}>
-              PLAY
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex items-center gap-3 bg-black/40 backdrop-blur-sm rounded-full p-1.5 border border-white/10">
+            {/* Library button for PLAY mode */}
+            <button onClick={() => setIsExploreDrawerOpen(true)} className={cn("p-2 rounded-full transition-colors flex items-center justify-center", !state.isMixMode && "text-white bg-white/10")} title="Sound library">
+              <MusicIcon className="w-4 h-4" />
             </button>
-            
-            <button onClick={handleMixModeClick} className={cn("px-3 py-1 rounded-full transition-colors", state.isMixMode ? "bg-gray-500/70 text-white" : "text-white/50 hover:text-white")}>
-              MIX
+
+            {/* Mode Switcher */}
+            <div className="flex items-center bg-black/20 rounded-full p-1 text-xs font-medium">
+              <button onClick={handlePlayModeClick} className={cn("px-3 py-1 rounded-full transition-colors", !state.isMixMode ? "bg-gray-500/70 text-white" : "text-white/50 hover:text-white")}>
+                PLAY
+              </button>
+              
+              <button onClick={handleMixModeClick} className={cn("px-3 py-1 rounded-full transition-colors", state.isMixMode ? "bg-gray-500/70 text-white" : "text-white/50 hover:text-white")}>
+                MIX
+              </button>
+            </div>
+
+            {/* Library button for MIX mode */}
+            <button onClick={() => state.isMixMode ? setIsMixDrawerOpen(true) : null} className={cn("p-2 rounded-full transition-colors flex items-center justify-center", state.isMixMode && "text-white bg-white/10")} title="Mix library">
+              <Library className="w-4 h-4" />
             </button>
           </div>
-
-          {/* Library button for MIX mode */}
-          <button onClick={() => state.isMixMode ? setIsMixDrawerOpen(true) : null} className={cn("p-2 rounded-full transition-colors flex items-center justify-center", state.isMixMode && "text-white bg-white/10")} title="Mix library">
-            <Library className="w-4 h-4" />
-          </button>
+          
+          {/* Current Sound Name - only display when a sound is playing and not in mix mode */}
+          {state.currentSound && !state.isMixMode && state.isPlaying && (
+            <span className="text-white/80 text-sm bg-black/30 px-3 py-1 rounded-full backdrop-blur-sm">
+              {state.currentSound.name}
+            </span>
+          )}
         </div>
       </div>
       
-      {/* Sound Icons Scroll Area */}
+      {/* Sound Icons Scroll Area - Centered */}
       {!state.isMixMode && <div className={cn(
-          "fixed z-10 w-full max-w-4xl px-4",
+          "fixed z-10 left-1/2 transform -translate-x-1/2 px-4 max-w-md mx-auto w-full",
           isMobile ? "bottom-24" : "bottom-36"
         )}>
-          <ScrollArea className="w-full" orientation="horizontal">
+          <ScrollArea className="w-full overflow-x-auto" orientation="horizontal">
             <div className="flex space-x-3 pb-2 min-w-max py-[5px] items-center justify-center">
               {sounds.map(sound => <div key={sound.id} className="flex flex-col items-center">
                   <SoundIcon sound={sound} size="sm" />

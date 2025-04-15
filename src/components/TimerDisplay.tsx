@@ -5,7 +5,8 @@ import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { useIsMobile } from '@/hooks/use-mobile';
 import TimerMenu from './TimerMenu';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, Settings } from 'lucide-react';
+import TimerSettingsModal from './TimerSettingsModal';
 
 const TimerDisplay = () => {
   const {
@@ -19,6 +20,7 @@ const TimerDisplay = () => {
   } = state;
   const [displayTime, setDisplayTime] = useState('');
   const [progress, setProgress] = useState(0);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const isMobile = useIsMobile();
   
   useEffect(() => {
@@ -65,6 +67,17 @@ const TimerDisplay = () => {
   return (
     <div className={`fixed inset-0 flex items-center justify-center z-10 pointer-events-none ${isMobile ? 'pt-0 -mt-16' : ''}`}>
       <div className="relative flex flex-col items-center justify-center pointer-events-auto max-w-md w-full px-6">
+        {/* Header with timer title and settings icon */}
+        <div className="flex items-center justify-center w-full mb-4">
+          <h2 className="text-white text-xl font-light">Focus Timer</h2>
+          <button 
+            className="ml-2 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-all"
+            onClick={() => setShowSettingsModal(true)}
+          >
+            <Settings className="h-4 w-4 text-white/70" />
+          </button>
+        </div>
+
         {/* Timer mode tabs - FOCUS/BREAK switcher - only show for Pomodoro timer */}
         {timer.breakDuration > 0 && (
           <div className="flex gap-10 mb-4">
@@ -141,6 +154,24 @@ const TimerDisplay = () => {
           <Progress value={progress} className="h-1 bg-white/10" />
         </div>
       </div>
+      
+      {/* Timer Settings Modal */}
+      <TimerSettingsModal 
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
+        selectedMinutes={Math.floor(timer.duration / 60)}
+        setSelectedMinutes={(mins) => {
+          // These just update the modal UI, not the actual timer
+        }}
+        shortBreakMinutes={Math.floor(timer.breakDuration / 60)}
+        setShortBreakMinutes={(mins) => {
+          // These just update the modal UI, not the actual timer
+        }}
+        customFocusMinutes=""
+        setCustomFocusMinutes={() => {}}
+        customBreakMinutes=""
+        setCustomBreakMinutes={() => {}}
+      />
     </div>
   );
 };

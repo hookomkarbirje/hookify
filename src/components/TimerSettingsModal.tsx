@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { usePlayer } from "@/context/PlayerContext";
 
 interface TimerSettingsModalProps {
   isOpen: boolean;
@@ -42,7 +42,15 @@ const TimerSettingsModal = ({
   customBreakMinutes,
   setCustomBreakMinutes,
 }: TimerSettingsModalProps) => {
-  const [timerType, setTimerType] = useState<'pomodoro' | 'simple'>('pomodoro');
+  const { state } = usePlayer();
+  const initialTimerType = state.timer.breakDuration > 0 ? 'pomodoro' : 'simple';
+  const [timerType, setTimerType] = useState<'pomodoro' | 'simple'>(initialTimerType);
+  
+  useEffect(() => {
+    if (isOpen) {
+      setTimerType(state.timer.breakDuration > 0 ? 'pomodoro' : 'simple');
+    }
+  }, [isOpen, state.timer.breakDuration]);
   
   const handleCustomFocusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

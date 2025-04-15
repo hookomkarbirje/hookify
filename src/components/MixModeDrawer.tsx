@@ -72,23 +72,15 @@ const MixModeDrawer = ({ isOpen, onOpenChange }: MixModeDrawerProps) => {
           <div className="flex justify-between items-center mb-4 px-4 pt-4">
             <h3 className="text-white font-medium text-lg">Sound Mix</h3>
             <div className="flex gap-2">
-              {/* Save and library buttons - Now always visible */}
-              <div className="flex gap-2 mr-2">
-                <button
-                  onClick={handleSaveMix}
-                  className={`p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all ${state.activeSounds.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
-                  title="Save current mix"
-                  disabled={state.activeSounds.length === 0}
-                >
-                  <Save className="h-4 w-4 text-white/70" />
-                </button>
-                <button
-                  onClick={() => setIsSavedMixesOpen(true)}
-                  className="text-white/70 text-sm bg-gradient-to-r from-blue-500/30 to-purple-500/30 hover:from-blue-500/40 hover:to-purple-500/40 px-3 py-1 rounded-full transition-all hover:scale-105 border border-white/10"
-                >
-                  Saved Mixes
-                </button>
-              </div>
+              {/* Save button only */}
+              <button
+                onClick={handleSaveMix}
+                className={`p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all ${state.activeSounds.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+                title="Save current mix"
+                disabled={state.activeSounds.length === 0}
+              >
+                <Save className="h-4 w-4 text-white/70" />
+              </button>
               <button 
                 onClick={() => {
                   onOpenChange(false);
