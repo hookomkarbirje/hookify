@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
-import { Play, Pause, Timer, Image, Eye, EyeOff, ChevronUp, Layers, Settings2 } from "lucide-react";
+import { Play, Pause, Timer, Image, Eye, EyeOff, Settings2 } from "lucide-react";
 import { sounds } from "@/data/soundData";
 import SoundIcon from "./SoundIcon";
 import TimerModal from "./TimerModal";
@@ -17,6 +18,7 @@ const PlayerControls = () => {
     state,
     togglePlayPause,
     toggleHideInterface,
+    toggleMixMode,
     setShowMixPanel
   } = usePlayer();
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
@@ -33,38 +35,36 @@ const PlayerControls = () => {
   }, [state.isMixMode]);
 
   if (state.isHidden) {
-    return <div className="fixed bottom-0.5 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-4">
+    return (
+      <div className="fixed bottom-0.5 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-4">
         <div className="flex gap-3">
           <button onClick={toggleHideInterface} className="control-button w-12 h-12" title="Show interface">
             <Eye className="w-6 h-6" />
           </button>
         </div>
-      </div>;
+      </div>
+    );
   }
   
-  const buttonStyles = `
-    bg-player-medium/80 hover:bg-player-medium 
-    text-white/80 hover:text-white 
-    px-6 py-2 rounded-full text-sm 
-    flex items-center gap-1 transition-colors
-    transform-gpu hover:transform hover:-translate-y-2
-    border-bottom-left-radius-0 border-bottom-right-radius-0
-    border-radius-20 w-[200px] flex justify-center
-    hover:transform hover:translate-y(-8px)
-    transform-none
-  `;
-  
-  return <>
-      {!state.isMixMode && <div className="fixed bottom-36 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-4xl px-4">
+  return (
+    <>
+      {/* Sound Icons Scroll Area */}
+      {!state.isMixMode && (
+        <div className="fixed bottom-36 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-4xl px-4">
           <ScrollArea className="w-full overflow-x-auto">
             <div className="flex space-x-4 pb-2 min-w-max py-[5px]">
-              {sounds.map(sound => <div key={sound.id} className="flex flex-col items-center">
+              {sounds.map(sound => (
+                <div key={sound.id} className="flex flex-col items-center">
                   <SoundIcon sound={sound} />
-                  <span className="text-white/70 text-xs mt-1 truncate w-14 text-center">{sound.name}</span>
-                </div>)}
+                  <span className="text-white/70 text-xs mt-1 truncate w-14 text-center">
+                    {sound.name}
+                  </span>
+                </div>
+              ))}
             </div>
           </ScrollArea>
-        </div>}
+        </div>
+      )}
       
       <MixModeDrawer 
         isOpen={isMixDrawerOpen} 
@@ -104,35 +104,47 @@ const PlayerControls = () => {
             </button>
           </div>
         </div>
-        
-        {state.isMixMode ? (
-          <button 
-            onClick={() => {
-              setIsMixDrawerOpen(true);
-              setShowMixPanel(true);
-            }}
-            className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors transform-none hover:transform hover:-translate-y-2 w-[200px] flex justify-center"
-            style={{
-              borderBottomLeftRadius: "0px !important",
-              borderBottomRightRadius: "0px !important",
-              borderRadius: "20px"
-            }}
-          >
-            <Layers className="w-4 h-4" /> Mix Sounds
-          </button>
-        ) : (
-          <button 
-            onClick={() => setIsExploreDrawerOpen(true)}
-            className="bg-player-medium/80 hover:bg-player-medium text-white/80 hover:text-white px-6 py-2 rounded-full text-sm flex items-center gap-1 transition-colors transform-none hover:transform hover:-translate-y-2 w-[200px] flex justify-center"
-            style={{
-              borderBottomLeftRadius: "0px !important",
-              borderBottomRightRadius: "0px !important",
-              borderRadius: "20px"
-            }}
-          >
-            Explore <ChevronUp className="w-4 h-4" />
-          </button>
-        )}
+
+        {/* Mode Switcher */}
+        <div className="flex items-center bg-player-medium/80 rounded-full p-1 text-sm">
+          <div className="flex items-center">
+            <button
+              onClick={() => state.isMixMode && toggleMixMode()}
+              className={cn(
+                "px-4 py-1 rounded-full transition-colors",
+                !state.isMixMode
+                  ? "bg-white text-black"
+                  : "text-white/70 hover:text-white"
+              )}
+            >
+              PLAY
+              <button 
+                onClick={() => setIsExploreDrawerOpen(true)}
+                className="ml-2 px-2 py-0.5 text-xs rounded bg-black/20 hover:bg-black/30"
+              >
+                Library
+              </button>
+            </button>
+            
+            <button
+              onClick={() => !state.isMixMode && toggleMixMode()}
+              className={cn(
+                "px-4 py-1 rounded-full transition-colors",
+                state.isMixMode
+                  ? "bg-white text-black"
+                  : "text-white/70 hover:text-white"
+              )}
+            >
+              MIX
+              <button 
+                onClick={() => setIsMixDrawerOpen(true)}
+                className="ml-2 px-2 py-0.5 text-xs rounded bg-black/20 hover:bg-black/30"
+              >
+                Library
+              </button>
+            </button>
+          </div>
+        </div>
       </div>
       
       <TimerModal isOpen={isTimerModalOpen} onClose={() => setIsTimerModalOpen(false)} />
@@ -142,7 +154,8 @@ const PlayerControls = () => {
         isOpen={isAdvancedSettingsOpen} 
         onOpenChange={setIsAdvancedSettingsOpen}
       />
-    </>;
+    </>
+  );
 };
 
 export default PlayerControls;
