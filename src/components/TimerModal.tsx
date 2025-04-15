@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Timer, Minus, Plus, ChevronRight, Settings } from "lucide-react";
+import { Timer, Minus, Plus, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -77,12 +77,6 @@ const TimerModal = ({
             <DialogTitle className="text-white text-2xl font-light">
               <div className="flex items-center justify-center">
                 Focus Timer
-                <button 
-                  className="ml-2 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-all"
-                  onClick={() => setShowSettings(true)}
-                >
-                  <Settings className="h-4 w-4 text-white/70" />
-                </button>
               </div>
             </DialogTitle>
             
@@ -108,15 +102,14 @@ const TimerModal = ({
               <div className="flex justify-between items-center" onClick={() => setShowSettings(true)}>
                 <div className="text-center">
                   <div className="text-4xl font-light">{selectedMinutes}</div>
-                  <div className="text-white/60 text-xs">Focus</div>
+                  <div className="text-white/60 text-xs">Focus (min)</div>
                 </div>
                 {timerType === 'pomodoro' && <div className="text-center">
                     <div className="text-4xl font-light">{shortBreakMinutes}</div>
-                    <div className="text-white/60 text-xs">Short Break</div>
+                    <div className="text-white/60 text-xs">Short Break (min)</div>
                   </div>}
                 <div className="flex flex-col items-center">
                   <div className="flex items-center text-white/80">
-                    <Settings size={16} className="mr-1" />
                     <span className="mr-1">Custom</span>
                     <ChevronRight size={18} />
                   </div>

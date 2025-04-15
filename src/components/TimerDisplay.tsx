@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { useIsMobile } from '@/hooks/use-mobile';
 import TimerMenu from './TimerMenu';
-import { Play, Pause, Settings } from 'lucide-react';
+import { Play, Pause } from 'lucide-react';
 import TimerSettingsModal from './TimerSettingsModal';
 
 const TimerDisplay = () => {
@@ -67,15 +67,9 @@ const TimerDisplay = () => {
   return (
     <div className={`fixed inset-0 flex items-center justify-center z-10 pointer-events-none ${isMobile ? 'pt-0 -mt-16' : ''}`}>
       <div className="relative flex flex-col items-center justify-center pointer-events-auto max-w-md w-full px-6">
-        {/* Header with timer title and settings icon */}
+        {/* Header with timer title */}
         <div className="flex items-center justify-center w-full mb-4">
           <h2 className="text-white text-xl font-light">Focus Timer</h2>
-          <button 
-            className="ml-2 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-all"
-            onClick={() => setShowSettingsModal(true)}
-          >
-            <Settings className="h-4 w-4 text-white/70" />
-          </button>
         </div>
 
         {/* Timer mode tabs - FOCUS/BREAK switcher - only show for Pomodoro timer */}
