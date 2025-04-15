@@ -34,26 +34,28 @@ const MixPanel = () => {
       <div className="bg-black/60 backdrop-blur-md border border-white/10 rounded-lg p-4">
         <h3 className="text-white text-center mb-4">Sound Mix</h3>
         
-        <div className="space-y-3">
-          {state.activeSounds.map((sound: Sound) => (
-            <div key={sound.id} className="flex items-center gap-3">
-              <div className="w-8 h-8 flex items-center justify-center bg-player-medium/70 rounded-full overflow-hidden">
-                {/* Ensure we always use the specific icon for this sound */}
-                <Icon name={sound.icon} size={20} className="text-white/80" />
+        <ScrollArea className="max-h-64">
+          <div className="space-y-3">
+            {state.activeSounds.map((sound: Sound) => (
+              <div key={sound.id} className="flex items-center gap-3">
+                <div className="w-8 h-8 flex items-center justify-center bg-player-medium/70 rounded-full overflow-hidden">
+                  <Icon name={sound.icon} size={20} className="text-white/80" />
+                </div>
+                <div className="text-white text-sm flex-1 truncate">{sound.name}</div>
+                <div className="w-32">
+                  <Slider
+                    value={[localVolumes[sound.id] ?? state.volume]}
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    onValueChange={(values) => handleVolumeChange(sound.id, values)}
+                    aria-label={`Volume for ${sound.name}`}
+                  />
+                </div>
               </div>
-              <div className="text-white text-sm flex-1">{sound.name}</div>
-              <div className="w-32">
-                <Slider
-                  value={[localVolumes[sound.id] ?? state.volume]}
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  onValueChange={(values) => handleVolumeChange(sound.id, values)}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </ScrollArea>
       </div>
     </div>
   );

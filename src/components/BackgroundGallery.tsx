@@ -22,13 +22,8 @@ const BackgroundGallery = ({ isOpen, onClose }: BackgroundGalleryProps) => {
     const selected = backgroundImages.find(bg => bg.id === backgroundId);
     if (selected) {
       setBackground(selected);
-      onClose();
     }
   };
-
-  if (!isOpen) {
-    return null;
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>

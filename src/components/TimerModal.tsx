@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Button } from "@/components/ui/button";
@@ -33,18 +34,23 @@ const TimerModal = ({
   const [timerType, setTimerType] = useState<'pomodoro' | 'simple'>('pomodoro');
   const isMobile = useIsMobile();
   
-  // Keep timer type consistent when navigating between screens
+  // Reset form when opening the modal
   useEffect(() => {
-    // Pass the timer type to settings dialog
-    if (showSettings) {
-      // The settings modal will use this timerType
+    if (isOpen) {
+      setTask("");
+      setSelectedMinutes(25);
+      setShortBreakMinutes(5);
+      setRounds(1);
+      setCustomFocusMinutes("");
+      setCustomBreakMinutes("");
     }
-  }, [showSettings, timerType]);
+  }, [isOpen]);
   
   const handleSetTimer = () => {
     const focusMinutes = customFocusMinutes ? parseInt(customFocusMinutes) : selectedMinutes;
     const breakMinutes = customBreakMinutes ? parseInt(customBreakMinutes) : shortBreakMinutes;
     const breakDuration = timerType === 'simple' ? 0 : breakMinutes * 60;
+    
     setTimer(focusMinutes * 60, task, breakDuration, timerType === 'simple' ? 1 : rounds);
     onClose();
   };
@@ -65,7 +71,8 @@ const TimerModal = ({
     return null;
   }
   
-  return <>
+  return (
+    <>
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
         <DialogContent className="bg-black border-white/10 text-white max-w-sm sm:max-w-md">
           <DialogHeader className="text-center">
@@ -84,7 +91,12 @@ const TimerModal = ({
 
           <div className="py-4">
             <div className="mb-4">
-              <Tabs defaultValue={timerType} value={timerType} onValueChange={value => setTimerType(value as 'pomodoro' | 'simple')} className="w-full">
+              <Tabs 
+                defaultValue={timerType} 
+                value={timerType} 
+                onValueChange={value => setTimerType(value as 'pomodoro' | 'simple')} 
+                className="w-full"
+              >
                 <TabsList className="w-full bg-white/5">
                   <TabsTrigger value="pomodoro" className="data-[state=active]:bg-white/10 data-[state=active]:text-white flex-1 text-white/70">
                     Pomodoro
@@ -96,18 +108,31 @@ const TimerModal = ({
               </Tabs>
             </div>
             
-            <Input type="text" placeholder="What's getting done?" value={task} onChange={e => setTask(e.target.value)} className="bg-white/5 border-white/10 text-white mb-6 p-4 h-12 rounded-lg" />
+            <Input 
+              type="text" 
+              placeholder="What's getting done?" 
+              value={task} 
+              onChange={e => setTask(e.target.value)} 
+              className="bg-white/5 border-white/10 text-white mb-6 p-4 h-12 rounded-lg" 
+            />
             
-            <div className="bg-white/5 rounded-lg p-4 mb-6">
-              <div className="flex justify-between items-center" onClick={() => setShowSettings(true)}>
+            <div 
+              className="bg-white/5 rounded-lg p-4 mb-6"
+              onClick={() => setShowSettings(true)}
+              role="button"
+              tabIndex={0}
+            >
+              <div className="flex justify-between items-center">
                 <div className="text-center">
                   <div className="text-4xl font-light">{selectedMinutes}</div>
                   <div className="text-white/60 text-xs">Focus (min)</div>
                 </div>
-                {timerType === 'pomodoro' && <div className="text-center">
+                {timerType === 'pomodoro' && (
+                  <div className="text-center">
                     <div className="text-4xl font-light">{shortBreakMinutes}</div>
                     <div className="text-white/60 text-xs">Short Break (min)</div>
-                  </div>}
+                  </div>
+                )}
                 <div className="flex flex-col items-center">
                   <div className="flex items-center text-white/80">
                     <span className="mr-1">Custom</span>
@@ -117,8 +142,12 @@ const TimerModal = ({
               </div>
             </div>
             
-            {timerType === 'pomodoro' && <div className="flex justify-between items-center mb-2">
-                <button onClick={decrementRounds} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center">
+            {timerType === 'pomodoro' && (
+              <div className="flex justify-between items-center mb-2">
+                <button 
+                  onClick={decrementRounds} 
+                  className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center"
+                >
                   <Minus size={20} className="text-white" />
                 </button>
                 <div className="text-center">
@@ -127,37 +156,52 @@ const TimerModal = ({
                     {rounds} × Focus Time + {rounds} × Short Break
                   </div>
                 </div>
-                <button onClick={incrementRounds} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center">
+                <button 
+                  onClick={incrementRounds} 
+                  className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center"
+                >
                   <Plus size={20} className="text-white" />
                 </button>
-              </div>}
+              </div>
+            )}
           </div>
 
           <DialogFooter className="flex flex-col gap-2 sm:flex-row">
-            <Button variant="outline" onClick={onClose} className="w-full sm:w-1/2 bg-transparent border-white/10 text-white hover:bg-white/10">
-              Done
+            <Button 
+              variant="outline" 
+              onClick={onClose} 
+              className="w-full sm:w-1/2 bg-transparent border-white/10 text-white hover:bg-white/10"
+            >
+              Cancel
             </Button>
-            <Button onClick={handleSetTimer} className="w-full sm:w-1/2 bg-white text-black hover:bg-white/90">
+            <Button 
+              onClick={handleSetTimer} 
+              className="w-full sm:w-1/2 bg-white text-black hover:bg-white/90"
+            >
               Start
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {showSettings && <TimerSettingsModal 
-        isOpen={showSettings} 
-        onClose={() => setShowSettings(false)} 
-        selectedMinutes={selectedMinutes} 
-        setSelectedMinutes={setSelectedMinutes} 
-        shortBreakMinutes={shortBreakMinutes} 
-        setShortBreakMinutes={setShortBreakMinutes} 
-        customFocusMinutes={customFocusMinutes} 
-        setCustomFocusMinutes={setCustomFocusMinutes} 
-        customBreakMinutes={customBreakMinutes} 
-        setCustomBreakMinutes={setCustomBreakMinutes} 
-      />}
+      {showSettings && (
+        <TimerSettingsModal 
+          isOpen={showSettings} 
+          onClose={() => setShowSettings(false)} 
+          selectedMinutes={selectedMinutes} 
+          setSelectedMinutes={setSelectedMinutes} 
+          shortBreakMinutes={shortBreakMinutes} 
+          setShortBreakMinutes={setShortBreakMinutes} 
+          customFocusMinutes={customFocusMinutes} 
+          setCustomFocusMinutes={setCustomFocusMinutes} 
+          customBreakMinutes={customBreakMinutes} 
+          setCustomBreakMinutes={setCustomBreakMinutes} 
+        />
+      )}
 
       <AdvancedSettingsDrawer isOpen={showAdvancedSettings} onOpenChange={setShowAdvancedSettings} />
-    </>;
+    </>
+  );
 };
+
 export default TimerModal;

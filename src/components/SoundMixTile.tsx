@@ -18,13 +18,13 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
   
   // Sync local volume with active sound's volume when it changes
   useEffect(() => {
-    if (isActive) {
-      const activeSound = state.activeSounds.find(s => s.id === sound.id);
-      if (activeSound?.volume !== undefined) {
-        setLocalVolume(activeSound.volume);
-      }
+    const activeSound = state.activeSounds.find(s => s.id === sound.id);
+    if (activeSound?.volume !== undefined) {
+      setLocalVolume(activeSound.volume);
+    } else {
+      setLocalVolume(state.volume);
     }
-  }, [isActive, sound.id, state.activeSounds]);
+  }, [sound.id, state.activeSounds, state.volume]);
 
   const handleClick = () => {
     playSound(sound);
@@ -36,32 +36,35 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
     updateSoundVolume(sound.id, newVolume);
   };
 
+  // Check if this sound is in active sounds even if not playing
+  const isSoundActive = state.activeSounds.some(s => s.id === sound.id);
+
   return (
     <div className="flex flex-col items-center gap-3">
       <div 
-        className="w-20 h-20 rounded-full overflow-hidden relative cursor-pointer shadow-lg transition-all duration-300"
+        className={`
+          w-20 h-20 rounded-full overflow-hidden relative cursor-pointer shadow-lg 
+          transition-all duration-300
+          ${isActive ? 'scale-105' : 'scale-100'}
+        `}
         onClick={handleClick}
-        style={{
-          transform: isActive ? 'scale(1.05)' : 'scale(1)',
-        }}
       >
         <div className={`
           absolute inset-0 flex items-center justify-center 
-          ${isActive 
+          ${isSoundActive 
             ? "bg-[#0061EF] text-white" 
             : "bg-player-medium text-white/80 hover:bg-player-light hover:text-white"}
-          ${isActive ? "border-2 border-white" : "border border-white/30"}
+          ${isSoundActive ? "border-2 border-white" : "border border-white/30"}
         `}>
-          {/* Make sure to always show the icon in mix mode */}
           <Icon name={sound.icon} size={32} />
         </div>
       </div>
       
-      <div className="text-white text-xs font-medium mt-1">
+      <div className="text-white text-xs font-medium mt-1 w-20 text-center truncate">
         {sound.name}
       </div>
       
-      {isActive && (
+      {isSoundActive && (
         <div className={`w-full px-4 ${isMobile ? "py-5" : "py-1"}`}>
           <Slider
             value={[localVolume]}
