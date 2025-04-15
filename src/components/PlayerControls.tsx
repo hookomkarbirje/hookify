@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Play, Pause, Timer, Image, Eye, EyeOff, Settings2, Library } from "lucide-react";
 import { sounds } from "@/data/soundData";
+import SoundIcon from "./SoundIcon";
 import TimerModal from "./TimerModal";
 import BackgroundGallery from "./BackgroundGallery";
 import ExploreDrawer from "./ExploreDrawer";
