@@ -67,11 +67,11 @@ const TimerDisplay = () => {
   return (
     <div className={`fixed inset-0 flex items-center justify-center z-10 pointer-events-none ${isMobile ? 'pt-0 -mt-16' : ''}`}>
       <div className="relative flex flex-col items-center justify-center pointer-events-auto max-w-md w-full px-6">
-        {/* Header with timer title and settings icon */}
-        <div className="flex items-center justify-center w-full mb-4">
+        {/* Header with timer title and settings icon - now with justified layout */}
+        <div className="flex items-center justify-between w-full mb-4">
           <h2 className="text-white text-xl font-light">Focus Timer</h2>
           <button 
-            className="ml-2 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-all"
+            className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all"
             onClick={() => setShowSettingsModal(true)}
           >
             <Settings className="h-4 w-4 text-white/70" />

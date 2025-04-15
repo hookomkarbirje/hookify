@@ -1,7 +1,12 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Bell } from "lucide-react";
 import { 
   Dialog,
   DialogContent,
@@ -12,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePlayer } from "@/context/PlayerContext";
+import { Separator } from "@/components/ui/separator";
 
 interface TimerSettingsModalProps {
   isOpen: boolean;
@@ -42,7 +48,7 @@ const TimerSettingsModal = ({
   customBreakMinutes,
   setCustomBreakMinutes,
 }: TimerSettingsModalProps) => {
-  const { state } = usePlayer();
+  const { state, updateTimerSettings } = usePlayer();
   const initialTimerType = state.timer.breakDuration > 0 ? 'pomodoro' : 'simple';
   const [timerType, setTimerType] = useState<'pomodoro' | 'simple'>(initialTimerType);
   
@@ -72,6 +78,17 @@ const TimerSettingsModal = ({
     }
   };
 
+  const handleToggleSound = (checked: boolean) => {
+    updateTimerSettings({ playSound: checked });
+  };
+
+  const handleToggleNotifications = (checked: boolean) => {
+    updateTimerSettings({ showNotifications: checked });
+    if (checked && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  };
+
   if (!isOpen) {
     return null;
   }
@@ -80,7 +97,7 @@ const TimerSettingsModal = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="bg-black border-white/10 text-white max-w-sm">
         <DialogHeader className="text-center">
-          <DialogTitle className="text-white text-2xl font-light">Settings</DialogTitle>
+          <DialogTitle className="text-white text-2xl font-light">Timer Settings</DialogTitle>
           <DialogDescription className="text-white/70 text-sm">Adjust Focus Timer Intervals</DialogDescription>
         </DialogHeader>
 
@@ -181,6 +198,74 @@ const TimerSettingsModal = ({
                 />
               </div>
             )}
+          </div>
+
+          <Separator className="my-4 bg-white/10" />
+
+          {/* Additional Settings Section */}
+          <div className="space-y-4">
+            <h3 className="text-white text-sm font-medium mb-3">Timer Sound Effect</h3>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-white/70">Enabled</span>
+              <Switch 
+                checked={state.timer.playSound !== false}
+                onCheckedChange={handleToggleSound}
+                className="data-[state=checked]:bg-white/30"
+              />
+            </div>
+            
+            {state.timer.playSound && (
+              <RadioGroup 
+                defaultValue="beep" 
+                value={state.timer.soundType || 'beep'} 
+                onValueChange={(value) => updateTimerSettings({ soundType: value as 'beep' | 'bell' })} 
+                className="space-y-1 mb-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="beep" id="beep" className="border-white" />
+                  <Label htmlFor="beep" className="text-sm flex items-center cursor-pointer">
+                    <Bell className="h-3.5 w-3.5 mr-1.5 text-white/70" />
+                    Beep Sound
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="bell" id="bell" className="border-white" />
+                  <Label htmlFor="bell" className="text-sm flex items-center cursor-pointer">
+                    <Bell className="h-3.5 w-3.5 mr-1.5 text-white/70" />
+                    Bell Sound
+                  </Label>
+                </div>
+              </RadioGroup>
+            )}
+            
+            <Separator className="my-4 bg-white/10" />
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-white/80">Auto Start Timers</span>
+              <Switch 
+                checked={state.timer.autoStart !== false}
+                onCheckedChange={(checked) => updateTimerSettings({ autoStart: checked })}
+                className="data-[state=checked]:bg-white/30"
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-white/80">Hide Seconds</span>
+              <Switch 
+                checked={state.timer.hideSeconds || false}
+                onCheckedChange={(checked) => updateTimerSettings({ hideSeconds: checked })}
+                className="data-[state=checked]:bg-white/30"
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-white/80">Browser Notifications</span>
+              <Switch 
+                checked={state.timer.showNotifications || false}
+                onCheckedChange={handleToggleNotifications}
+                className="data-[state=checked]:bg-white/30"
+              />
+            </div>
           </div>
         </div>
 
