@@ -149,7 +149,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
             const audio = audioElements.get(sound.id);
             if (audio) {
               audio.volume = savedVolume ? parseFloat(savedVolume) : initialState.volume;
-              audio.play().catch(console.error);
+              audio.play().catch(error => {
+                console.error('Error playing audio:', error);
+                toast.error('Failed to play audio');
+              });
             }
           }, 500);
         }
