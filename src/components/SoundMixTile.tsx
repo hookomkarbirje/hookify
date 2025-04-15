@@ -52,6 +52,7 @@ const SoundMixTile = ({ sound }: SoundMixTileProps) => {
             : "bg-player-medium text-white/80 hover:bg-player-light hover:text-white"}
           ${isActive ? "border-2 border-white" : "border border-white/30"}
         `}>
+          {/* Make sure to always show the icon in mix mode */}
           <Icon name={sound.icon} size={32} />
         </div>
       </div>

@@ -38,6 +38,7 @@ const MixPanel = () => {
           {state.activeSounds.map((sound: Sound) => (
             <div key={sound.id} className="flex items-center gap-3">
               <div className="w-8 h-8 flex items-center justify-center bg-player-medium/70 rounded-full overflow-hidden">
+                {/* Ensure we always use the specific icon for this sound */}
                 <Icon name={sound.icon} size={20} className="text-white/80" />
               </div>
               <div className="text-white text-sm flex-1">{sound.name}</div>
