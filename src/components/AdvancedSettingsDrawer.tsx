@@ -1,9 +1,10 @@
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Settings, Bell } from "lucide-react";
+import { Bell, Volume2 } from "lucide-react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Separator } from "@/components/ui/separator";
 
@@ -13,7 +14,7 @@ interface AdvancedSettingsDrawerProps {
 }
 
 const AdvancedSettingsDrawer = ({ isOpen, onOpenChange }: AdvancedSettingsDrawerProps) => {
-  const { state, updateTimerSettings } = usePlayer();
+  const { state, updateTimerSettings, setVolume } = usePlayer();
 
   const handleToggleSound = (checked: boolean) => {
     updateTimerSettings({ playSound: checked });
@@ -34,6 +35,23 @@ const AdvancedSettingsDrawer = ({ isOpen, onOpenChange }: AdvancedSettingsDrawer
         </SheetHeader>
         
         <div className="mt-6 space-y-6">
+          {/* Volume Control Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-white mb-4">Volume Control</h3>
+            <div className="flex items-center gap-4">
+              <Volume2 className="w-5 h-5 text-white/70" />
+              <Slider 
+                value={[state.volume]} 
+                min={0} 
+                max={1} 
+                step={0.01} 
+                onValueChange={values => setVolume(values[0])} 
+              />
+            </div>
+          </div>
+
+          <Separator className="my-4 bg-white/10" />
+
           {/* Timer Settings Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-white mb-4">Timer Settings</h3>

@@ -1,8 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
-import { Play, Pause, Timer, Image, Eye, EyeOff, ChevronUp, Layers } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
+import { Play, Pause, Timer, Image, Eye, EyeOff, ChevronUp, Layers, Settings2 } from "lucide-react";
 import { sounds } from "@/data/soundData";
 import SoundIcon from "./SoundIcon";
 import TimerModal from "./TimerModal";
@@ -12,20 +10,20 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MixModeDrawer from "./MixModeDrawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import AdvancedSettingsDrawer from "./AdvancedSettingsDrawer";
 
 const PlayerControls = () => {
   const {
     state,
     togglePlayPause,
     toggleHideInterface,
-    setVolume,
     setShowMixPanel
   } = usePlayer();
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
   const [isBackgroundGalleryOpen, setIsBackgroundGalleryOpen] = useState(false);
   const [isExploreDrawerOpen, setIsExploreDrawerOpen] = useState(false);
   const [isMixDrawerOpen, setIsMixDrawerOpen] = useState(false);
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
   const isMobile = useIsMobile();
   
   useEffect(() => {
@@ -76,11 +74,7 @@ const PlayerControls = () => {
         }} 
       />
       
-      <div className="fixed bottom-0.5 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-4">
-        {showVolumeSlider && <div className={`${isMobile ? 'w-48' : 'w-64'} bg-player-medium/90 backdrop-blur-sm rounded-full px-4 py-2 mb-2`}>
-            <Slider value={[state.volume]} min={0} max={1} step={0.01} className="w-full" onValueChange={values => setVolume(values[0])} />
-          </div>}
-        
+      <div className="fixed bottom-0.5 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-4">        
         <div className="flex items-center justify-center">
           <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'} mr-4`}>
             <button onClick={() => setIsBackgroundGalleryOpen(true)} className="control-button" title="Background gallery">
@@ -101,12 +95,12 @@ const PlayerControls = () => {
               <EyeOff className="w-5 h-5" />
             </button>
             
-            <button onClick={() => setShowVolumeSlider(!showVolumeSlider)} className={cn("control-button", showVolumeSlider && "bg-white/20 text-white")} title="Volume control">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-              </svg>
+            <button 
+              onClick={() => setIsAdvancedSettingsOpen(true)} 
+              className="control-button" 
+              title="Advanced settings"
+            >
+              <Settings2 className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -144,6 +138,10 @@ const PlayerControls = () => {
       <TimerModal isOpen={isTimerModalOpen} onClose={() => setIsTimerModalOpen(false)} />
       <BackgroundGallery isOpen={isBackgroundGalleryOpen} onClose={() => setIsBackgroundGalleryOpen(false)} />
       <ExploreDrawer isOpen={isExploreDrawerOpen} onClose={() => setIsExploreDrawerOpen(false)} />
+      <AdvancedSettingsDrawer 
+        isOpen={isAdvancedSettingsOpen} 
+        onOpenChange={setIsAdvancedSettingsOpen}
+      />
     </>;
 };
 
