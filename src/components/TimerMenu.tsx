@@ -34,8 +34,21 @@ const TimerMenu = ({ className }: TimerMenuProps) => {
   };
 
   const handleAdd10Minutes = () => {
-    const newDuration = state.timer.duration + 10 * 60;
-    const newRemaining = state.timer.remaining + 10 * 60;
+    // Since we can't directly modify the timer state from here,
+    // we'll need to reset with the current remaining time + 10 minutes
+    const currentMode = state.timer.mode;
+    const currentDuration = currentMode === 'focus' ? state.timer.duration : state.timer.breakDuration;
+    const newDuration = currentDuration + 10 * 60;
+    
+    // Reset the timer with the new duration
+    // This is a workaround since we don't have direct access to update the remaining time
+    if (currentMode === 'focus') {
+      state.timer.duration = newDuration;
+      resetTimer('focus');
+    } else {
+      state.timer.breakDuration = newDuration;
+      resetTimer('break');
+    }
     
     toast("Added 10 minutes to timer");
     setIsOpen(false);

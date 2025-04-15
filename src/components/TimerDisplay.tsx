@@ -33,7 +33,7 @@ const TimerDisplay = () => {
       // Calculate progress percentage for the progress bar (0 to 100)
       // Use the correct total time based on mode
       const totalTime = timer.mode === 'focus' ? timer.duration : timer.breakDuration;
-      const progressPercent = 100 - timer.remaining / totalTime * 100;
+      const progressPercent = 100 - (timer.remaining / totalTime * 100);
       setProgress(progressPercent);
 
       // Update document title when timer is active
@@ -45,7 +45,7 @@ const TimerDisplay = () => {
       // Reset title when timer is inactive
       document.title = 'serene-soundscapes-player';
     }
-  }, [timer.remaining, timer.duration, timer.mode, timer.hideSeconds]);
+  }, [timer.remaining, timer.duration, timer.breakDuration, timer.mode, timer.hideSeconds]);
 
   // Reset title when component unmounts or timer becomes inactive
   useEffect(() => {
@@ -65,24 +65,9 @@ const TimerDisplay = () => {
   return (
     <div className={`fixed inset-0 flex items-center justify-center z-10 pointer-events-none ${isMobile ? 'pt-0 -mt-16' : ''}`}>
       <div className="relative flex flex-col items-center justify-center pointer-events-auto max-w-md w-full px-6">
-        {/* Controls row - repositioned and styled */}
-        <div className="absolute top-0 w-full flex justify-between items-center px-6">
-          {/* Play/Pause button */}
-          <button 
-            onClick={pauseResumeTimer} 
-            aria-label={timer.isPaused ? "Start timer" : "Pause timer"} 
-            className="p-2 rounded-full bg-black/30 border border-white/20 hover:bg-white/10 shadow-md transition-all hover:scale-105"
-          >
-            {timer.isPaused ? <Play className="h-5 w-5 text-white" /> : <Pause className="h-5 w-5 text-white" />}
-          </button>
-          
-          {/* Timer menu with improved visibility */}
-          <TimerMenu className="opacity-40 hover:opacity-100 transition-opacity duration-300" />
-        </div>
-        
         {/* Timer mode tabs - FOCUS/BREAK switcher - only show for Pomodoro timer */}
         {timer.breakDuration > 0 && (
-          <div className="flex gap-10 mb-4 mt-10">
+          <div className="flex gap-10 mb-4">
             <button 
               onClick={() => timer.mode === 'break' && resetTimer('focus')} 
               className={cn("text-xs uppercase tracking-widest font-medium", 
@@ -103,6 +88,21 @@ const TimerDisplay = () => {
         {/* Timer display */}
         <div className={cn("text-white font-extralight mb-4", isMobile ? "text-6xl" : "text-8xl")}>
           {displayTime}
+        </div>
+        
+        {/* Controls row - centered under timer */}
+        <div className="w-full flex justify-center items-center gap-8 mb-4">
+          {/* Play/Pause button */}
+          <button 
+            onClick={pauseResumeTimer} 
+            aria-label={timer.isPaused ? "Start timer" : "Pause timer"} 
+            className="p-2 rounded-full bg-black/30 border border-white/20 hover:bg-white/10 shadow-md transition-all hover:scale-105"
+          >
+            {timer.isPaused ? <Play className="h-5 w-5 text-white" /> : <Pause className="h-5 w-5 text-white" />}
+          </button>
+          
+          {/* Timer menu with improved visibility */}
+          <TimerMenu className="opacity-70 hover:opacity-100 transition-opacity duration-300" />
         </div>
         
         {/* Round indicators as dots - only show for Pomodoro timer with multiple rounds */}

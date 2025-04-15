@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Play, Pause, Timer, Image, Eye, EyeOff, Settings2, Library, MusicIcon } from "lucide-react";
@@ -11,7 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import MixModeDrawer from "./MixModeDrawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import AdvancedSettingsDrawer from "./AdvancedSettingsDrawer";
-import SavedMixesDrawer from "./SavedMixesDrawer";
+
 const PlayerControls = () => {
   const {
     state,
@@ -25,13 +26,14 @@ const PlayerControls = () => {
   const [isExploreDrawerOpen, setIsExploreDrawerOpen] = useState(false);
   const [isMixDrawerOpen, setIsMixDrawerOpen] = useState(false);
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
-  const [isSavedMixesOpen, setIsSavedMixesOpen] = useState(false);
   const isMobile = useIsMobile();
+  
   useEffect(() => {
     if (state.isMixMode) {
       setIsMixDrawerOpen(true);
     }
   }, [state.isMixMode]);
+  
   if (state.isHidden) {
     return <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center">
         <button onClick={toggleHideInterface} className="control-button w-12 h-12 bg-black/50 backdrop-blur-sm" title="Show interface">
@@ -57,6 +59,7 @@ const PlayerControls = () => {
       setIsMixDrawerOpen(true);
     }
   };
+  
   return <>
       {/* Mode Switcher at the top */}
       <div className="fixed top-12 left-1/2 transform -translate-x-1/2 z-10">
@@ -85,8 +88,11 @@ const PlayerControls = () => {
       </div>
       
       {/* Sound Icons Scroll Area */}
-      {!state.isMixMode && <div className="fixed bottom-36 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-4xl px-4">
-          <ScrollArea className="w-full overflow-x-auto">
+      {!state.isMixMode && <div className={cn(
+          "fixed z-10 w-full max-w-4xl px-4",
+          isMobile ? "bottom-24" : "bottom-36"
+        )}>
+          <ScrollArea className="w-full" orientation="horizontal">
             <div className="flex space-x-3 pb-2 min-w-max py-[5px] items-center justify-center">
               {sounds.map(sound => <div key={sound.id} className="flex flex-col items-center">
                   <SoundIcon sound={sound} size="sm" />
@@ -116,8 +122,6 @@ const PlayerControls = () => {
               <button onClick={() => setIsTimerModalOpen(true)} className="control-button" title="Set timer">
                 <Timer className="w-4 h-4" />
               </button>
-              
-              
             </div>
             
             {/* Center play button */}
@@ -143,7 +147,6 @@ const PlayerControls = () => {
       <BackgroundGallery isOpen={isBackgroundGalleryOpen} onClose={() => setIsBackgroundGalleryOpen(false)} />
       <ExploreDrawer isOpen={isExploreDrawerOpen} onClose={() => setIsExploreDrawerOpen(false)} />
       <AdvancedSettingsDrawer isOpen={isAdvancedSettingsOpen} onOpenChange={setIsAdvancedSettingsOpen} />
-      <SavedMixesDrawer isOpen={isSavedMixesOpen} onClose={() => setIsSavedMixesOpen(false)} />
     </>;
 };
 export default PlayerControls;
