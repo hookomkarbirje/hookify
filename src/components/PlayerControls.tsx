@@ -121,17 +121,15 @@ const PlayerControls = () => {
           </button>
         </div>
         
-        {/* Save/Library buttons when in mix mode */}
-        {state.isMixMode && state.activeSounds.length > 0 && (
-          <div className="mt-2 flex justify-center gap-2">
-            <button 
-              onClick={() => setIsSavedMixesOpen(true)} 
-              className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full"
-            >
-              Saved Mixes
-            </button>
-          </div>
-        )}
+        {/* Save/Library buttons - now always visible with improved styling */}
+        <div className="mt-2 flex justify-center gap-2">
+          <button 
+            onClick={() => setIsSavedMixesOpen(true)} 
+            className="text-xs bg-gradient-to-r from-blue-500/30 to-purple-500/30 hover:from-blue-500/40 hover:to-purple-500/40 text-white px-3 py-1.5 rounded-full transition-all hover:scale-105 shadow-lg shadow-black/20 border border-white/10"
+          >
+            Saved Mixes
+          </button>
+        </div>
       </div>
       
       {/* Sound Icons Scroll Area */}

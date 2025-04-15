@@ -63,21 +63,24 @@ const TimerDisplay = () => {
   return (
     <div className={`fixed inset-0 flex items-center justify-center z-10 pointer-events-none ${isMobile ? 'pt-0 -mt-16' : ''}`}>
       <div className="relative flex flex-col items-center justify-center pointer-events-auto max-w-md w-full px-6">
-        {/* Timer menu in the top-right */}
-        <TimerMenu className="absolute right-2 top-0" />
-        
-        {/* Play/Pause button positioned in the top-left */}
-        <button 
-          onClick={pauseResumeTimer} 
-          aria-label={timer.isPaused ? "Start timer" : "Pause timer"} 
-          className="absolute left-2 top-0 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-        >
-          {timer.isPaused ? <Play className="h-5 w-5 text-white" /> : <Pause className="h-5 w-5 text-white" />}
-        </button>
+        {/* Controls row - repositioned and styled */}
+        <div className="absolute top-0 w-full flex justify-between items-center px-6">
+          {/* Play/Pause button */}
+          <button 
+            onClick={pauseResumeTimer} 
+            aria-label={timer.isPaused ? "Start timer" : "Pause timer"} 
+            className="p-2 rounded-full bg-black/30 border border-white/20 hover:bg-white/10 shadow-md transition-all hover:scale-105"
+          >
+            {timer.isPaused ? <Play className="h-5 w-5 text-white" /> : <Pause className="h-5 w-5 text-white" />}
+          </button>
+          
+          {/* Timer menu with improved visibility */}
+          <TimerMenu className="opacity-40 hover:opacity-100 transition-opacity duration-300" />
+        </div>
         
         {/* Timer mode tabs - FOCUS/BREAK switcher - only show for Pomodoro timer */}
         {timer.breakDuration > 0 && (
-          <div className="flex gap-10 mb-4">
+          <div className="flex gap-10 mb-4 mt-10">
             <button 
               onClick={() => timer.mode === 'break' && resetTimer('focus')} 
               className={cn("text-xs uppercase tracking-widest font-medium", 

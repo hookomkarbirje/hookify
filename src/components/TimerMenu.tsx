@@ -42,11 +42,11 @@ const TimerMenu = ({ className }: TimerMenuProps) => {
   };
 
   return (
-    <div className={cn("relative group", className)} ref={menuRef}>
+    <div className={cn("relative", className)} ref={menuRef}>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <button 
-            className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-2 rounded-full hover:bg-black/20"
+            className="p-2 rounded-full bg-black/30 border border-white/20 hover:bg-white/10 shadow-md transition-all hover:scale-105"
             aria-label="Timer menu"
           >
             <MoreHorizontal className="w-5 h-5 text-white" />
@@ -54,7 +54,7 @@ const TimerMenu = ({ className }: TimerMenuProps) => {
         </PopoverTrigger>
         <PopoverContent 
           className="w-56 p-2 bg-player-dark border-white/10 text-white"
-          align="center"
+          align="end"
         >
           <div className="flex flex-col space-y-1">
             <Button 
