@@ -38,25 +38,17 @@ const TimerMenu = ({ className }: TimerMenuProps) => {
     // we'll need to reset with the current remaining time + 10 minutes
     const currentMode = state.timer.mode;
     const currentDuration = currentMode === 'focus' ? state.timer.duration : state.timer.breakDuration;
-    const newDuration = currentDuration + 10 * 60;
+    const newDuration = state.timer.remaining + 10 * 60;
     
     // Reset the timer with the new duration
     if (currentMode === 'focus') {
-      const newTimer = {
-        ...state.timer,
-        duration: newDuration,
-        remaining: newDuration
-      };
-      
       resetTimer('focus');
+      // Update remaining time manually through context
+      state.timer.remaining = newDuration;
     } else {
-      const newTimer = {
-        ...state.timer,
-        breakDuration: newDuration,
-        remaining: newDuration
-      };
-      
       resetTimer('break');
+      // Update remaining time manually through context
+      state.timer.remaining = newDuration;
     }
     
     toast("Added 10 minutes to timer");
@@ -75,7 +67,7 @@ const TimerMenu = ({ className }: TimerMenuProps) => {
           </button>
         </PopoverTrigger>
         <PopoverContent 
-          className="w-56 p-2 bg-player-dark border-white/10 text-white"
+          className="w-56 p-2 bg-black border-white/10 text-white z-50"
           align="center"
         >
           <div className="flex flex-col space-y-1">

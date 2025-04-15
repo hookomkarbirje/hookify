@@ -21,8 +21,19 @@ const TimerDisplay = () => {
   const [displayTime, setDisplayTime] = useState('');
   const [progress, setProgress] = useState(0);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [selectedMinutes, setSelectedMinutes] = useState(25);
+  const [shortBreakMinutes, setShortBreakMinutes] = useState(5);
+  const [customFocusMinutes, setCustomFocusMinutes] = useState("");
+  const [customBreakMinutes, setCustomBreakMinutes] = useState("");
   const isMobile = useIsMobile();
   
+  useEffect(() => {
+    if (timer.isActive) {
+      setSelectedMinutes(Math.floor(timer.duration / 60));
+      setShortBreakMinutes(Math.floor(timer.breakDuration / 60));
+    }
+  }, [timer.isActive, timer.duration, timer.breakDuration]);
+
   useEffect(() => {
     if (timer.remaining > 0) {
       const minutes = Math.floor(timer.remaining / 60);
@@ -45,17 +56,17 @@ const TimerDisplay = () => {
       setDisplayTime(timer.hideSeconds ? '00:00' : '00:00');
       setProgress(0);
       // Reset title when timer is inactive
-      document.title = 'serene-soundscapes-player';
+      document.title = 'Serene Soundscapes Player';
     }
   }, [timer.remaining, timer.duration, timer.breakDuration, timer.mode, timer.hideSeconds]);
 
   // Reset title when component unmounts or timer becomes inactive
   useEffect(() => {
     if (!timer.isActive) {
-      document.title = 'serene-soundscapes-player';
+      document.title = 'Serene Soundscapes Player';
     }
     return () => {
-      document.title = 'serene-soundscapes-player';
+      document.title = 'Serene Soundscapes Player';
     };
   }, [timer.isActive]);
 
@@ -153,18 +164,14 @@ const TimerDisplay = () => {
       <TimerSettingsModal 
         isOpen={showSettingsModal}
         onClose={() => setShowSettingsModal(false)}
-        selectedMinutes={Math.floor(timer.duration / 60)}
-        setSelectedMinutes={(mins) => {
-          // These just update the modal UI, not the actual timer
-        }}
-        shortBreakMinutes={Math.floor(timer.breakDuration / 60)}
-        setShortBreakMinutes={(mins) => {
-          // These just update the modal UI, not the actual timer
-        }}
-        customFocusMinutes=""
-        setCustomFocusMinutes={() => {}}
-        customBreakMinutes=""
-        setCustomBreakMinutes={() => {}}
+        selectedMinutes={selectedMinutes}
+        setSelectedMinutes={setSelectedMinutes}
+        shortBreakMinutes={shortBreakMinutes}
+        setShortBreakMinutes={setShortBreakMinutes}
+        customFocusMinutes={customFocusMinutes}
+        setCustomFocusMinutes={setCustomFocusMinutes}
+        customBreakMinutes={customBreakMinutes}
+        setCustomBreakMinutes={setCustomBreakMinutes}
       />
     </div>
   );
