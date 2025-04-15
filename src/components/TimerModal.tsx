@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import TimerSettingsModal from "./TimerSettingsModal";
+import AdvancedSettingsDrawer from "./AdvancedSettingsDrawer";
 
 interface TimerModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ const TimerModal = ({
   const [customFocusMinutes, setCustomFocusMinutes] = useState<string>("");
   const [customBreakMinutes, setCustomBreakMinutes] = useState<string>("");
   const [showSettings, setShowSettings] = useState(false);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [timerType, setTimerType] = useState<'pomodoro' | 'simple'>('pomodoro');
   const isMobile = useIsMobile();
   
@@ -161,6 +163,8 @@ const TimerModal = ({
         customBreakMinutes={customBreakMinutes} 
         setCustomBreakMinutes={setCustomBreakMinutes} 
       />}
+
+      <AdvancedSettingsDrawer isOpen={showAdvancedSettings} onOpenChange={setShowAdvancedSettings} />
     </>;
 };
 export default TimerModal;

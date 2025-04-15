@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
-import { Play, Pause, Timer, Image, Eye, EyeOff, MusicIcon, Library } from "lucide-react";
+import { Play, Pause, Timer, Image, Eye, EyeOff, Settings2, Library, MusicIcon } from "lucide-react";
 import { sounds } from "@/data/soundData";
 import SoundIcon from "./SoundIcon";
 import TimerModal from "./TimerModal";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MixModeDrawer from "./MixModeDrawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import AdvancedSettingsDrawer from "./AdvancedSettingsDrawer";
 
 const PlayerControls = () => {
   const {
@@ -24,6 +25,7 @@ const PlayerControls = () => {
   const [isBackgroundGalleryOpen, setIsBackgroundGalleryOpen] = useState(false);
   const [isExploreDrawerOpen, setIsExploreDrawerOpen] = useState(false);
   const [isMixDrawerOpen, setIsMixDrawerOpen] = useState(false);
+  const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
   const isMobile = useIsMobile();
   
   useEffect(() => {
@@ -91,13 +93,6 @@ const PlayerControls = () => {
               {state.currentSound.name}
             </span>
           )}
-          
-          {/* Active Sounds Count - only display in mix mode with active sounds */}
-          {state.isMixMode && state.activeSounds.length > 0 && state.isPlaying && (
-            <span className="text-white/80 text-sm bg-black/30 px-3 py-1 rounded-full backdrop-blur-sm">
-              {state.activeSounds.length} sound{state.activeSounds.length !== 1 ? 's' : ''} playing
-            </span>
-          )}
         </div>
       </div>
       
@@ -148,6 +143,10 @@ const PlayerControls = () => {
               <button onClick={toggleHideInterface} className="control-button" title="Hide interface">
                 <EyeOff className="w-4 h-4" />
               </button>
+              
+              <button onClick={() => setIsAdvancedSettingsOpen(true)} className="control-button" title="Advanced settings">
+                <Settings2 className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
@@ -156,6 +155,7 @@ const PlayerControls = () => {
       <TimerModal isOpen={isTimerModalOpen} onClose={() => setIsTimerModalOpen(false)} />
       <BackgroundGallery isOpen={isBackgroundGalleryOpen} onClose={() => setIsBackgroundGalleryOpen(false)} />
       <ExploreDrawer isOpen={isExploreDrawerOpen} onClose={() => setIsExploreDrawerOpen(false)} />
+      <AdvancedSettingsDrawer isOpen={isAdvancedSettingsOpen} onOpenChange={setIsAdvancedSettingsOpen} />
     </>;
 };
 export default PlayerControls;

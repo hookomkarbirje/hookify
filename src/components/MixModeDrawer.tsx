@@ -72,16 +72,7 @@ const MixModeDrawer = ({ isOpen, onOpenChange }: MixModeDrawerProps) => {
           <div className="flex justify-between items-center mb-4 px-4 pt-4">
             <h3 className="text-white font-medium text-lg">Sound Mix</h3>
             <div className="flex gap-2">
-              {/* Saved mixes button */}
-              <button
-                onClick={() => setIsSavedMixesOpen(true)}
-                className="p-2 rounded-full hover:bg-white/10 bg-white/5"
-                title="Saved mixes"
-              >
-                <ChevronDown className="h-4 w-4 text-white/70" />
-              </button>
-              
-              {/* Save button */}
+              {/* Save button only */}
               <button
                 onClick={handleSaveMix}
                 className={`p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all ${state.activeSounds.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
@@ -90,8 +81,6 @@ const MixModeDrawer = ({ isOpen, onOpenChange }: MixModeDrawerProps) => {
               >
                 <Save className="h-4 w-4 text-white/70" />
               </button>
-              
-              {/* Close button */}
               <button 
                 onClick={() => {
                   onOpenChange(false);
