@@ -29,7 +29,7 @@ const AdvancedSettingsDrawer = ({ isOpen, onOpenChange }: AdvancedSettingsDrawer
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-80 bg-black border-white/10 text-white z-50">
+      <SheetContent side="right" className="w-80 bg-black border-white/10 text-white">
         <SheetHeader>
           <SheetTitle className="text-white">Advanced Settings</SheetTitle>
         </SheetHeader>
@@ -71,7 +71,7 @@ const AdvancedSettingsDrawer = ({ isOpen, onOpenChange }: AdvancedSettingsDrawer
               
               {state.timer.playSound && (
                 <RadioGroup 
-                  defaultValue={state.timer.soundType || 'beep'} 
+                  defaultValue="beep" 
                   value={state.timer.soundType || 'beep'} 
                   onValueChange={(value) => updateTimerSettings({ soundType: value as 'beep' | 'bell' })} 
                   className="space-y-1"

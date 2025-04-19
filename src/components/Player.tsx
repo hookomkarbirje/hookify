@@ -2,7 +2,6 @@
 import { usePlayer } from "@/context/PlayerContext";
 import PlayerControls from "./PlayerControls";
 import TimerDisplay from "./TimerDisplay";
-import { useEffect } from "react";
 
 const Player = () => {
   const { state } = usePlayer();
@@ -13,28 +12,18 @@ const Player = () => {
     ? currentSound.backgroundUrl
     : currentBackground.url;
 
-  // Update document title based on current sound
-  useEffect(() => {
-    if (currentSound && state.isPlaying) {
-      document.title = `Playing: ${currentSound.name} | Serene Soundscapes`;
-    } else {
-      document.title = "Serene Soundscapes Player";
-    }
-  }, [currentSound, state.isPlaying]);
-
   return (
     <div className="relative w-full h-screen overflow-hidden bg-black">
-      {/* Background Image with smooth transition */}
+      {/* Background Image */}
       <div className="absolute inset-0 z-0">
         {/* Grid overlay */}
         <div className="absolute inset-0 bg-grid-pattern opacity-20 z-0" />
         
-        {/* Background image with animation */}
+        {/* Background image */}
         <img
           src={backgroundImage}
           alt={currentBackground.name}
-          className="object-cover w-full h-full opacity-80 transition-opacity duration-1000"
-          loading="eager"
+          className="object-cover w-full h-full opacity-80"
         />
         
         {/* Gradient overlay */}

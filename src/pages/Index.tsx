@@ -2,7 +2,6 @@
 import { PlayerProvider } from "@/context/PlayerContext";
 import Player from "@/components/Player";
 import { useEffect } from "react";
-import { Toaster } from "@/components/ui/toaster";
 
 const Index = () => {
   // Make sure React is properly initialized before rendering dialogs
@@ -12,12 +11,9 @@ const Index = () => {
   }, []);
 
   return (
-    <>
-      <PlayerProvider>
-        <Player />
-      </PlayerProvider>
-      <Toaster />
-    </>
+    <PlayerProvider>
+      <Player />
+    </PlayerProvider>
   );
 };
 
