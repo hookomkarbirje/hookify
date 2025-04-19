@@ -12,12 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize timer controller
   timerController.init();
   
-  // Initialize UI controller last, after all other systems are ready
-  uiController.init();
-  
-  // Check for URL parameters (e.g., for shared mixes)
-  const urlParams = new URLSearchParams(window.location.search);
-  const mixParam = urlParams.get('mix');
+  // Initialize mix mode handler
+  const mixParam = new URLSearchParams(window.location.search).get('mix');
   
   if (mixParam) {
     try {
@@ -32,18 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
         mixData.sounds.forEach(soundInfo => {
           const sound = sounds.find(s => s.id === soundInfo.id);
           if (sound) {
-            // Create a modified sound with the stored volume
             const soundWithVolume = { ...sound, volume: soundInfo.volume };
-            
-            // Add to active sounds
             playerState.activeSounds.push(soundWithVolume);
             
-            // Set the audio element's volume
             const audioElement = playerState.audioElements.get(sound.id);
             if (audioElement) {
               audioElement.volume = soundInfo.volume;
               
-              // Play if autoPlay is true
               if (mixData.autoPlay) {
                 audioElement.play().catch(console.error);
                 playerState.isPlaying = true;
@@ -54,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Update UI
         updatePlayerUI();
-        
         toast.success("Mix loaded from shared link!");
       }
     } catch (e) {
@@ -62,9 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
       toast.error('Could not load the shared mix');
     }
     
-    // Clean up URL to prevent repeated loading
+    // Clean up URL
     window.history.replaceState({}, document.title, window.location.pathname);
   }
+  
+  // Initialize UI controller last
+  uiController.init();
 });
 
 // Handle page visibility changes

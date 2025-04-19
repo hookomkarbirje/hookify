@@ -1,6 +1,5 @@
-
 /**
- * Player functionality module for sound playback and management
+ * Player functionality module
  */
 
 // Player state object
@@ -39,7 +38,7 @@ const playerState = {
     showNotifications: false,
   },
   
-  // Saved mixes
+  // Mix mode state
   savedMixes: [],
   
   // Initialize player
@@ -129,6 +128,7 @@ const playerState = {
               audio.volume = this.volume;
               audio.play().catch(error => {
                 console.error('Error playing audio:', error);
+                toast.error('Failed to play audio');
               });
             }
           }, 500);
@@ -282,13 +282,11 @@ const playerState = {
       // Stop all sounds
       this.audioElements.forEach(audio => audio.pause());
       
-      // Play current sound if playing
       if (this.isPlaying && this.currentSound) {
         const audio = this.audioElements.get(this.currentSound.id);
         if (audio) {
           audio.play().catch(console.error);
           
-          // Update background if using sound's background
           if (this.useBackgroundFromSound && this.currentSound.backgroundUrl) {
             this.updateBackgroundImage(this.currentSound.backgroundUrl);
           }
@@ -297,7 +295,6 @@ const playerState = {
       
       toast.info('Single mode activated');
     } else {
-      // Switch to mix mode
       this.isMixMode = true;
       this.activeSounds = this.currentSound ? [{ ...this.currentSound, volume: this.volume }] : [];
       this.currentSound = null;
@@ -307,8 +304,6 @@ const playerState = {
     }
     
     this.persistState();
-    
-    // Update UI
     updatePlayerUI();
   },
   
@@ -418,20 +413,17 @@ const playerState = {
       return;
     }
     
-    // Pause all current sounds
     this.audioElements.forEach(audio => audio.pause());
     
     if (!this.isMixMode) {
       this.isMixMode = true;
     }
     
-    // Load sounds from the mix
     const activeSoundObjects = mix.sounds.map(soundInfo => {
       const sound = sounds.find(s => s.id === soundInfo.id);
       return sound ? { ...sound, volume: soundInfo.volume } : null;
     }).filter(Boolean);
     
-    // Load background
     if (mix.backgroundId) {
       const background = backgroundImages.find(bg => bg.id === mix.backgroundId);
       if (background) {
