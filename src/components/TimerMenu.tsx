@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { 
@@ -35,7 +34,6 @@ const TimerMenu = ({ className }: TimerMenuProps) => {
 
   const handleAdd10Minutes = () => {
     addMinutesToTimer(10);
-    toast("Added 10 minutes to timer");
     setIsOpen(false);
   };
 

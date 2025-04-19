@@ -29,6 +29,7 @@ interface PlayerContextType {
   deleteMix: (mixId: string) => void;
   getSavedMixes: () => SavedMix[];
   shareMix: (mixId: string) => string;
+  addMinutesToTimer: (minutes: number) => void; // Add this missing method declaration
 }
 
 const initialState: PlayerState = {
@@ -693,6 +694,21 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     return shareUrl;
   };
 
+  // Let's add the missing function implementation
+  const addMinutesToTimer = (minutes: number) => {
+    if (!state.timer.isActive) return;
+    
+    setState(prevState => ({
+      ...prevState,
+      timer: {
+        ...prevState.timer,
+        remaining: prevState.timer.remaining + (minutes * 60)
+      }
+    }));
+    
+    toast.success(`Added ${minutes} minutes to timer`);
+  };
+
   return (
     <PlayerContext.Provider
       value={{
@@ -718,6 +734,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         deleteMix,
         getSavedMixes,
         shareMix,
+        addMinutesToTimer, // Add the function to the context value
       }}
     >
       {children}
