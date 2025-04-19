@@ -4,303 +4,383 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Serene Soundscapes Player</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Serene Sound Player</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.316.0/font/lucide-icons.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap">
 </head>
 <body>
-  <div id="player-container">
-    <!-- Background Image -->
+  <div class="player-container">
+    <!-- Background elements -->
     <div class="background-container">
       <div class="grid-overlay"></div>
-      <img id="background-image" src="https://source.unsplash.com/random/1920x1080/?nature" alt="Background">
+      <img id="background-image" src="https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?q=80&w=2878" alt="Background" class="background-image">
       <div class="gradient-overlay"></div>
     </div>
 
-    <!-- Sound Information Display -->
+    <!-- Sound information display -->
     <div id="sound-info" class="sound-info">
-      <p id="sound-text">Select a sound to begin</p>
+      <p id="sound-name-display" class="sound-name">Select a sound to begin</p>
     </div>
 
     <!-- Timer Display (initially hidden) -->
     <div id="timer-display" class="timer-display hidden">
-      <h2 class="timer-title">Focus Timer</h2>
-      <div id="timer-mode-tabs" class="timer-mode-tabs hidden">
-        <button id="focus-tab" class="timer-tab active">FOCUS</button>
-        <button id="break-tab" class="timer-tab">BREAK</button>
-      </div>
-      <div id="timer-time" class="timer-time">00:00</div>
-      <div class="timer-controls">
-        <button id="timer-play-pause" class="control-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-        </button>
-        <button id="timer-menu" class="control-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-        </button>
-      </div>
-      <div id="timer-rounds" class="timer-rounds hidden"></div>
-      <div id="timer-round-info" class="timer-round-info hidden"></div>
-      <div id="timer-task" class="timer-task hidden"></div>
-      <div class="timer-progress-container">
-        <div id="timer-progress" class="timer-progress"></div>
-      </div>
-    </div>
-    
-    <!-- Mix Panel (initially hidden) -->
-    <div id="mix-panel" class="mix-panel hidden">
-      <div class="mix-panel-content">
-        <h3 class="text-center mb-4">Sound Mix</h3>
-        <div id="mix-sounds" class="mix-sounds"></div>
+      <div class="timer-container">
+        <!-- Timer header -->
+        <div class="timer-header">
+          <h2 class="timer-title">Focus Timer</h2>
+        </div>
+
+        <!-- Timer mode tabs (only for Pomodoro) -->
+        <div id="timer-mode-tabs" class="timer-mode-tabs hidden">
+          <button id="focus-tab" class="timer-tab active">FOCUS</button>
+          <button id="break-tab" class="timer-tab">BREAK</button>
+        </div>
+
+        <!-- Timer time display -->
+        <div id="time-display" class="time-display">00:00</div>
+
+        <!-- Timer controls -->
+        <div class="timer-controls">
+          <button id="pause-resume-timer" class="timer-control-btn">
+            <i class="lucide-play"></i>
+          </button>
+          <div class="timer-menu">
+            <button id="timer-menu-btn" class="timer-control-btn">
+              <i class="lucide-more-horizontal"></i>
+            </button>
+            <div id="timer-menu-dropdown" class="timer-menu-dropdown hidden">
+              <button id="complete-timer" class="menu-item">
+                <i class="lucide-check"></i> Complete Timer
+              </button>
+              <button id="restart-timer" class="menu-item">
+                <i class="lucide-refresh-cw"></i> Restart Timer
+              </button>
+              <button id="add-minutes" class="menu-item">
+                <i class="lucide-plus"></i> Add 10 Minutes
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Round indicators -->
+        <div id="round-indicators" class="round-indicators hidden"></div>
+        <div id="round-info" class="round-info hidden"></div>
+
+        <!-- Task display -->
+        <div id="task-display" class="task-display hidden"></div>
+
+        <!-- Progress bar -->
+        <div class="progress-container">
+          <div id="timer-progress" class="progress-bar"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Mode Switcher -->
+    <!-- Mode switcher -->
     <div class="mode-switcher">
-      <div class="mode-switcher-container">
-        <button id="explore-button" class="mode-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+      <div class="mode-container">
+        <button id="explore-btn" class="mode-btn">
+          <i class="lucide-music"></i>
         </button>
         <div class="mode-tabs">
           <button id="play-mode" class="mode-tab active">PLAY</button>
           <button id="mix-mode" class="mode-tab">MIX</button>
         </div>
-        <button id="mix-library-button" class="mode-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="12" x2="15" y2="12"></line><line x1="9" y1="15" x2="13" y2="15"></line></svg>
+        <button id="library-btn" class="mode-btn">
+          <i class="lucide-library"></i>
         </button>
       </div>
-      <div id="current-sound-name" class="current-sound-name hidden"></div>
+      <span id="current-sound-label" class="current-sound-label hidden"></span>
     </div>
 
-    <!-- Sound Icons Scroll Area -->
-    <div id="sound-scrollarea" class="sound-scrollarea">
-      <div id="sound-icons" class="sound-icons">
-        <!-- Sound icons will be added here dynamically -->
+    <!-- Sound Selector Scroll Area -->
+    <div id="sound-scroller" class="sound-scroller">
+      <div class="sounds-container" id="sounds-container">
+        <!-- Sound icons will be generated here by JavaScript -->
       </div>
     </div>
 
-    <!-- Main Control Panel -->
+    <!-- Mix Panel (initially hidden) -->
+    <div id="mix-panel" class="mix-panel hidden">
+      <div class="mix-panel-inner">
+        <h3 class="mix-panel-title">Sound Mix</h3>
+        <div id="mix-sounds" class="mix-sounds">
+          <!-- Active sounds with volume controls will be added here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Player Controls -->
     <div class="player-controls">
-      <div class="controls-container">
+      <div class="control-panel">
         <div class="control-group">
-          <button id="background-button" class="control-button" title="Background gallery">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
+          <button id="background-btn" class="control-button" title="Background gallery">
+            <i class="lucide-image"></i>
           </button>
-          <button id="timer-button" class="control-button" title="Set timer">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <button id="timer-btn" class="control-button" title="Set timer">
+            <i class="lucide-timer"></i>
           </button>
         </div>
-        <button id="play-button" class="play-button" title="Play">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+
+        <button id="play-pause-btn" class="play-button" title="Play">
+          <i class="lucide-play"></i>
         </button>
+
         <div class="control-group">
-          <button id="hide-button" class="control-button" title="Hide interface">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>
+          <button id="hide-btn" class="control-button" title="Hide interface">
+            <i class="lucide-eye-off"></i>
           </button>
-          <button id="settings-button" class="control-button" title="Advanced settings">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"></path><path d="M14 17H5"></path><circle cx="17" cy="17" r="3"></circle><circle cx="7" cy="7" r="3"></circle></svg>
+          <button id="settings-btn" class="control-button" title="Advanced settings">
+            <i class="lucide-settings-2"></i>
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- When UI is hidden, only show eye button -->
+    <div id="show-ui-btn" class="show-ui-button hidden">
+      <i class="lucide-eye"></i>
     </div>
   </div>
 
-  <!-- Modals -->
-  <!-- Timer Modal -->
-  <div id="timer-modal" class="modal hidden">
-    <div class="modal-content">
+  <!-- Modal container -->
+  <div id="modal-container" class="modal-container hidden"></div>
+
+  <!-- Templates -->
+  <template id="timer-modal-template">
+    <div class="modal timer-modal">
       <div class="modal-header">
         <div class="modal-icon-container">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <i class="lucide-timer"></i>
         </div>
-        <h2>Focus Timer</h2>
+        <h2 class="modal-title">Focus Timer</h2>
       </div>
-      <div class="modal-body">
-        <div class="timer-tabs">
-          <button id="pomodoro-tab" class="tab active">Pomodoro</button>
-          <button id="simple-tab" class="tab">Simple Timer</button>
+      <div class="modal-content">
+        <!-- Timer type selector -->
+        <div class="timer-type-selector">
+          <button class="timer-type-btn active" data-type="pomodoro">Pomodoro</button>
+          <button class="timer-type-btn" data-type="simple">Simple Timer</button>
         </div>
-        <input type="text" id="timer-task-input" placeholder="What's getting done?" class="task-input">
-        <div class="timer-settings">
-          <div class="timer-duration-display">
-            <div class="time-setting">
-              <div class="time-value">25</div>
-              <div class="time-label">Focus (min)</div>
-            </div>
-            <div class="time-setting break-setting">
-              <div class="time-value">5</div>
-              <div class="time-label">Short Break (min)</div>
-            </div>
-            <div class="custom-link">
-              <span>Custom</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </div>
+
+        <!-- Task input -->
+        <input type="text" class="task-input" placeholder="What's getting done?">
+
+        <!-- Timer durations -->
+        <div class="timer-durations">
+          <div class="focus-duration">
+            <div class="time-display">25</div>
+            <div class="time-label">Focus (min)</div>
           </div>
-          <div id="rounds-container" class="rounds-container">
-            <button id="decrease-rounds" class="rounds-button">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
-            <div class="rounds-info">
-              <div class="rounds-count">Rounds: <span id="rounds-value">1</span></div>
-              <div class="rounds-detail">1 × Focus Time + 1 × Short Break</div>
-            </div>
-            <button id="increase-rounds" class="rounds-button">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
+          <div class="break-duration">
+            <div class="time-display">5</div>
+            <div class="time-label">Short Break (min)</div>
           </div>
+          <div class="custom-settings">
+            <span>Custom</span>
+            <i class="lucide-chevron-right"></i>
+          </div>
+        </div>
+
+        <!-- Round selector - only for Pomodoro -->
+        <div class="round-selector">
+          <button class="round-btn decrement">
+            <i class="lucide-minus"></i>
+          </button>
+          <div class="round-info">
+            <div class="round-count">Rounds: <span class="rounds">1</span></div>
+            <div class="round-breakdown">1 × Focus Time + 1 × Short Break</div>
+          </div>
+          <button class="round-btn increment">
+            <i class="lucide-plus"></i>
+          </button>
         </div>
       </div>
       <div class="modal-footer">
-        <button id="timer-cancel" class="button secondary">Cancel</button>
-        <button id="timer-start" class="button primary">Start</button>
+        <button class="modal-btn cancel-btn">Cancel</button>
+        <button class="modal-btn start-btn">Start</button>
       </div>
     </div>
-  </div>
+  </template>
 
-  <!-- Timer Settings Modal -->
-  <div id="timer-settings-modal" class="modal hidden">
-    <div class="modal-content">
+  <template id="background-modal-template">
+    <div class="modal background-modal">
       <div class="modal-header">
-        <h2>Settings</h2>
-        <p>Adjust Focus Timer Intervals</p>
+        <h2 class="modal-title"><i class="lucide-image"></i> Background Gallery</h2>
       </div>
-      <div class="modal-body">
-        <div class="timer-tabs settings-tabs">
-          <button id="pomodoro-settings-tab" class="tab active">Pomodoro</button>
-          <button id="simple-settings-tab" class="tab">Simple Timer</button>
-        </div>
-        
-        <div class="slider-container">
-          <div class="slider-header">
-            <label>Focus Time</label>
-            <div class="slider-value"><span id="focus-time-display">25:00</span></div>
-          </div>
-          <input type="range" id="focus-time-slider" min="5" max="60" step="5" value="25" class="slider">
-        </div>
-        
-        <div id="break-slider-container" class="slider-container">
-          <div class="slider-header">
-            <label>Short break</label>
-            <div class="slider-value"><span id="break-time-display">05:00</span></div>
-          </div>
-          <input type="range" id="break-time-slider" min="1" max="15" step="1" value="5" class="slider">
-        </div>
-        
-        <div class="custom-time-container">
-          <h3>Custom Time</h3>
-          <div class="custom-time-input">
-            <label>Focus Time (1-120 min)</label>
-            <input type="text" id="custom-focus-input" placeholder="Enter minutes" class="custom-input">
-          </div>
-          <div id="custom-break-container" class="custom-time-input">
-            <label>Break Time (1-30 min)</label>
-            <input type="text" id="custom-break-input" placeholder="Enter minutes" class="custom-input">
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button id="settings-done" class="button primary full-width">Done</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Background Gallery Modal -->
-  <div id="background-gallery-modal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
-          Background Gallery
-        </h2>
-      </div>
-      <div class="modal-body">
-        <div id="use-sound-bg-container" class="use-sound-bg hidden">
-          <div class="use-sound-bg-content">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+      <div class="modal-content">
+        <div id="sound-background-toggle" class="sound-background-toggle hidden">
+          <div class="toggle-label">
+            <i class="lucide-music"></i>
             <span>Use sound image as background</span>
           </div>
           <label class="switch">
-            <input id="use-sound-bg-toggle" type="checkbox">
+            <input type="checkbox" id="use-sound-bg" checked>
             <span class="slider round"></span>
           </label>
         </div>
         
-        <div id="background-grid" class="background-grid">
-          <!-- Background thumbnails will be dynamically added here -->
+        <div class="background-grid" id="background-grid">
+          <!-- Backgrounds will be added here by JavaScript -->
         </div>
       </div>
     </div>
-  </div>
+  </template>
 
-  <!-- Explore Modal -->
-  <div id="explore-modal" class="modal hidden">
-    <div class="modal-content">
+  <template id="explore-drawer-template">
+    <div class="drawer explore-drawer">
+      <div class="drawer-header">
+        <h2 class="drawer-title">Explore</h2>
+        <button class="close-drawer-btn">
+          <i class="lucide-x"></i>
+        </button>
+      </div>
+      <div class="drawer-content">
+        <!-- Scenarios section -->
+        <div class="scenarios-section">
+          <h3 class="section-title">Scenarios</h3>
+          <div class="scenarios-list">
+            <!-- Scenarios will be added here by JavaScript -->
+          </div>
+        </div>
+        
+        <!-- Sound categories sections -->
+        <div class="categories-container">
+          <!-- Categories and sounds will be added here by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="settings-drawer-template">
+    <div class="drawer settings-drawer">
+      <div class="drawer-header">
+        <h2 class="drawer-title">Advanced Settings</h2>
+      </div>
+      <div class="drawer-content">
+        <!-- Volume control -->
+        <div class="settings-section">
+          <h3 class="section-title">Volume Control</h3>
+          <div class="volume-control">
+            <i class="lucide-volume-2"></i>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8">
+          </div>
+        </div>
+        
+        <div class="separator"></div>
+        
+        <!-- Timer settings -->
+        <div class="settings-section">
+          <h3 class="section-title">Timer Settings</h3>
+          
+          <div class="setting-item">
+            <label class="setting-label">Timer Sound Effect</label>
+            <div class="setting-control">
+              <span class="setting-desc">Enabled</span>
+              <label class="switch">
+                <input type="checkbox" id="timer-sound-toggle" checked>
+                <span class="slider round"></span>
+              </label>
+            </div>
+            
+            <div class="sound-type-selector">
+              <div class="sound-type-option">
+                <input type="radio" id="beep-sound" name="sound-type" value="beep" checked>
+                <label for="beep-sound">
+                  <i class="lucide-bell"></i> Beep Sound
+                </label>
+              </div>
+              <div class="sound-type-option">
+                <input type="radio" id="bell-sound" name="sound-type" value="bell">
+                <label for="bell-sound">
+                  <i class="lucide-bell"></i> Bell Sound
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="separator"></div>
+          
+          <div class="setting-item">
+            <div class="setting-control">
+              <span class="setting-desc">Auto Start Timers</span>
+              <label class="switch">
+                <input type="checkbox" id="auto-start-toggle" checked>
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="setting-item">
+            <div class="setting-control">
+              <span class="setting-desc">Hide Seconds</span>
+              <label class="switch">
+                <input type="checkbox" id="hide-seconds-toggle">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="setting-item">
+            <div class="setting-control">
+              <span class="setting-desc">Browser Notifications</span>
+              <label class="switch">
+                <input type="checkbox" id="notifications-toggle">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="mix-drawer-template">
+    <div class="drawer mix-drawer">
+      <div class="drawer-header">
+        <h2 class="drawer-title">Sound Mix</h2>
+        <div class="drawer-actions">
+          <button class="drawer-action-btn" id="saved-mixes-btn" title="View saved mixes">
+            <i class="lucide-book-marked"></i>
+          </button>
+          <button class="drawer-action-btn" id="save-mix-btn" title="Save current mix">
+            <i class="lucide-save"></i>
+          </button>
+          <button class="close-drawer-btn">
+            <i class="lucide-x"></i>
+          </button>
+        </div>
+      </div>
+      <div class="drawer-content">
+        <div class="mix-sounds-grid" id="mix-sounds-grid">
+          <!-- Sound tiles will be added here by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="saved-mixes-template">
+    <div class="modal saved-mixes-modal">
       <div class="modal-header">
-        <h2>Explore Sounds</h2>
-      </div>
-      <div class="modal-body">
-        <div class="category-tabs" id="category-tabs">
-          <!-- Categories will be added here dynamically -->
-        </div>
-        <div id="sound-list" class="sound-list">
-          <!-- Sounds will be added here dynamically -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Mix Mode Drawer -->
-  <div id="mix-drawer" class="drawer hidden">
-    <div class="drawer-content">
-      <div class="drawer-header">
-        <h2>Sound Mix</h2>
-        <button id="close-mix-drawer" class="close-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <h2 class="modal-title">Saved Mixes</h2>
+        <button class="close-modal-btn">
+          <i class="lucide-x"></i>
         </button>
       </div>
-      <div class="drawer-body">
-        <div id="mix-tiles-container" class="mix-tiles-container">
-          <!-- Mix tiles will be added here dynamically -->
-        </div>
-      </div>
-      <div class="drawer-footer">
-        <div class="mixer-controls">
-          <button id="save-mix" class="mixer-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-            Save Mix
-          </button>
-          <button id="show-saved-mixes" class="mixer-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="12" x2="15" y2="12"></line><line x1="9" y1="15" x2="13" y2="15"></line></svg>
-            Saved Mixes
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Saved Mixes Drawer -->
-  <div id="saved-mixes-drawer" class="drawer hidden">
-    <div class="drawer-content">
-      <div class="drawer-header">
-        <h2>Saved Mixes</h2>
-        <button id="close-saved-mixes-drawer" class="close-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-      </div>
-      <div class="drawer-body">
+      <div class="modal-content">
         <div id="saved-mixes-container" class="saved-mixes-container">
-          <!-- Saved mixes will be added here dynamically -->
+          <!-- Saved mixes will be added here by JavaScript or empty state shown -->
         </div>
       </div>
     </div>
-  </div>
+  </template>
 
-  <!-- Toast notification -->
-  <div id="toast" class="toast hidden"></div>
-
-  <!-- Show UI Button (visible when UI is hidden) -->
-  <div id="show-ui-button" class="show-ui-button hidden">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-  </div>
-
-  <script src="script.js"></script>
+  <!-- Load data and scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
