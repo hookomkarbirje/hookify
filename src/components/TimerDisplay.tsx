@@ -77,15 +77,15 @@ const TimerDisplay = () => {
           <div className="flex gap-10 mb-4">
             <button 
               onClick={() => timer.mode === 'break' && resetTimer('focus')} 
-              className={cn("text-xs uppercase tracking-widest font-medium", 
-                timer.mode === 'focus' ? "text-white" : "text-gray-500")}
+              className={cn("text-xs uppercase tracking-widest font-medium transition-colors", 
+                timer.mode === 'focus' ? "text-white" : "text-gray-500 hover:text-white/70")}
             >
               FOCUS
             </button>
             <button 
               onClick={() => timer.mode === 'focus' && resetTimer('break')} 
-              className={cn("text-xs uppercase tracking-widest font-medium", 
-                timer.mode === 'break' ? "text-white" : "text-gray-500")}
+              className={cn("text-xs uppercase tracking-widest font-medium transition-colors", 
+                timer.mode === 'break' ? "text-white" : "text-gray-500 hover:text-white/70")}
             >
               BREAK
             </button>
@@ -93,7 +93,7 @@ const TimerDisplay = () => {
         )}
 
         {/* Timer display */}
-        <div className={cn("text-white font-extralight mb-4", isMobile ? "text-6xl" : "text-8xl")}>
+        <div className={cn("text-white font-extralight mb-4 transition-all", isMobile ? "text-6xl" : "text-8xl")}>
           {displayTime}
         </div>
         
@@ -119,10 +119,10 @@ const TimerDisplay = () => {
               <div 
                 key={index} 
                 className={cn(
-                  "w-2 h-2 rounded-full", 
+                  "w-2 h-2 rounded-full transition-all", 
                   index < timer.completedRounds || (index === timer.currentRound && timer.mode === 'break') 
                     ? "bg-white" 
-                    : "bg-white/30"
+                    : "bg-white/30 hover:bg-white/50"
                 )} 
               />
             ))}

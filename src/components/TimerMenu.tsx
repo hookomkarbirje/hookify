@@ -17,7 +17,7 @@ interface TimerMenuProps {
 }
 
 const TimerMenu = ({ className }: TimerMenuProps) => {
-  const { state, resetTimer, cancelTimer, pauseResumeTimer } = usePlayer();
+  const { state, resetTimer, cancelTimer, addMinutesToTimer } = usePlayer();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -34,31 +34,7 @@ const TimerMenu = ({ className }: TimerMenuProps) => {
   };
 
   const handleAdd10Minutes = () => {
-    // Since we can't directly modify the timer state from here,
-    // we'll need to reset with the current remaining time + 10 minutes
-    const currentMode = state.timer.mode;
-    const currentDuration = currentMode === 'focus' ? state.timer.duration : state.timer.breakDuration;
-    const newDuration = currentDuration + 10 * 60;
-    
-    // Reset the timer with the new duration
-    if (currentMode === 'focus') {
-      const newTimer = {
-        ...state.timer,
-        duration: newDuration,
-        remaining: newDuration
-      };
-      
-      resetTimer('focus');
-    } else {
-      const newTimer = {
-        ...state.timer,
-        breakDuration: newDuration,
-        remaining: newDuration
-      };
-      
-      resetTimer('break');
-    }
-    
+    addMinutesToTimer(10);
     toast("Added 10 minutes to timer");
     setIsOpen(false);
   };
